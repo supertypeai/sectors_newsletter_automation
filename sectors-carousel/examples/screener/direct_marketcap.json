@@ -1,0 +1,30 @@
+{
+  "_status": 200,
+  "_params": {
+    "where": "market_cap > 500000000000000",
+    "order_by": "-market_cap",
+    "limit": "5"
+  },
+  "data": {
+    "results": [
+      {
+        "symbol": "BBCA.JK",
+        "company_name": "PT Bank Central Asia Tbk."
+      },
+      {
+        "symbol": "BREN.JK",
+        "company_name": "PT Barito Renewables Energy Tbk."
+      }
+    ],
+    "pagination": {
+      "total_count": 2,
+      "showing": 2,
+      "limit": 5,
+      "offset": 0,
+      "has_next": false,
+      "has_previous": false,
+      "next_offset": null,
+      "previous_offset": null
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "_status": 200,
+  "data": {
+    "results": [
+      {
+        "symbol": "AADI.JK",
+        "company_name": "PT Adaro Andalan Indonesia Tbk"
+      },
+      {
+        "symbol": "ADMR.JK",
+        "company_name": "PT Alamtri Minerals Indonesia Tbk"
+      },
+      {
+        "symbol": "ADRO.JK",
+        "company_name": "Alamtri Resources Indonesia Tbk"
+      },
+      "__+7_more (total 10)__"
+    ],
+    "pagination": {
+      "total_count": 45,
+      "showing": 10,
+      "limit": 10,
+      "offset": 0,
+      "has_next": true,
+      "has_previous": false,
+      "next_offset": 10,
+      "previous_offset": null
+    }
+  }
+}

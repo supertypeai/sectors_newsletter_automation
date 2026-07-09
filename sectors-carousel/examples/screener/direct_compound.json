@@ -1,0 +1,34 @@
+{
+  "_status": 200,
+  "_params": {
+    "where": "sector = 'Financials' and listing_date > '2005-01-01'",
+    "limit": "5"
+  },
+  "data": {
+    "results": [
+      {
+        "symbol": "AGRS.JK",
+        "company_name": "PT Bank IBK Indonesia Tbk."
+      },
+      {
+        "symbol": "AMAG.JK",
+        "company_name": "Asuransi Multi Artha Guna Tbk"
+      },
+      {
+        "symbol": "AMAR.JK",
+        "company_name": "PT Bank Amar Indonesia Tbk."
+      },
+      "__+2_more (total 5)__"
+    ],
+    "pagination": {
+      "total_count": 58,
+      "showing": 5,
+      "limit": 5,
+      "offset": 0,
+      "has_next": true,
+      "has_previous": false,
+      "next_offset": 5,
+      "previous_offset": null
+    }
+  }
+}

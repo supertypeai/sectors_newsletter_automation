@@ -1,0 +1,347 @@
+/* ============================================================
+   Sectors Carousel — theme + components
+   Tokens are frozen from references/house-style.md.
+   Each slide renders standalone at native 1080xH (no scaling).
+   fonts.css (base64 @font-face) is inlined BEFORE this file by render.mjs.
+   ============================================================ */
+:root {
+  /* palette */
+  --brandPink:#E5337E;  --brandGold:#DF9439;
+  --gain:#1FB36A;       --loss:#E0003B;
+  --bg:#0C0A09;         --surface:#1E1916;   --surface2:#14100E;
+  --text:#F6F1EE;       --muted:#A99F99;     --dim:#6E6661;
+  /* peer-comparison chart colors (radar/multiline/stackedbar peer series only — NOT for
+     free-HTML text/UI). Deliberately not --dim: at 2-3px stroke weight on the near-black
+     background it reads as invisible, silently dropping a whole series. Kept out of pink/
+     gold (reserved for the "self" series) and out of gain/loss (reserved for up/down). */
+  --peerBlue:#7C93C9;   --peerPlum:#9B7EBD;
+
+  /* derived */
+  --brandGradient:linear-gradient(to right,#E5337E 0%,#DF9439 100%);
+  --border:rgba(246,241,238,0.12);
+  --border2:rgba(246,241,238,0.07);
+  --nebula:radial-gradient(ellipse 80% 55% at 50% 0%, rgba(229,51,126,0.20), transparent 70%);
+  --dots:radial-gradient(circle, rgba(246,241,238,0.10) 1.5px, transparent 1.5px);
+  --glassBg:rgba(28,23,20,0.42);
+  --glassBorder:rgba(246,241,238,0.14);
+  --glassBlur:blur(22px) saturate(135%);
+  --glassShadow:0 12px 38px -16px rgba(0,0,0,0.6), inset 0 1px 0 rgba(246,241,238,0.08);
+  --radius:16px; --radiusCard:22px;
+
+  --sans:'Plus Jakarta Sans',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+
+* { box-sizing:border-box; }
+html,body { margin:0; padding:0; }
+body { background:#000; }
+
+/* ---- the stage (one slide) ---- */
+.stage {
+  position:relative;
+  width:1080px; height:1350px;       /* overridden per format by an inline style */
+  background:var(--bg);
+  font-family:var(--sans); color:var(--text);
+  font-feature-settings:"tnum";
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
+.layer { position:absolute; inset:0; pointer-events:none; }
+.layer.nebula { background:var(--nebula); }
+.layer.dots   { background-image:var(--dots); background-size:30px 30px; }
+.content {
+  position:absolute; inset:0;
+  padding:80px 72px 76px;             /* PAD_TOP / PAD_X / PAD_BOT */
+  display:flex; flex-direction:column;
+}
+.stack { display:flex; flex-direction:column; }
+.spacer { flex:1 1 auto; min-height:24px; }
+.row { display:flex; gap:24px; align-items:stretch; }
+.row > * { flex:1 1 0; min-width:0; }
+
+/* ---- type atoms (ramp from house-style.md) ---- */
+.kicker {
+  font-family:var(--mono); font-size:22px; font-weight:500;
+  color:var(--brandGold); text-transform:uppercase; letter-spacing:0.16em;
+}
+.label {
+  font-size:26px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;
+  color:var(--muted);
+}
+.title { font-size:46px; font-weight:700; letter-spacing:-0.02em; line-height:1.08; }
+.subhead { font-size:38px; font-weight:600; line-height:1.25; }
+.body { font-size:34px; font-weight:500; line-height:1.45; color:var(--text); }
+.caption-t { font-size:22px; font-weight:500; color:var(--muted); }
+.num { font-family:var(--mono); font-weight:700; }
+.gradient-text {
+  background:var(--brandGradient); -webkit-background-clip:text; background-clip:text; color:transparent;
+  /* background-clip:text on an inline span that wraps mid-phrase miscalculates the clip
+     mask for the wrapped fragment and shears the top off tall strokes (e.g. "y"). Since
+     the gradient is meant to be one short verdict word/phrase anyway, keep it unbreakable. */
+  white-space:nowrap;
+}
+
+/* ---- auto-fit: any single-line numeric display that must never wrap.
+   render.mjs shrinks font-size after layout until it fits one line, so a long
+   value ("Rp 2,840") and a short one ("87%") in the same row both land clean
+   without per-component size tiers. Built-in on .value/.price; opt in on
+   free-HTML numbers with class="num autofit". ---- */
+.value, .price, .autofit { white-space:nowrap; overflow:hidden; }
+
+/* ---- glass surface ---- */
+.glass {
+  background:var(--glassBg);
+  -webkit-backdrop-filter:var(--glassBlur); backdrop-filter:var(--glassBlur);
+  border:1px solid var(--glassBorder);
+  border-radius:var(--radiusCard);
+  box-shadow:var(--glassShadow);
+  padding:30px 34px;
+}
+
+/* ---- ticker logo (shared): real logo = image only, no fill; monogram = gradient fallback ---- */
+.logo--img { background:transparent; }
+.logo--img img { width:100%; height:100%; object-fit:contain; display:block; }
+.logo--mono { background:var(--brandGradient); color:#fff; font-family:var(--mono); font-weight:700; display:grid; place-items:center; }
+
+/* ---- ticker chip ---- */
+.chip { display:inline-flex; align-items:center; gap:14px; }
+.chip .logo { width:52px; height:52px; border-radius:14px; overflow:hidden; flex-shrink:0; }
+.chip .logo--mono { font-size:22px; }
+.chip .pill {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:999px; padding:9px 20px;
+  font-family:var(--mono); font-weight:600; font-size:26px; letter-spacing:0.01em;
+}
+.chip .pill .dollar { color:var(--dim); }
+.chip-row { display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+.cover-vs { font-family:var(--mono); font-size:22px; font-weight:600; color:var(--dim); }
+
+/* ---- delta pill ---- */
+.delta {
+  display:inline-flex; align-items:center; gap:8px;
+  font-family:var(--mono); font-weight:700; font-size:26px;
+  padding:7px 16px; border-radius:999px; white-space:nowrap;
+}
+.delta.up   { color:var(--gain); background:rgba(31,179,106,0.12); }
+.delta.down { color:var(--loss); background:rgba(224,0,59,0.12); }
+.delta.flat { color:var(--muted); background:rgba(169,159,153,0.12); }
+
+/* ---- footer strip (cover/outro) ---- */
+.footer {
+  display:flex; align-items:center; justify-content:space-between;
+  padding-top:22px; margin-top:30px; flex-shrink:0;
+}
+.footer .brand { display:flex; align-items:center; gap:10px; }
+.footer .brand svg { height:22px; width:auto; display:block; }
+.footer .wordmark { font-weight:800; font-size:19px; letter-spacing:-0.01em; }
+.footer .handles { display:flex; align-items:center; gap:14px; font-family:var(--mono); font-size:15px; font-weight:500; color:var(--text); }
+.footer .hitem { display:flex; align-items:center; gap:8px; }
+.footer .hitem svg { width:18px; height:18px; }
+.footer .divider { width:2px; height:18px; background:rgba(246,241,238,0.45); border-radius:1px; }
+.footer .attr { color:var(--muted); }
+
+/* ---- block: stat ---- */
+.b-stat .label { margin-bottom:8px; }
+.b-stat .value { line-height:1; }
+.b-stat.hero .value { font-size:172px; line-height:0.92; letter-spacing:-0.02em; white-space:nowrap; }
+.b-stat .value.s1 { font-size:80px; } .b-stat .value.s2 { font-size:64px; } .b-stat .value.s3 { font-size:48px; }
+.b-stat .sub { margin-top:10px; }
+
+/* ---- block: keyFacts (glass cards) ---- */
+.b-keyfacts { display:grid; gap:24px; }
+/* minmax(0,1fr), not 1fr: without it a track's min-content (a long nowrap .value) steals
+   space from its neighbors, so cards end up unequal width. Same fix .row already applies
+   via min-width:0 on its flex children. */
+.b-keyfacts.cols-2 { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.b-keyfacts.cols-3 { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.b-keyfacts .card { display:flex; flex-direction:column; gap:10px; }
+.b-keyfacts .card .value { font-family:var(--mono); font-weight:700; font-size:64px; }
+
+/* ---- block: priceSnapshot ---- */
+.b-price .head { display:flex; align-items:center; justify-content:space-between; }
+.b-price .price { font-family:var(--mono); font-weight:700; font-size:96px; margin:24px 0 4px; }
+
+/* ---- block: rangeBar ---- */
+.b-range .track {
+  position:relative; height:22px; border-radius:11px;
+  background:var(--surface2); border:1px solid var(--border2); margin:26px 0;
+}
+.b-range .fill { position:absolute; left:0; top:0; bottom:0; border-radius:11px; background:var(--brandGradient); opacity:0.4; }
+.b-range .marker {
+  position:absolute; top:-8px; width:10px; height:38px; margin-left:-5px; border-radius:5px;
+  background:var(--brandPink); box-shadow:0 0 0 7px rgba(223,148,57,0.18);
+}
+.b-range .cur { position:absolute; top:-46px; transform:translateX(-50%); font-family:var(--mono); font-weight:700; font-size:34px; white-space:nowrap; }
+.b-range .ends { display:flex; justify-content:space-between; }
+.b-range .ends .num { font-size:36px; }
+
+/* ---- block: dividendHistory (div bars) ---- */
+.b-div .bars { display:flex; align-items:flex-end; gap:20px; height:300px; }
+.b-div .col { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:10px; }
+.b-div .col .dps { font-family:var(--mono); font-weight:700; font-size:30px; }
+.b-div .col .bar { width:56%; border-radius:8px 8px 0 0; background:linear-gradient(to top,var(--brandPink),var(--brandGold)); }
+.b-div .col .yr { font-family:var(--mono); font-size:24px; color:var(--muted); margin-top:6px; }
+.b-div .summary { display:flex; justify-content:space-between; margin-top:24px; }
+.b-div .summary .num { font-size:56px; }
+
+/* ---- block: ownership ---- */
+.b-own { display:flex; align-items:center; gap:56px; }
+.b-own .rows { flex:1; display:flex; flex-direction:column; gap:22px; }
+.b-own .r .top { display:flex; justify-content:space-between; }
+.b-own .r .name { font-size:30px; } .b-own .r .pct { font-family:var(--mono); font-weight:700; font-size:30px; }
+.b-own .r .track { height:10px; border-radius:999px; background:var(--surface); margin-top:8px; overflow:hidden; }
+.b-own .r .bar { height:100%; border-radius:999px; }
+
+/* ---- block: ratio bars (peerBars) ---- */
+.b-bars { display:flex; flex-direction:column; gap:22px; }
+.b-bars .r .top { display:flex; justify-content:space-between; align-items:baseline; }
+.b-bars .r .name { font-size:30px; } .b-bars .r.self .name { font-weight:700; }
+.b-bars .r .val { font-family:var(--mono); font-weight:700; font-size:30px; }
+.b-bars .r .track { height:20px; border-radius:10px; background:var(--surface); margin-top:10px; overflow:hidden; border:1px solid var(--border2); }
+.b-bars .r .fill { height:100%; background:var(--dim); }
+.b-bars .r.self .fill { background:var(--brandGradient); }
+
+/* ---- block: ranking / comparison (rows) ---- */
+.b-rows .r { display:flex; align-items:center; gap:20px; padding:22px 0; border-top:1px solid var(--border); }
+.b-rows .r:first-child { border-top:none; }
+.b-rows .rank { font-family:var(--mono); font-weight:700; font-size:34px; color:var(--dim); width:48px; }
+.b-rows .logo { width:44px; height:44px; border-radius:10px; overflow:hidden; flex-shrink:0; }
+.b-rows .logo--mono { font-size:18px; }
+.b-rows .name { flex:1; font-size:30px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.b-rows .val { font-family:var(--mono); font-weight:700; font-size:32px; }
+
+/* ---- block: matrix (N tickers x M metrics, all visible at once) ---- */
+/* .b-matrix is the single grid container; every cell (head + body) is a direct child so
+   every row shares the same column tracks, a per-row border-top on each cell (added inline,
+   skipped on row 0) reads as one continuous rule across the row without nesting a grid per row. */
+.b-matrix { display:grid; align-items:center; column-gap:16px; }
+.b-matrix > * { padding:16px 0; }
+.mx-col { font-size:20px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); text-align:right; padding-bottom:14px !important; }
+.mx-rank { font-family:var(--mono); font-weight:700; font-size:24px; color:var(--dim); }
+.mx-rank.self { color:var(--brandGold); }
+.mx-name { display:flex; align-items:center; gap:14px; font-size:26px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.mx-name .logo { width:36px; height:36px; border-radius:8px; overflow:hidden; flex-shrink:0; }
+.mx-name .logo--mono { font-size:15px; }
+.mx-name.self { font-weight:700; }
+/* No overflow:hidden/ellipsis here on purpose (unlike .mx-name): a truncated NUMBER is a wrong
+   number, the same reasoning as the autofit floor warning in render.mjs. nowrap keeps a long
+   value on one line so any overflow is horizontal and geometrically detectable (render.mjs's
+   content-overflow check), instead of silently wrapping the row taller or eating characters. */
+.mx-val { font-family:var(--mono); font-weight:700; font-size:26px; text-align:right; white-space:nowrap; }
+.mx-val.self { font-weight:800; }
+
+/* ---- block: heatmap (category x time/metric matrix; cell background = intensity, cell text = its own value, color set inline per-cell) ---- */
+.b-heatmap { display:grid; align-items:stretch; column-gap:8px; row-gap:8px; }
+.hm-col { font-family:var(--mono); font-size:20px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); display:flex; align-items:center; justify-content:center; padding-bottom:10px; }
+.hm-row { font-size:24px; font-weight:600; color:var(--muted); display:flex; align-items:center; padding-right:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.hm-cell { font-family:var(--mono); font-weight:700; display:flex; align-items:center; justify-content:center; border-radius:8px; min-height:52px; white-space:nowrap; }
+
+/* ---- block: timeline (dated event rows, grouped by same-day cluster) ---- */
+.tl-group { position:relative; padding-left:4px; }
+.tl-date { font-family:var(--mono); font-size:22px; font-weight:600; color:var(--brandGold); text-transform:uppercase; letter-spacing:0.08em; margin:22px 0 12px; }
+.tl-group:first-child .tl-date { margin-top:0; }
+.tl-row { display:flex; align-items:flex-start; gap:20px; position:relative; padding:10px 0; }
+.tl-row::before { content:""; position:absolute; left:6px; top:-2px; bottom:-2px; width:2px; background:var(--border2); }
+.tl-row:first-child::before { top:50%; }
+.tl-row:last-child::before { bottom:50%; }
+.tl-dot { width:14px; height:14px; border-radius:50%; background:var(--brandGradient); margin-top:8px; flex-shrink:0; z-index:1; }
+.tl-body { flex:1; }
+.tl-label { font-size:28px; line-height:1.3; }
+.tl-detail { font-size:22px; color:var(--muted); margin-top:4px; }
+
+/* ---- block: insight / quote / cta / bullets ---- */
+.b-insight .kicker { margin-bottom:14px; }
+.b-quote .glyph { font-size:96px; line-height:0.6; font-weight:800; }
+.b-quote .text { font-size:46px; font-weight:500; line-height:1.2; margin:8px 0 18px; }
+.b-quote .attr { font-family:var(--mono); font-size:24px; color:var(--brandGold); }
+.b-cta { display:inline-flex; flex-direction:column; gap:18px; align-items:flex-start; }
+.b-cta .pill { background:var(--brandGradient); border-radius:999px; padding:18px 44px; font-size:38px; font-weight:700; color:#fff; }
+.b-cta .handle { font-family:var(--mono); font-size:24px; color:var(--muted); }
+.b-bullets { display:flex; flex-direction:column; gap:18px; }
+.b-bullets .li { display:flex; align-items:flex-start; gap:18px; }
+.b-bullets .dot { width:14px; height:14px; border-radius:50%; background:var(--brandGradient); margin-top:14px; flex-shrink:0; }
+
+/* ---- legend (shared) ---- */
+.legend { display:flex; gap:36px; align-items:center; flex-wrap:wrap; }
+.legend .item { display:flex; align-items:center; gap:12px; }
+.legend .sw { width:24px; height:24px; border-radius:6px; }
+
+/* ---- cover ---- */
+.cover .hook { z-index:2; }
+/* small company logo lives inside the spark callout pill */
+.spark-callout .logo { height:30px; display:flex; align-items:center; }
+.spark-callout .logo img { height:30px; width:auto; object-fit:contain; display:block; }
+.spark-callout .logo--mono { width:30px; height:30px; border-radius:8px; font-size:14px; }
+/* line-height sits just above 1 (not the tighter 0.98 this used to be): below 1, a run of
+   descender-heavy words (y/g/p/q/j) on one line sits close enough to the line below that it
+   reads as crowding or clipping even though every glyph is fully painted — most visible on a
+   headline that runs the full 3-line budget (viral-hooks.md caps it at ~9 words/1-3 lines,
+   but nothing enforces that mechanically, so a long headline still needs to not look broken
+   when it happens, see brand-lint's headline-length check). */
+.cover .headline { font-weight:800; line-height:1.06; letter-spacing:-0.035em; margin:18px 0 20px; }
+.cover .support { font-size:36px; color:var(--muted); font-weight:500; line-height:1.35; max-width:840px; }
+.cover .spark-callout {
+  position:absolute; right:72px; top:206px; display:inline-flex; align-items:center; gap:16px;
+  padding:16px 26px;
+}
+.cover .spark-callout .t { font-family:var(--mono); font-size:26px; font-weight:500; color:var(--muted); }
+
+/* ---- cover stat hook: the "single stat" support option (house-style.md §8) ----
+   Plain text color, no gradient — the headline already owns the one brand moment.
+   compare pair (two figures + "vs") lets the cover prove a comparison at a glance. */
+.cover .cover-stat { display:flex; align-items:flex-end; gap:28px; margin:2px 0 22px; }
+.cover .cover-stat .item { display:flex; flex-direction:column; gap:6px; }
+.cover .cover-stat .v { font-family:var(--mono); font-weight:700; font-size:88px; line-height:1; letter-spacing:-0.02em; }
+.cover .cover-stat .l { font-size:24px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); }
+.cover .cover-stat .vs { font-family:var(--mono); font-size:26px; color:var(--dim); align-self:center; margin:0 2px 20px; }
+
+/* ---- inline ticker mention (prose/titles, especially comparisons): small logo next to the symbol ---- */
+.logo.logo-inline { display:inline-block; width:1em; height:1em; vertical-align:-0.14em; margin-right:0.12em; border-radius:0.2em; overflow:hidden; }
+
+/* ---- outro (ported from OutroDevices.tsx; device group scales by canvas height) ---- */
+.outro .glow { background:radial-gradient(ellipse 70% 56% at 82% 8%, rgba(229,51,126,0.278), transparent 70%); }
+.outro .frontshadow { background:linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 7%, transparent 15%); }
+.outro-devices { position:absolute; inset:0; pointer-events:none; }
+
+/* laptop */
+.outro .lp { position:absolute; left:350px; bottom:168px; z-index:1; }
+.outro .lp-screen { width:710px; background:#0D0A09; border:2px solid #3A322C; border-radius:18px 18px 4px 4px; box-shadow:0 40px 90px -28px rgba(0,0,0,0.9); overflow:hidden; position:relative; }
+.outro .lp-chrome { background:#1A1512; }
+.outro .lp-row1 { display:flex; align-items:flex-end; gap:10px; padding:7px 12px 0; }
+.outro .lp-traffic { display:flex; gap:5px; align-items:center; padding-bottom:7px; }
+.outro .lp-traffic i { width:8px; height:8px; border-radius:50%; display:block; }
+.outro .lp-tab { display:flex; align-items:center; gap:6px; background:#0D0A09; border-radius:8px 8px 0 0; padding:5px 12px; font-size:9px; font-weight:600; color:#CFC7C1; }
+.outro .lp-tabmark svg { height:11px; width:auto; display:block; }
+.outro .lp-x { color:#6E6661; margin-left:6px; }
+.outro .lp-addr { background:#0D0A09; padding:5px 12px 7px; display:flex; align-items:center; gap:8px; }
+.outro .lp-nav { color:#6E6661; font-size:10px; letter-spacing:4px; }
+.outro .lp-pill { flex:1; display:flex; align-items:center; gap:6px; background:#17120F; border-radius:7px; padding:4px 10px; font-size:9px; color:#A99F99; }
+.outro .lp-pill svg { width:9px; height:9px; }
+.outro .lp-shot { display:block; width:706px; }
+.outro .lp-glass { position:absolute; inset:0; pointer-events:none; background:linear-gradient(115deg, rgba(255,255,255,0.05) 0%, transparent 26%); }
+.outro .lp-base { width:770px; height:22px; margin-left:-30px; background:linear-gradient(#332C27,#191412); border-radius:2px 2px 16px 16px; position:relative; }
+.outro .lp-notch { position:absolute; top:0; left:50%; transform:translateX(-50%); width:116px; height:8px; border-radius:0 0 9px 9px; background:#15100E; display:block; }
+
+/* phone */
+.outro .ph { position:absolute; left:104px; bottom:190px; z-index:2; width:226px; height:474px; border-radius:38px; border:7px solid #1D1814; background:#0F0C0A; overflow:hidden; transform:rotate(5deg); box-shadow:0 40px 80px -26px rgba(0,0,0,0.95), 0 0 0 1px rgba(246,241,238,0.05); }
+.outro .ph-notch { position:absolute; top:8px; left:50%; transform:translateX(-50%); width:54px; height:15px; border-radius:999px; background:#060404; z-index:3; display:block; }
+.outro .ph-body { padding:34px 14px 14px; display:flex; flex-direction:column; gap:10px; height:100%; }
+.outro .ph-head { display:flex; align-items:center; gap:8px; color:#F6F1EE; font-size:14.5px; font-weight:700; }
+.outro .ph-mark svg { height:18px; width:auto; display:block; }
+.outro .ph-user { align-self:flex-end; max-width:168px; background:var(--brandGradient); color:#fff; border-radius:15px 15px 4px 15px; padding:9px 12px; font-size:12px; font-weight:600; line-height:1.35; margin-top:6px; }
+.outro .ph-answer { align-self:flex-start; max-width:182px; background:#1B1613; border:1px solid rgba(246,241,238,0.12); border-radius:15px 15px 15px 4px; padding:10px 12px; font-size:11px; line-height:1.42; color:#D8CFC9; }
+.outro .ph-ticks { display:flex; flex-wrap:wrap; gap:5px; margin-top:7px; }
+.outro .ph-ticks i { font-family:var(--mono); font-size:8.5px; font-weight:500; border:1px solid rgba(246,241,238,0.18); border-radius:999px; padding:2px 7px; color:#A99F99; font-style:normal; }
+.outro .ph-suggest { display:flex; flex-direction:column; gap:5px; margin-top:2px; }
+.outro .ph-suggest i { align-self:flex-start; font-size:10px; color:#DF9439; border:1px solid rgba(223,148,57,0.4); border-radius:999px; padding:5px 9px; font-style:normal; }
+.outro .ph-input { margin-top:auto; display:flex; align-items:center; gap:7px; background:#17120F; border:1px solid rgba(246,241,238,0.16); border-radius:999px; padding:6px 6px 6px 12px; font-size:10.5px; color:#8A817B; }
+.outro .ph-ph { flex:1; min-width:0; white-space:nowrap; overflow:hidden; }
+.outro .ph-send { width:26px; height:26px; border-radius:50%; flex-shrink:0; background:var(--brandGradient); display:flex; align-items:center; justify-content:center; color:#fff; font-size:13px; font-weight:700; }
+
+/* text column + outro footer override */
+.outro-text { position:absolute; inset:0; padding:80px 72px 52px; display:flex; flex-direction:column; color:var(--text); font-feature-settings:"tnum"; pointer-events:none; }
+.outro-stack { display:flex; flex-direction:column; align-items:flex-start; }
+.outro .outro-h { font-weight:800; line-height:1.02; letter-spacing:-0.03em; max-width:880px; }
+.outro .outro-sub { font-weight:500; line-height:1.4; color:rgba(246,241,238,0.82); max-width:760px; }
+.outro .searchpill { display:inline-flex; align-items:center; gap:18px; border:2px solid rgba(246,241,238,0.85); border-radius:999px; padding:22px 46px 22px 36px; font-weight:600; margin-top:10px; }
+.outro .footer { position:absolute; left:72px; right:72px; bottom:52px; margin-top:0; border-top:none; }

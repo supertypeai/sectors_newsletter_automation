@@ -1,0 +1,159 @@
+{
+  "_status": 200,
+  "_params": {
+    "start": "2026-05-26",
+    "end": "2026-06-11"
+  },
+  "data": {
+    "symbol": "BBCA.JK",
+    "start": "2026-05-26",
+    "end": "2026-06-11",
+    "data": [
+      {
+        "date": "2026-05-26",
+        "summary": [
+          {
+            "broker_code": "AG",
+            "bfreq": 64,
+            "blot": 4447,
+            "bval": 2677722500,
+            "bavg_per_share": 6021.4133,
+            "sfreq": 249,
+            "slot": 13937,
+            "sval": 8424515000,
+            "savg_per_share": 6044.7119,
+            "nlot": -9490,
+            "nval": -5746792500,
+            "navg_per_share": 6044.7119
+          },
+          {
+            "broker_code": "AH",
+            "bfreq": 0,
+            "blot": 0,
+            "bval": 0,
+            "bavg_per_share": null,
+            "sfreq": 1,
+            "slot": 36,
+            "sval": 21600000,
+            "savg_per_share": 6000.0,
+            "nlot": -36,
+            "nval": -21600000,
+            "navg_per_share": 6000.0
+          },
+          {
+            "broker_code": "AI",
+            "bfreq": 41,
+            "blot": 1714,
+            "bval": 1025525000,
+            "bavg_per_share": 5983.2264,
+            "sfreq": 32,
+            "slot": 506,
+            "sval": 304855000,
+            "savg_per_share": 6024.8024,
+            "nlot": 1208,
+            "nval": 720670000,
+            "navg_per_share": 5983.2264
+          },
+          "__+66_more (total 69)__"
+        ]
+      },
+      {
+        "date": "2026-05-29",
+        "summary": [
+          {
+            "broker_code": "--",
+            "bfreq": 27358,
+            "blot": 1476744,
+            "bval": 855826205000,
+            "bavg_per_share": 5795.3593,
+            "sfreq": 27358,
+            "slot": 1476744,
+            "sval": 855826205000,
+            "savg_per_share": 5795.3593,
+            "nlot": 0,
+            "nval": 0,
+            "navg_per_share": null
+          },
+          {
+            "broker_code": "AF",
+            "bfreq": 11,
+            "blot": 1070,
+            "bval": 619620000,
+            "bavg_per_share": 5790.8411,
+            "sfreq": 0,
+            "slot": 0,
+            "sval": 0,
+            "savg_per_share": null,
+            "nlot": 1070,
+            "nval": 619620000,
+            "navg_per_share": 5790.8411
+          },
+          {
+            "broker_code": "AG",
+            "bfreq": 231,
+            "blot": 11262,
+            "bval": 6468572500,
+            "bavg_per_share": 5743.7156,
+            "sfreq": 4,
+            "slot": 111,
+            "sval": 64632500,
+            "savg_per_share": 5822.7477,
+            "nlot": 11151,
+            "nval": 6403940000,
+            "navg_per_share": 5743.7156
+          },
+          "__+81_more (total 84)__"
+        ]
+      },
+      {
+        "date": "2026-06-02",
+        "summary": [
+          {
+            "broker_code": "AF",
+            "bfreq": 16,
+            "blot": 700,
+            "bval": 402750000,
+            "bavg_per_share": 5753.5714,
+            "sfreq": 0,
+            "slot": 0,
+            "sval": 0,
+            "savg_per_share": null,
+            "nlot": 700,
+            "nval": 402750000,
+            "navg_per_share": 5753.5714
+          },
+          {
+            "broker_code": "AG",
+            "bfreq": 40,
+            "blot": 9696,
+            "bval": 5566172500,
+            "bavg_per_share": 5740.6895,
+            "sfreq": 10,
+            "slot": 251,
+            "sval": 145955000,
+            "savg_per_share": 5814.9402,
+            "nlot": 9445,
+            "nval": 5420217500,
+            "navg_per_share": 5740.6895
+          },
+          {
+            "broker_code": "AI",
+            "bfreq": 37,
+            "blot": 1975,
+            "bval": 1148792500,
+            "bavg_per_share": 5816.6709,
+            "sfreq": 34,
+            "slot": 2260,
+            "sval": 1311760000,
+            "savg_per_share": 5804.2478,
+            "nlot": -285,
+            "nval": -162967500,
+            "navg_per_share": 5804.2478
+          },
+          "__+71_more (total 74)__"
+        ]
+      },
+      "__+7_more (total 10)__"
+    ]
+  }
+}

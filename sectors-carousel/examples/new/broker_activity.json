@@ -1,0 +1,159 @@
+{
+  "_status": 200,
+  "_params": {
+    "start": "2026-05-26",
+    "end": "2026-06-11"
+  },
+  "data": {
+    "broker_code": "MG",
+    "start": "2026-05-26",
+    "end": "2026-06-11",
+    "data": [
+      {
+        "date": "2026-05-26",
+        "summary": [
+          {
+            "symbol": "AADI.JK",
+            "bfreq": 104,
+            "blot": 2500,
+            "bval": 2076250000,
+            "bavg_per_share": 8305.0,
+            "sfreq": 3,
+            "slot": 6,
+            "sval": 4967500,
+            "savg_per_share": 8279.1667,
+            "nlot": 2494,
+            "nval": 2071282500,
+            "navg_per_share": 8305.0
+          },
+          {
+            "symbol": "ABBA.JK",
+            "bfreq": 0,
+            "blot": 0,
+            "bval": 0,
+            "bavg_per_share": null,
+            "sfreq": 11,
+            "slot": 250,
+            "sval": 825000,
+            "savg_per_share": 33.0,
+            "nlot": -250,
+            "nval": -825000,
+            "navg_per_share": 33.0
+          },
+          {
+            "symbol": "ACST.JK",
+            "bfreq": 5,
+            "blot": 200,
+            "bval": 1680000,
+            "bavg_per_share": 84.0,
+            "sfreq": 0,
+            "slot": 0,
+            "sval": 0,
+            "savg_per_share": null,
+            "nlot": 200,
+            "nval": 1680000,
+            "navg_per_share": 84.0
+          },
+          "__+440_more (total 443)__"
+        ]
+      },
+      {
+        "date": "2026-05-29",
+        "summary": [
+          {
+            "symbol": "AADI.JK",
+            "bfreq": 38,
+            "blot": 2000,
+            "bval": 1680000000,
+            "bavg_per_share": 8400.0,
+            "sfreq": 139,
+            "slot": 3506,
+            "sval": 2946310000,
+            "savg_per_share": 8403.6224,
+            "nlot": -1506,
+            "nval": -1266310000,
+            "navg_per_share": 8403.6224
+          },
+          {
+            "symbol": "AALI.JK",
+            "bfreq": 1,
+            "blot": 1600,
+            "bval": 1036000000,
+            "bavg_per_share": 6475.0,
+            "sfreq": 0,
+            "slot": 0,
+            "sval": 0,
+            "savg_per_share": null,
+            "nlot": 1600,
+            "nval": 1036000000,
+            "navg_per_share": 6475.0
+          },
+          {
+            "symbol": "ABMM.JK",
+            "bfreq": 1,
+            "blot": 20,
+            "bval": 4900000,
+            "bavg_per_share": 2450.0,
+            "sfreq": 3,
+            "slot": 31,
+            "sval": 7440000,
+            "savg_per_share": 2400.0,
+            "nlot": -11,
+            "nval": -2540000,
+            "navg_per_share": 2400.0
+          },
+          "__+410_more (total 413)__"
+        ]
+      },
+      {
+        "date": "2026-06-02",
+        "summary": [
+          {
+            "symbol": "AADI.JK",
+            "bfreq": 2,
+            "blot": 200,
+            "bval": 167000000,
+            "bavg_per_share": 8350.0,
+            "sfreq": 132,
+            "slot": 10107,
+            "sval": 8449447500,
+            "savg_per_share": 8359.9955,
+            "nlot": -9907,
+            "nval": -8282447500,
+            "navg_per_share": 8359.9955
+          },
+          {
+            "symbol": "ADES.JK",
+            "bfreq": 6,
+            "blot": 160,
+            "bval": 350975000,
+            "bavg_per_share": 21935.9375,
+            "sfreq": 0,
+            "slot": 0,
+            "sval": 0,
+            "savg_per_share": null,
+            "nlot": 160,
+            "nval": 350975000,
+            "navg_per_share": 21935.9375
+          },
+          {
+            "symbol": "ADHI.JK",
+            "bfreq": 1,
+            "blot": 50,
+            "bval": 840000,
+            "bavg_per_share": 168.0,
+            "sfreq": 0,
+            "slot": 0,
+            "sval": 0,
+            "savg_per_share": null,
+            "nlot": 50,
+            "nval": 840000,
+            "navg_per_share": 168.0
+          },
+          "__+428_more (total 431)__"
+        ]
+      },
+      "__+7_more (total 10)__"
+    ]
+  }
+}

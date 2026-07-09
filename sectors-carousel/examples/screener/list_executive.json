@@ -1,0 +1,33 @@
+{
+  "_status": 200,
+  "_params": {
+    "where": "key_executives_name like '%Prajogo%'",
+    "limit": "5"
+  },
+  "data": {
+    "results": [
+      {
+        "symbol": "ARTO.JK",
+        "company_name": "PT Bank Jago Tbk."
+      },
+      {
+        "symbol": "TOTO.JK",
+        "company_name": "Surya Toto Indonesia Tbk"
+      },
+      {
+        "symbol": "TPIA.JK",
+        "company_name": "PT Chandra Asri Pacific Tbk"
+      }
+    ],
+    "pagination": {
+      "total_count": 3,
+      "showing": 3,
+      "limit": 5,
+      "offset": 0,
+      "has_next": false,
+      "has_previous": false,
+      "next_offset": null,
+      "previous_offset": null
+    }
+  }
+}

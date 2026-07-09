@@ -1,0 +1,53 @@
+{
+  "_status": 200,
+  "data": {
+    "results": [
+      {
+        "symbol": "BJTM.JK",
+        "company_name": "Bank Pembangunan Daerah Jawa Timur Tbk",
+        "query_values": {
+          "sub_sector": "Banks",
+          "total_yield[2025]": 0.105210997164249
+        }
+      },
+      {
+        "symbol": "BJBR.JK",
+        "company_name": "Bank Pembangunan Daerah Jawa Barat dan Banten Tbk",
+        "query_values": {
+          "sub_sector": "Banks",
+          "total_yield[2025]": 0.103676997125149
+        }
+      },
+      {
+        "symbol": "BMRI.JK",
+        "company_name": "PT Bank Mandiri (Persero) Tbk",
+        "query_values": {
+          "sub_sector": "Banks",
+          "total_yield[2025]": 0.0952206999063492
+        }
+      },
+      "__+2_more (total 5)__"
+    ],
+    "pagination": {
+      "total_count": 22,
+      "showing": 5,
+      "limit": 5,
+      "offset": 0,
+      "has_next": true,
+      "has_previous": false,
+      "next_offset": 5,
+      "previous_offset": null
+    },
+    "llm_translation": {
+      "natural_query": "top 5 dividend paying banks",
+      "translated_params": {
+        "where": "sub_sector = 'Banks' and total_yield[2025] IS NOT NULL and total_yield[2025] > 0",
+        "order_by": "-total_yield[2025]",
+        "limit": 5,
+        "offset": null,
+        "include_query_values": true
+      },
+      "message": null
+    }
+  }
+}

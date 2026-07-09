@@ -1,0 +1,35 @@
+{
+  "_status": 200,
+  "_params": {
+    "where": "revenue[2024] > earnings[2024] * 5",
+    "order_by": "-revenue[2024]",
+    "limit": "5"
+  },
+  "data": {
+    "results": [
+      {
+        "symbol": "ASII.JK",
+        "company_name": "Astra International Tbk"
+      },
+      {
+        "symbol": "TLKM.JK",
+        "company_name": "PT Telkom Indonesia (Persero) Tbk"
+      },
+      {
+        "symbol": "UNTR.JK",
+        "company_name": "United Tractors Tbk"
+      },
+      "__+2_more (total 5)__"
+    ],
+    "pagination": {
+      "total_count": 757,
+      "showing": 5,
+      "limit": 5,
+      "offset": 0,
+      "has_next": true,
+      "has_previous": false,
+      "next_offset": 5,
+      "previous_offset": null
+    }
+  }
+}

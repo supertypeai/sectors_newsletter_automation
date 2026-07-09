@@ -1,0 +1,35 @@
+{
+  "_status": 200,
+  "_params": {
+    "where": "earnings[2024] > 0 and earnings[2023] > 0",
+    "order_by": "-(earnings[2024]/earnings[2023])",
+    "limit": "5"
+  },
+  "data": {
+    "results": [
+      {
+        "symbol": "ABMM.JK",
+        "company_name": "ABM Investama Tbk"
+      },
+      {
+        "symbol": "LPKR.JK",
+        "company_name": "Lippo Karawaci Tbk"
+      },
+      {
+        "symbol": "AGAR.JK",
+        "company_name": "PT Asia Sejahtera Mina Tbk"
+      },
+      "__+2_more (total 5)__"
+    ],
+    "pagination": {
+      "total_count": 587,
+      "showing": 5,
+      "limit": 5,
+      "offset": 0,
+      "has_next": true,
+      "has_previous": false,
+      "next_offset": 5,
+      "previous_offset": null
+    }
+  }
+}

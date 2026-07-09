@@ -1,0 +1,6 @@
+{
+  "_status": 400,
+  "data": {
+    "error": "Given stock symbol does not exist for this data."
+  }
+}

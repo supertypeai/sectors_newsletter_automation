@@ -1,0 +1,56 @@
+{
+  "_status": 200,
+  "data": {
+    "symbol": "BBCA.JK",
+    "company_name": "PT Bank Central Asia Tbk.",
+    "valuation": {
+      "last_close_price": 5650,
+      "latest_close_date": "2026-06-10",
+      "daily_close_change": 0.0970873786407767,
+      "forward_pe": 11.7103296952132,
+      "intrinsic_value": 13694,
+      "historical_valuation": [
+        {
+          "pb": 4.71766971488811,
+          "pe": 25.6154045827394,
+          "ps": 11.9285086042203,
+          "pcf": 30.8908493442671,
+          "peg": 0.8642744448236932,
+          "year": 2022,
+          "pb_peer_avg": 0.975919472508022,
+          "pe_peer_avg": 15.1292552726864,
+          "ps_peer_avg": 4.41860675563346,
+          "enterprise_to_ebitda": null,
+          "enterprise_to_revenue": null
+        },
+        {
+          "pb": 4.72995882171211,
+          "pe": 23.5858451556753,
+          "ps": 11.4782182062595,
+          "pcf": 19.7400808741289,
+          "peg": 1.21566215982569,
+          "year": 2023,
+          "pb_peer_avg": 0.854769761923978,
+          "pe_peer_avg": 16.8856446249576,
+          "ps_peer_avg": 4.03165315770388,
+          "enterprise_to_ebitda": null,
+          "enterprise_to_revenue": null
+        },
+        {
+          "pb": 4.3426516277396,
+          "pe": 21.5324363605918,
+          "ps": 10.9020123508745,
+          "pcf": 21.9389487856415,
+          "peg": 1.6899917254340542,
+          "year": 2024,
+          "pb_peer_avg": 0.809474232052149,
+          "pe_peer_avg": 16.1927341107751,
+          "ps_peer_avg": 3.43164746605984,
+          "enterprise_to_ebitda": null,
+          "enterprise_to_revenue": null
+        },
+        "__+2_more (total 5)__"
+      ]
+    }
+  }
+}

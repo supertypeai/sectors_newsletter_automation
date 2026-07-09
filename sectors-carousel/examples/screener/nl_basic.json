@@ -1,0 +1,56 @@
+{
+  "_status": 200,
+  "_params": {
+    "q": "top 5 technology companies by revenue in 2024"
+  },
+  "data": {
+    "results": [
+      {
+        "symbol": "MTDL.JK",
+        "company_name": "Metrodata Electronics Tbk",
+        "query_values": {
+          "sector": "Technology",
+          "revenue[2024]": 25148938000000.0
+        }
+      },
+      {
+        "symbol": "BELI.JK",
+        "company_name": "PT Global Digital Niaga Tbk",
+        "query_values": {
+          "sector": "Technology",
+          "revenue[2024]": 16715576000000.0
+        }
+      },
+      {
+        "symbol": "GOTO.JK",
+        "company_name": "PT GoTo Gojek Tokopedia Tbk",
+        "query_values": {
+          "sector": "Technology",
+          "revenue[2024]": 15894462000000.0
+        }
+      },
+      "__+2_more (total 5)__"
+    ],
+    "pagination": {
+      "total_count": 43,
+      "showing": 5,
+      "limit": 5,
+      "offset": 0,
+      "has_next": true,
+      "has_previous": false,
+      "next_offset": 5,
+      "previous_offset": null
+    },
+    "llm_translation": {
+      "natural_query": "top 5 technology companies by revenue in 2024",
+      "translated_params": {
+        "where": "sector = 'Technology' and revenue[2024] IS NOT NULL",
+        "order_by": "-revenue[2024]",
+        "limit": 5,
+        "offset": null,
+        "include_query_values": true
+      },
+      "message": null
+    }
+  }
+}

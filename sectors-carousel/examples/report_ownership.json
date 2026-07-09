@@ -1,0 +1,82 @@
+{
+  "_status": 200,
+  "data": {
+    "symbol": "BBCA.JK",
+    "company_name": "PT Bank Central Asia Tbk.",
+    "ownership": {
+      "major_shareholders": [
+        {
+          "name": "PT Dwimuria Investama Andalan",
+          "share_value": 382674217500000,
+          "share_amount": 67729950000,
+          "share_percentage": "0.54942"
+        },
+        {
+          "name": "Public",
+          "share_value": 311108255527700,
+          "share_amount": 55063408058,
+          "share_percentage": "0.44667"
+        },
+        {
+          "name": "Treasury Stock",
+          "share_value": 2267437095000,
+          "share_amount": 401316300,
+          "share_percentage": "0.00326"
+        },
+        "__+9_more (total 12)__"
+      ],
+      "top_transactions": {
+        "date": "2026-04-30",
+        "top_buyers": [
+          {
+            "name": "Fidelity Institutional Asset Management",
+            "changeAmount": 186742480
+          },
+          {
+            "name": "Vanguard",
+            "changeAmount": 91671208
+          },
+          {
+            "name": "Thornburg Investment Management Inc",
+            "changeAmount": 46547634
+          }
+        ],
+        "top_sellers": [
+          {
+            "name": "Fidelity Management & Research Company LLC",
+            "changeAmount": -833622654
+          },
+          {
+            "name": "T. Rowe Price",
+            "changeAmount": -102934401
+          },
+          {
+            "name": "BlackRock Fund Advisors",
+            "changeAmount": -6410560
+          }
+        ]
+      },
+      "institutional_transaction_flow": [
+        {
+          "date": "2026-04-30",
+          "net_transaction": -4575387238
+        },
+        {
+          "date": "2026-02-28",
+          "net_transaction": -2055237632
+        },
+        {
+          "date": "2026-01-31",
+          "net_transaction": -3879565254
+        },
+        "__+18_more (total 21)__"
+      ],
+      "whale_investors": [
+        "Anthoni Salim"
+      ],
+      "conglomerates_group": [
+        "Djarum Group"
+      ]
+    }
+  }
+}

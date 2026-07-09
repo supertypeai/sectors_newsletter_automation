@@ -1,0 +1,27 @@
+{
+  "_status": 200,
+  "data": [
+    {
+      "symbol": "BBCA.JK",
+      "date": "2026-03-16",
+      "close": 6750,
+      "volume": 127757500,
+      "market_cap": 823785521625000
+    },
+    {
+      "symbol": "BBCA.JK",
+      "date": "2026-03-17",
+      "close": 6775,
+      "volume": 160903900,
+      "market_cap": 826836579112500
+    },
+    {
+      "symbol": "BBCA.JK",
+      "date": "2026-03-25",
+      "close": 6900,
+      "volume": 314353900,
+      "market_cap": 842091866550000
+    },
+    "__+49_more (total 52)__"
+  ]
+}

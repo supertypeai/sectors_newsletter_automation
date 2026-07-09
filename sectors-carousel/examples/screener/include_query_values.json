@@ -1,0 +1,45 @@
+{
+  "_status": 200,
+  "_params": {
+    "where": "roe[2024] > 0.2",
+    "order_by": "-roe[2024]",
+    "limit": "5",
+    "include_query_values": "true"
+  },
+  "data": {
+    "results": [
+      {
+        "symbol": "TLDN.JK",
+        "company_name": "PT Teladan Prima Agro Tbk",
+        "query_values": {
+          "roe[2024]": 262.52311103536
+        }
+      },
+      {
+        "symbol": "BATA.JK",
+        "company_name": "Sepatu Bata Tbk",
+        "query_values": {
+          "roe[2024]": 9.29034390388282
+        }
+      },
+      {
+        "symbol": "FOOD.JK",
+        "company_name": "PT Sentra Food Indonesia Tbk",
+        "query_values": {
+          "roe[2024]": 7.67078696173022
+        }
+      },
+      "__+2_more (total 5)__"
+    ],
+    "pagination": {
+      "total_count": 93,
+      "showing": 5,
+      "limit": 5,
+      "offset": 0,
+      "has_next": true,
+      "has_previous": false,
+      "next_offset": 5,
+      "previous_offset": null
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "_status": 200,
+  "data": [
+    {
+      "sector": "transportation-logistic",
+      "subsector": "transportation"
+    },
+    {
+      "sector": "properties-real-estate",
+      "subsector": "properties-real-estate"
+    },
+    {
+      "sector": "infrastructures",
+      "subsector": "telecommunication"
+    },
+    "__+30_more (total 33)__"
+  ]
+}

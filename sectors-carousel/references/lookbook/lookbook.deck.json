@@ -1,0 +1,186 @@
+{
+  "_note": "Reference artifact only — a visual catalog of every cover archetype (visual-language.md) plus content archetype (archetypes.md), rendered once so there's ground truth without re-running the pipeline. Figures are illustrative placeholders, NOT real Sectors API data — never treat this file as a worked example of a real piece (see samples/ for that).",
+  "format": "portrait",
+  "footer": {
+    "handle": "@sectorsapp",
+    "site": "sectors.app",
+    "attribution": "supertype.ai"
+  },
+  "autoOutro": false,
+  "slides": [
+    {
+      "role": "cover",
+      "tickers": [
+        "BBRI"
+      ],
+      "kicker": "COVER · SOLO (1 ticker)",
+      "headline": "A high yield, the hard way.",
+      "emphasis": "hard way",
+      "spark": {
+        "points": [
+          100,
+          98,
+          103,
+          96,
+          90,
+          94,
+          101,
+          97,
+          89,
+          85,
+          88,
+          84.4
+        ],
+        "change": -15.6,
+        "label": "$BBRI · 30D"
+      },
+      "stat": {
+        "value": "12%",
+        "label": "DIVIDEND YIELD",
+        "compare": {
+          "value": "6.8%",
+          "label": "10Y BOND"
+        }
+      }
+    },
+    {
+      "role": "cover",
+      "tickers": [
+        "BBCA",
+        "BBRI"
+      ],
+      "kicker": "COVER · DUEL (2 tickers)",
+      "headline": "A wider margin. A smaller return.",
+      "emphasis": "smaller return",
+      "duel": {
+        "series": [
+          {
+            "name": "BBCA",
+            "self": true,
+            "values": [
+              100,
+              98,
+              103,
+              96,
+              90,
+              88,
+              84.4
+            ]
+          },
+          {
+            "name": "BBRI",
+            "values": [
+              100,
+              102,
+              101,
+              105,
+              108,
+              110,
+              109
+            ]
+          }
+        ]
+      },
+      "stat": {
+        "value": "20.4%",
+        "label": "BBCA ROE",
+        "compare": {
+          "value": "17.1%",
+          "label": "BBRI ROE"
+        }
+      }
+    },
+    {
+      "role": "cover",
+      "tickers": [
+        "BBCA",
+        "BBRI",
+        "BMRI",
+        "BBNI",
+        "ARTO",
+        "BRIS",
+        "BJTM"
+      ],
+      "kicker": "COVER · FIELD (7+ tickers, no chart)",
+      "headline": "Seven banks. One rate cycle.",
+      "emphasis": "One rate cycle",
+      "stat": {
+        "value": "18.2%",
+        "label": "SECTOR AVG ROE"
+      }
+    },
+    {
+      "role": "content",
+      "html": "<div class=\"stack\" style=\"gap:16px;flex:1;justify-content:center;\"><div class=\"caption-t\">ARCHETYPE H1 · THE VERDICT NUMBER (Hero, sparse, centered)</div><div class=\"label\">P/E, TRAILING</div><div class=\"num autofit\" style=\"font-size:172px;line-height:0.92;\">12.4×</div><div class=\"body\">The cheapest <span class=\"logo-inline\" data-logo=\"BBCA\"></span>BBCA has traded in three years. <span class=\"gradient-text\">Down from 21.5×</span> in 2024.</div></div>"
+    },
+    {
+      "role": "content",
+      "html": "<div class=\"stack\" style=\"gap:20px;flex:1;justify-content:space-between;\"><div><div class=\"caption-t\">ARCHETYPE T1 · THE ARC (Trend, medium, distributed)</div><div class=\"kicker\" style=\"margin-top:10px;\">EARNINGS · YOY</div><div class=\"title\" style=\"margin-top:14px;\">Profit climbed for years, then <span class=\"gradient-text\">stalled</span></div></div><div data-chart=\"bar\" data-spec='{\"bars\":[{\"label\":\"2021\",\"value\":31.1,\"display\":\"31.1\"},{\"label\":\"2022\",\"value\":51.2,\"display\":\"51.2\"},{\"label\":\"2023\",\"value\":60.1,\"display\":\"60.1\"},{\"label\":\"2024\",\"value\":60.2,\"display\":\"60.2\"},{\"label\":\"2025\",\"value\":56.7,\"display\":\"56.7\"}]}'></div><div class=\"body\">Net profit rose 82% since 2021, but 2025 broke the streak, down 5.8% from the peak.</div></div>"
+    },
+    {
+      "role": "content",
+      "html": "<div class=\"stack\" style=\"gap:20px;flex:1;justify-content:space-between;\"><div><div class=\"caption-t\">ARCHETYPE T2 · THE DUEL (Trend, medium, distributed)</div><div class=\"kicker\" style=\"margin-top:10px;\">INDEXED PRICE · 30D</div><div class=\"title\" style=\"margin-top:14px;\"><span class=\"logo-inline\" data-logo=\"BBRI\"></span>BBRI <span class=\"gradient-text\">underperformed</span> its closest peer</div></div><div data-chart=\"multiline\" data-spec='{\"series\":[{\"name\":\"BBRI\",\"self\":true,\"area\":true,\"values\":[100,98,103,96,90,88,84.4]},{\"name\":\"BBCA\",\"values\":[100,102,101,105,108,110,109]}]}'></div><div class=\"body\"><span class=\"logo-inline\" data-logo=\"BBCA\"></span>BBCA gained 9% while BBRI slipped 15.6% over the same window.</div></div>"
+    },
+    {
+      "role": "content",
+      "html": "<div class=\"stack\" style=\"gap:24px;flex:1;justify-content:center;\"><div class=\"caption-t\">ARCHETYPE S1 · THE FACT GRID (Scorecard, dense, centered)</div><div class=\"title\">The funding base is the <span class=\"gradient-text\">moat</span></div><div class=\"b-keyfacts cols-2\"><div class=\"glass card\"><div class=\"label\">CASA RATIO</div><div class=\"value num\">84.3%</div></div><div class=\"glass card\"><div class=\"label\">NPL RATIO</div><div class=\"value num\">1.65%</div></div><div class=\"glass card\"><div class=\"label\">ROE</div><div class=\"value num\">20.4%</div></div><div class=\"glass card\"><div class=\"label\">YIELD TTM</div><div class=\"value num\">6.0%</div></div></div></div>"
+    },
+    {
+      "role": "content",
+      "html": "<div class=\"stack\" style=\"gap:16px;flex:1;justify-content:space-between;\"><div><div class=\"caption-t\">ARCHETYPE S2 · THE FIELD (Scorecard, dense, centered)</div><div class=\"kicker\" style=\"margin-top:10px;\">PEER SCORECARD</div><div class=\"title\" style=\"margin-top:14px;\"><span class=\"logo-inline\" data-logo=\"BBRI\"></span>BBRI <span class=\"gradient-text\">leads</span> on scale, not efficiency</div></div><div data-chart=\"radar\" data-spec='{\"axes\":[\"ROE\",\"NPL\",\"CASA\",\"Div Yield\",\"Growth\"],\"series\":[{\"name\":\"BBRI\",\"self\":true,\"values\":[78,55,60,85,40]},{\"name\":\"BBCA\",\"values\":[85,80,90,50,55]}]}'></div><div class=\"body\">Across five scorecard axes, BBRI trails <span class=\"logo-inline\" data-logo=\"BBCA\"></span>BBCA on asset quality (80 vs 55) and funding cost.</div></div>"
+    },
+    {
+      "role": "content",
+      "html": "<div class=\"stack\" style=\"gap:20px;flex:1;justify-content:center;\"><div class=\"caption-t\">ARCHETYPE B1 · THE MIX (Breakdown, medium, centered)</div><div class=\"title\">Family <span class=\"gradient-text\">still</span> holds control</div><div data-chart=\"donut\" data-spec='{\"segments\":[{\"pct\":54.9,\"color\":\"#E5337E\"},{\"pct\":45.1,\"color\":\"#3A332E\"}],\"centerLabel\":\"54.9%\",\"centerSub\":\"FOUNDING FAMILY\"}'></div><div class=\"body\">One shareholder still holds an outright majority, five years after the IPO.</div></div>"
+    },
+    {
+      "role": "content",
+      "html": "<div class=\"stack\" style=\"gap:20px;flex:1;justify-content:space-between;\"><div><div class=\"caption-t\">ARCHETYPE B2 · THE SHIFT (Breakdown, medium, distributed)</div><div class=\"kicker\" style=\"margin-top:10px;\">LOAN BOOK MIX</div><div class=\"title\" style=\"margin-top:14px;\">Micro-lending is <span class=\"gradient-text\">most</span> of the book</div></div><div data-chart=\"stackedbar\" data-spec='{\"bars\":[{\"label\":\"2023\",\"segments\":[{\"value\":40,\"color\":\"#E5337E\"},{\"value\":20,\"color\":\"#DF9439\"},{\"value\":10,\"color\":\"#A99F99\"}]},{\"label\":\"2025\",\"segments\":[{\"value\":48,\"color\":\"#E5337E\"},{\"value\":21,\"color\":\"#DF9439\"},{\"value\":9,\"color\":\"#A99F99\"}]}],\"legend\":[{\"label\":\"Micro\",\"color\":\"#E5337E\"},{\"label\":\"Consumer\",\"color\":\"#DF9439\"},{\"label\":\"Corporate\",\"color\":\"#A99F99\"}]}'></div><div class=\"body\">Micro-lending has held near half the loan book for three straight years.</div></div>"
+    },
+    {
+      "role": "content",
+      "html": "<div class=\"stack\" style=\"gap:24px;flex:1;justify-content:center;\"><div class=\"caption-t\">ARCHETYPE C1 · THE PAYOFF (Closer, sparse, centered)</div><div class=\"title\">The exit was about <span class=\"gradient-text\">Indonesia</span>, not the bank.</div><div class=\"glass\"><div class=\"body\">ROE held at 20.4% through six months of selling. When MSCI flagged Indonesia's transparency, foreign funds trimmed their most liquid position. Net Q2 outflow: Rp 8.9T. The November review is the next checkpoint.</div></div></div>"
+    },
+    {
+      "role": "content",
+      "asOf": "1 Jul 2026",
+      "html": "<div class=\"stack\" style=\"gap:20px;flex:1;justify-content:space-between;\"><div><div class=\"caption-t\">CHART · LINE + start anchor, interior peak, benchmark line, asOf below</div><div class=\"kicker\" style=\"margin-top:10px;\">INDEXED PRICE · 90D</div><div class=\"title\" style=\"margin-top:14px;\">Three months of <span class=\"gradient-text\">drift</span></div></div><div data-chart=\"line\" data-spec='{\"values\":[100,98,103,96,90,94,101,97,89,85,88,84.4],\"area\":true,\"w\":920,\"h\":260,\"startLabel\":\"100\",\"extremes\":true,\"benchmark\":{\"value\":93.8,\"label\":\"90D AVG\"}}'></div><div class=\"body\">The line now anchors its start (100) and interior peak (103), not just the endpoint (84.4, a 15.6% slide) and the dashed 90-day average, so the slope reads against real numbers instead of a guessed baseline.</div></div>"
+    },
+    {
+      "role": "content",
+      "html": "<div class=\"stack\" style=\"gap:20px;flex:1;justify-content:space-between;\"><div><div class=\"caption-t\">CHART · MULTILINE, \"index\":true (raw-scale series rebased to 100 at their own start)</div><div class=\"kicker\" style=\"margin-top:10px;\">DAILY CLOSE · 7D</div><div class=\"title\" style=\"margin-top:14px;\"><span class=\"logo-inline\" data-logo=\"BBCA\"></span>BBCA and <span class=\"logo-inline\" data-logo=\"DEWA\"></span>DEWA, <span class=\"gradient-text\">indexed</span> to compare on one chart</div></div><div data-chart=\"multiline\" data-spec='{\"index\":true,\"series\":[{\"name\":\"BBCA\",\"self\":true,\"area\":true,\"values\":[9420,9500,9650,9380,9800,9700,9850]},{\"name\":\"DEWA\",\"values\":[182,175,190,168,195,201,210]}]}'></div><div class=\"body\">Raw closes sit 50 times apart in scale, BBCA near Rp 9,500, DEWA near Rp 190. \"index\":true rebases both to 100 at day one, so neither line goes flat on the shared axis.</div></div>"
+    },
+    {
+      "role": "content",
+      "html": "<div class=\"stack\" style=\"gap:20px;flex:1;justify-content:space-between;\"><div><div class=\"caption-t\">ARCHETYPE B3 · THE BRIDGE (Breakdown, medium, distributed) · a start total, named contributors, an end total</div><div class=\"title\" style=\"margin-top:10px;\">What actually moved <span class=\"logo-inline\" data-logo=\"BBNI\"></span>BBNI's earnings</div></div><div data-chart=\"waterfall\" data-spec='{\"bars\":[{\"label\":\"Q1 2025\",\"value\":14.31,\"isTotal\":true,\"display\":\"14.31\"},{\"label\":\"+NII\",\"value\":1.3},{\"label\":\"+Fees\",\"value\":0.4},{\"label\":\"-Opex\",\"value\":-0.53},{\"label\":\"-Provision\",\"value\":-0.66},{\"label\":\"Q1 2026\",\"value\":14.82,\"isTotal\":true,\"display\":\"14.82\"}]}'></div><div class=\"body\">Revenue grew across every line. A bigger loan-loss provision, a conservative buffer, cost more of it than opex did.</div></div>"
+    },
+    {
+      "role": "content",
+      "html": "<div class=\"stack\" style=\"gap:20px;flex:1;justify-content:center;\"><div><div class=\"caption-t\">ARCHETYPE S4 · THE ROSTER (Scorecard, dense, centered) · N tickers × M metrics at once, past ranking's 1-metric ceiling; DEWA marked self:true</div><div class=\"title\" style=\"margin-top:10px;\">Five cheapest blue chips, three metrics at once</div></div><div data-chart=\"table\" data-spec='{\"columns\":[\"P/E\",\"Yield\",\"Mkt Cap\"],\"rows\":[{\"ticker\":\"DEWA\",\"values\":[\"2.67×\",\"1.2%\",\"Rp 18T\"],\"self\":true},{\"ticker\":\"BBTN\",\"values\":[\"4.12×\",\"4.8%\",\"Rp 21T\"]},{\"ticker\":\"JPFA\",\"values\":[\"4.44×\",\"3.1%\",\"Rp 14T\"]},{\"ticker\":\"INKP\",\"values\":[\"4.92×\",\"2.0%\",\"Rp 62T\"]},{\"ticker\":\"AADI\",\"values\":[\"5.16×\",\"6.5%\",\"Rp 33T\"]}]}'></div></div>"
+    },
+    {
+      "role": "content",
+      "html": "<div class=\"stack\" style=\"gap:20px;flex:1;justify-content:center;\"><div><div class=\"caption-t\">ARCHETYPE T3 · THE CLUSTER (Trend, medium, centered) · dated events, grouped by same-session cluster</div><div class=\"title\" style=\"margin-top:10px;\">A quiet stretch, then a cluster in one afternoon</div></div><div data-chart=\"timeline\" data-spec='{\"events\":[{\"date\":\"12 Sep 2025\",\"label\":\"Commissioner buys 50,000 shares\"},{\"date\":\"3 Mar 2026, afternoon\",\"label\":\"President Commissioner buys 317,900 shares\",\"detail\":\"14:26 · Rp 6,982/share\"},{\"date\":\"3 Mar 2026, afternoon\",\"label\":\"Director A buys 200,000 shares\",\"detail\":\"14:29 · Rp 6,982/share\"},{\"date\":\"3 Mar 2026, afternoon\",\"label\":\"Director B buys 150,000 shares\",\"detail\":\"14:31 · Rp 6,982/share\"}]}'></div></div>"
+    },
+    {
+      "role": "content",
+      "html": "<div class=\"stack\" style=\"gap:20px;flex:1;justify-content:center;\"><div><div class=\"caption-t\">ARCHETYPE S3 · THE MAP (Scorecard, dense, centered) · two independent axes at once; DEWA marked self:true</div><div class=\"title\" style=\"margin-top:10px;\">Cheap AND big is the <span class=\"gradient-text\">rare</span> combination</div></div><div data-chart=\"scatter\" data-spec='{\"xLabel\":\"P/E, trailing\",\"yLabel\":\"Market cap\",\"yScale\":\"log\",\"points\":[{\"x\":2.7,\"y\":18,\"label\":\"DEWA\",\"self\":true,\"displayX\":\"2.7×\",\"displayY\":\"Rp 18T\"},{\"x\":5.5,\"y\":55,\"label\":\"JPFA\",\"displayX\":\"5.5×\",\"displayY\":\"Rp 55T\"},{\"x\":8,\"y\":140,\"label\":\"INKP\",\"displayX\":\"8×\",\"displayY\":\"Rp 140T\"},{\"x\":11.9,\"y\":689,\"label\":\"BBCA\",\"displayX\":\"11.9×\",\"displayY\":\"Rp 689T\"},{\"x\":3.2,\"y\":420,\"label\":\"ASII\",\"displayX\":\"3.2×\",\"displayY\":\"Rp 420T\"},{\"x\":14,\"y\":95,\"label\":\"GOTO\",\"displayX\":\"14×\",\"displayY\":\"Rp 95T\"}]}'></div></div>"
+    },
+    {
+      "role": "content",
+      "html": "<div class=\"stack\" style=\"gap:20px;flex:1;justify-content:center;\"><div><div class=\"caption-t\">ARCHETYPE S5 · THE GRID (Scorecard, dense, centered) · category × time in one grid; mode:\"diverging\", holder-type × month deltas</div><div class=\"title\" style=\"margin-top:10px;\">Where the <span class=\"gradient-text\">accumulation</span> happened last month</div></div><div data-chart=\"heatmap\" data-spec='{\"mode\":\"diverging\",\"rows\":[\"Individual\",\"Insurance\",\"Mutual fund\",\"Pension fund\"],\"cols\":[\"Sep\",\"Oct\",\"Nov\",\"Dec\"],\"values\":[[120000,-85000,45000,-30000],[-15000,22000,-8000,5000],[300000,-120000,-60000,90000],[-5000,-12000,18000,-4000]],\"display\":[[\"+120K\",\"-85K\",\"+45K\",\"-30K\"],[\"-15K\",\"+22K\",\"-8K\",\"+5K\"],[\"+300K\",\"-120K\",\"-60K\",\"+90K\"],[\"-5K\",\"-12K\",\"+18K\",\"-4K\"]],\"caption\":\"month-over-month change in shares held, by holder type\"}'></div></div>"
+    },
+    {
+      "role": "content",
+      "html": "<div class=\"stack\" style=\"gap:20px;flex:1;justify-content:center;\"><div><div class=\"caption-t\">ARCHETYPE T4 · THE LEADERBOARD (Trend, dense, distributed) · ranked leaderboard over time; ABCD auto-detected as #1 every day, IJKL shows a re-entry after dropping out</div><div class=\"title\" style=\"margin-top:10px;\">One name never left the <span class=\"gradient-text\">top spot</span></div></div><div data-chart=\"bump\" data-spec='{\"days\":[{\"date\":\"18 Jun\",\"entries\":[{\"symbol\":\"ABCD\"},{\"symbol\":\"EFGH\"},{\"symbol\":\"IJKL\"},{\"symbol\":\"MNOP\"},{\"symbol\":\"QRST\"}]},{\"date\":\"19 Jun\",\"entries\":[{\"symbol\":\"ABCD\"},{\"symbol\":\"EFGH\"},{\"symbol\":\"MNOP\"},{\"symbol\":\"IJKL\"},{\"symbol\":\"UVWX\"}]},{\"date\":\"20 Jun\",\"entries\":[{\"symbol\":\"ABCD\"},{\"symbol\":\"MNOP\"},{\"symbol\":\"EFGH\"},{\"symbol\":\"UVWX\"},{\"symbol\":\"IJKL\"}]},{\"date\":\"21 Jun\",\"entries\":[{\"symbol\":\"ABCD\"},{\"symbol\":\"MNOP\"},{\"symbol\":\"UVWX\"},{\"symbol\":\"EFGH\"},{\"symbol\":\"YZAB\"}]},{\"date\":\"22 Jun\",\"entries\":[{\"symbol\":\"ABCD\"},{\"symbol\":\"UVWX\"},{\"symbol\":\"MNOP\"},{\"symbol\":\"YZAB\"},{\"symbol\":\"IJKL\"}]},{\"date\":\"23 Jun\",\"entries\":[{\"symbol\":\"ABCD\"},{\"symbol\":\"UVWX\"},{\"symbol\":\"YZAB\"},{\"symbol\":\"MNOP\"},{\"symbol\":\"EFGH\"}]},{\"date\":\"24 Jun\",\"entries\":[{\"symbol\":\"ABCD\",\"value\":9.9,\"display\":\"9.9B\"},{\"symbol\":\"UVWX\",\"value\":5.2,\"display\":\"5.2B\"},{\"symbol\":\"YZAB\",\"value\":3.1,\"display\":\"3.1B\"},{\"symbol\":\"IJKL\",\"value\":2.4,\"display\":\"2.4B\"},{\"symbol\":\"MNOP\",\"value\":1.8,\"display\":\"1.8B\"}]}],\"caption\":\"top 5 by volume, 7-day window\",\"h\":880}'></div></div>"
+    },
+    {
+      "role": "content",
+      "html": "<div class=\"stack\" style=\"gap:20px;flex:1;justify-content:center;\"><div><div class=\"caption-t\">ARCHETYPE B4 · THE FLOW (Breakdown, dense, distributed) · multi-level flow decomposition; gradient marks the dominant root-to-leaf chain</div><div class=\"title\" style=\"margin-top:10px;\">Most of it comes from <span class=\"gradient-text\">one place</span></div></div><div data-chart=\"sankey\" data-spec='{\"unit\":\"T\",\"caption\":\"revenue segments -> total revenue -> cost & profit split, Rp trillion\",\"links\":[{\"source\":\"Cellular\",\"target\":\"Total Revenue\",\"value\":8},{\"source\":\"Data & Internet\",\"target\":\"Total Revenue\",\"value\":52},{\"source\":\"Fixed Line\",\"target\":\"Total Revenue\",\"value\":3},{\"source\":\"Enterprise\",\"target\":\"Total Revenue\",\"value\":14},{\"source\":\"Other\",\"target\":\"Total Revenue\",\"value\":5},{\"source\":\"Total Revenue\",\"target\":\"Cost of Revenue\",\"value\":30},{\"source\":\"Total Revenue\",\"target\":\"Gross Profit\",\"value\":45},{\"source\":\"Total Revenue\",\"target\":\"Tax & Other\",\"value\":7}],\"h\":920}'></div></div>"
+    },
+    {
+      "role": "content",
+      "html": "<div class=\"stack\" style=\"gap:20px;flex:1;justify-content:space-between;\"><div><div class=\"caption-t\">COMPOSE · the escape hatch · a slope chart (no named kind draws it), built from governed layers</div><div class=\"kicker\" style=\"margin-top:10px;\">ROE · FY24 → FY25</div><div class=\"title\" style=\"margin-top:14px;\"><span class=\"logo-inline\" data-logo=\"BBRI\"></span>BBRI pulled <span class=\"gradient-text\">ahead</span> of the sector</div></div><div data-chart=\"compose\" data-spec='{\"w\":920,\"h\":300,\"x\":{\"type\":\"band\",\"domain\":[\"FY24\",\"FY25\"]},\"y\":{\"type\":\"linear\",\"domain\":[0,30]},\"axes\":{\"y\":{\"label\":\"ROE %\",\"ticks\":[0,15,30]},\"x\":{}},\"layers\":[{\"mark\":\"line\",\"points\":[[\"FY24\",18.4],[\"FY25\",24.1]],\"gradient\":true,\"width\":5},{\"mark\":\"line\",\"points\":[[\"FY24\",16],[\"FY25\",15.2]],\"color\":\"peer0\",\"width\":4},{\"mark\":\"dot\",\"points\":[[\"FY24\",18.4],[\"FY25\",24.1,\"BBRI 24.1%\"]],\"color\":\"self\"},{\"mark\":\"dot\",\"points\":[[\"FY24\",16],[\"FY25\",15.2,\"sector 15.2%\"]],\"color\":\"peer0\"},{\"mark\":\"refLine\",\"axis\":\"y\",\"value\":12,\"label\":\"10Y avg 12%\",\"color\":\"muted\",\"labelSide\":\"left\"}]}'></div><div class=\"body\">A shape we never pre-built, still on-brand by construction: the pink→gold self line and mono numerals come from the same primitives every named chart uses, colors are semantic-only, and the promise (print a number) is enforced. Reach for it only when none of the 13 fit.</div></div>"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "_status": 200,
+  "data": [
+    {
+      "index_code": "LQ45",
+      "date": "2026-03-16",
+      "price": 713.721
+    },
+    {
+      "index_code": "LQ45",
+      "date": "2026-03-17",
+      "price": 722.411
+    },
+    {
+      "index_code": "LQ45",
+      "date": "2026-03-25",
+      "price": 746.454
+    },
+    "__+49_more (total 52)__"
+  ]
+}

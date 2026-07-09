@@ -1,0 +1,20 @@
+{
+  "_status": 200,
+  "_params": {
+    "where": "forecast_revenue_estimate[2025] > 100000000000000",
+    "limit": "5"
+  },
+  "data": {
+    "results": [],
+    "pagination": {
+      "total_count": 0,
+      "showing": 0,
+      "limit": 5,
+      "offset": 0,
+      "has_next": false,
+      "has_previous": false,
+      "next_offset": null,
+      "previous_offset": null
+    }
+  }
+}

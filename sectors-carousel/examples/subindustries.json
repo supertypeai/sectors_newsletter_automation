@@ -1,0 +1,18 @@
+{
+  "_status": 200,
+  "data": [
+    {
+      "industry": "forestry-paper",
+      "sub_industry": "paper"
+    },
+    {
+      "industry": "metals-minerals",
+      "sub_industry": "diversified-metals-minerals"
+    },
+    {
+      "industry": "electrical",
+      "sub_industry": "electrical-components-equipment"
+    },
+    "__+98_more (total 101)__"
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "_status": 200,
+  "_params": {
+    "metric": "gross",
+    "origin": "foreign",
+    "n_brokers": "5"
+  },
+  "data": {
+    "date": "2026-06-11",
+    "metric": "gross",
+    "origin": "foreign",
+    "cohort": "all",
+    "results": [
+      {
+        "rank": 1,
+        "broker_code": "AK",
+        "gross": 5435441902500,
+        "net": -413050689700
+      },
+      {
+        "rank": 2,
+        "broker_code": "ZP",
+        "gross": 3921115824300,
+        "net": -40953078100
+      },
+      {
+        "rank": 3,
+        "broker_code": "YP",
+        "gross": 2148771617300,
+        "net": 96378225100
+      },
+      "__+2_more (total 5)__"
+    ]
+  }
+}

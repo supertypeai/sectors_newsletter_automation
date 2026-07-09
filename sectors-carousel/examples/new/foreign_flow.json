@@ -1,0 +1,27 @@
+{
+  "_status": 200,
+  "_params": {
+    "start": "2026-03-14",
+    "end": "2026-06-11"
+  },
+  "data": {
+    "symbol": "BBCA.JK",
+    "start": "2026-03-14",
+    "end": "2026-06-11",
+    "data": [
+      {
+        "date": "2026-03-16",
+        "net_foreign_inflow": -329107502500
+      },
+      {
+        "date": "2026-03-17",
+        "net_foreign_inflow": -197276697500
+      },
+      {
+        "date": "2026-03-25",
+        "net_foreign_inflow": -273997942500
+      },
+      "__+45_more (total 48)__"
+    ]
+  }
+}

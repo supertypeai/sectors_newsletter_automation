@@ -1,0 +1,250 @@
+{
+  "_status": 200,
+  "data": {
+    "symbol": "BBCA.JK",
+    "company_name": "PT Bank Central Asia Tbk.",
+    "peers": [
+      {
+        "peers_data": {
+          "companies": [
+            {
+              "year": 2025,
+              "group": [
+                "self"
+              ],
+              "pb_mrq": 2.66095236855111,
+              "pe_ttm": 11.8606846930566,
+              "symbol": "BBCA.JK",
+              "market_cap": 689538992175000,
+              "net_income": 57537287000000,
+              "company_name": "PT Bank Central Asia Tbk.",
+              "employee_num": 27937,
+              "total_assets": 1586830000000000,
+              "total_equity": 281687555000000,
+              "pretax_income": 71260876000000,
+              "total_revenue": 112006326000000,
+              "point_summaries": [
+                {
+                  "name": "value",
+                  "point": 10.5,
+                  "maxpoint": 18
+                },
+                {
+                  "name": "competitive",
+                  "point": 16.5,
+                  "maxpoint": 25.5
+                },
+                {
+                  "name": "future",
+                  "point": 30,
+                  "maxpoint": 30
+                },
+                "__+3_more (total 6)__"
+              ],
+              "yearly_mcap_chg": -0.398936170212766,
+              "operating_expense": 36734403000000,
+              "revenue_breakdown": null,
+              "total_liabilities": 1305140000000000,
+              "int_income_breakdown": [
+                {
+                  "class": "Loans & Deposits",
+                  "amount": 67446394000000,
+                  "category": "Loans"
+                },
+                {
+                  "class": "Marketable Securities",
+                  "amount": 24163987000000,
+                  "category": "Investment securities"
+                },
+                {
+                  "class": "Marketable Securities",
+                  "amount": 727466000000,
+                  "category": "Securities purchased under agreements to resell"
+                },
+                "__+5_more (total 8)__"
+              ],
+              "operating_expense_breakdown": [
+                {
+                  "class": "Salaries & Benefits",
+                  "amount": 17780770000000,
+                  "category": "Personnel expenses"
+                },
+                {
+                  "class": "General & Admin",
+                  "amount": 16780115000000,
+                  "category": "General and administrative"
+                },
+                {
+                  "class": "Other expenses",
+                  "amount": 2173518000000,
+                  "category": "Others (expense)"
+                }
+              ]
+            },
+            {
+              "year": 2025,
+              "group": [
+                "sub_sector",
+                "sector",
+                "industry",
+                "__+1_more (total 4)__"
+              ],
+              "pb_mrq": 1.27770703021927,
+              "pe_ttm": 7.26840541161509,
+              "symbol": "BBRI.JK",
+              "market_cap": 432125025370560,
+              "net_income": 56652384000000,
+              "company_name": "PT Bank Rakyat Indonesia (Persero) Tbk",
+              "employee_num": 27937,
+              "total_assets": 2135370000000000,
+              "total_equity": 330941434000000,
+              "pretax_income": 72792819000000,
+              "total_revenue": 181304342000000,
+              "point_summaries": [
+                {
+                  "name": "value",
+                  "point": 9,
+                  "maxpoint": 18
+                },
+                {
+                  "name": "competitive",
+                  "point": 13.5,
+                  "maxpoint": 25.5
+                },
+                {
+                  "name": "future",
+                  "point": 18,
+                  "maxpoint": 18
+                },
+                "__+3_more (total 6)__"
+              ],
+              "yearly_mcap_chg": -0.352808988764045,
+              "operating_expense": 88446886000000,
+              "revenue_breakdown": null,
+              "total_liabilities": 1804430000000000,
+              "int_income_breakdown": [
+                {
+                  "class": "Loans & Deposits",
+                  "amount": 167837861000000,
+                  "category": "Loans"
+                },
+                {
+                  "class": "Finance Receivable",
+                  "amount": 3236963000000,
+                  "category": "Finance Receivables"
+                },
+                {
+                  "class": "Securities",
+                  "amount": 15233115000000,
+                  "category": "Securities"
+                },
+                "__+7_more (total 10)__"
+              ],
+              "operating_expense_breakdown": [
+                {
+                  "class": "Salaries & Benefits",
+                  "amount": 42113566000000,
+                  "category": "Salaries and employees' benefits"
+                },
+                {
+                  "class": "General & Admin",
+                  "amount": 33776049000000,
+                  "category": "General and administrative"
+                },
+                {
+                  "class": "Other expenses",
+                  "amount": 12557271000000,
+                  "category": "Others (expense)"
+                }
+              ]
+            },
+            {
+              "year": 2025,
+              "group": [
+                "sub_sector",
+                "sector",
+                "industry",
+                "__+1_more (total 4)__"
+              ],
+              "pb_mrq": 1.29076149905724,
+              "pe_ttm": 5.82474947902243,
+              "symbol": "BMRI.JK",
+              "market_cap": 393623999982960,
+              "net_income": 56293950000000,
+              "company_name": "PT Bank Mandiri (Persero) Tbk",
+              "employee_num": 38751,
+              "total_assets": 2829950000000000,
+              "total_equity": 327401998000000,
+              "pretax_income": 76417563000000,
+              "total_revenue": 134313864000000,
+              "point_summaries": [
+                {
+                  "name": "value",
+                  "point": 7.5,
+                  "maxpoint": 18
+                },
+                {
+                  "name": "competitive",
+                  "point": 15,
+                  "maxpoint": 25.5
+                },
+                {
+                  "name": "future",
+                  "point": 30,
+                  "maxpoint": 30
+                },
+                "__+3_more (total 6)__"
+              ],
+              "yearly_mcap_chg": -0.19622641509434,
+              "operating_expense": 67584405000000,
+              "revenue_breakdown": null,
+              "total_liabilities": 2502550000000000,
+              "int_income_breakdown": [
+                {
+                  "class": "Loans & Deposits",
+                  "amount": 109869267000000,
+                  "category": "Loans"
+                },
+                {
+                  "class": "Securities",
+                  "amount": 14146067000000,
+                  "category": "Securities"
+                },
+                {
+                  "class": "Finance Receivable",
+                  "amount": 6624748000000,
+                  "category": "Consumer financing income"
+                },
+                "__+5_more (total 8)__"
+              ],
+              "operating_expense_breakdown": [
+                {
+                  "class": "Salaries & Benefits",
+                  "amount": 26635454000000,
+                  "category": "Salaries and employees' benefits"
+                },
+                {
+                  "class": "General & Admin",
+                  "amount": 30422281000000,
+                  "category": "General and administrative"
+                },
+                {
+                  "class": "Other expenses",
+                  "amount": 10526670000000,
+                  "category": "Others (expense)"
+                }
+              ]
+            },
+            "__+7_more (total 10)__"
+          ],
+          "group_name": {
+            "sector": "Financials",
+            "industry": "Banks",
+            "sub_sector": "Banks",
+            "sub_industry": "Banks"
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "format": "portrait",
+  "slides": [
+    {
+      "role": "cover",
+      "tickers": ["AMMN"],
+      "kicker": "IDX · MINING",
+      "headline": "The stock crashed. Insiders didn't wait.",
+      "emphasis": "didn't wait",
+      "spark": {
+        "points": [5025, 4870, 5525, 5350, 5425, 5425, 5725, 5600, 5600, 5550, 5550, 5650, 5475, 5225, 5000, 5400, 5125, 5200, 5100, 4950, 5175, 5000, 4640, 4210, 4130, 4070, 3700, 3450, 3170, 2970, 3040, 2900, 3150, 3110, 3300, 3890, 3310, 3500, 3290, 3150, 3410, 3310, 3060, 3450, 3780, 3720, 4000, 3820, 3760, 3770, 3460, 3430, 3340, 3300, 3100, 3210, 3240, 3500],
+        "change": -30.3,
+        "label": "$AMMN · 90D"
+      },
+      "stat": {
+        "value": "3",
+        "label": "INSIDER BUYS IN 6 DAYS",
+        "compare": { "value": "-58.6%", "label": "OFF JAN HIGH" }
+      }
+    },
+    {
+      "role": "content",
+      "html": "<div class=\"stack\" style=\"gap:36px;flex:1;justify-content:center;\"><div><div class=\"kicker\">INSIDER FILINGS</div><div class=\"title\" style=\"margin-top:14px;\">Three insiders bought <span class=\"gradient-text\">in the same six days</span></div></div><div data-chart=\"timeline\" data-spec='{\"events\":[{\"date\":\"30 Jun 2026\",\"label\":\"Arief Widyawan Sidarto buys 1,600,000 shares\",\"detail\":\"Rp 3,105/share · Rp 5.0B\"},{\"date\":\"1-2 Jul 2026\",\"label\":\"Anthony Robert Mathias buys 1,413,600 shares\",\"detail\":\"Rp 3,208/share avg · Rp 4.5B, across nine trades\"},{\"date\":\"6 Jul 2026\",\"label\":\"Aditya Sasmito buys 850,000 shares\",\"detail\":\"Rp 3,530/share · Rp 3.0B, three days after the stock jumped 8% in a session\"}]}'></div><div class=\"row\" style=\"gap:24px;align-items:center;\"><div class=\"glass card\" style=\"flex:none;padding:24px 32px;\"><div class=\"label\">COMBINED, THREE BUYS</div><div class=\"value num\">Rp 12.5B</div></div><div class=\"body\" style=\"margin:0;\">All three bought <span class=\"logo-inline\" data-logo=\"AMMN\"></span>AMMN shares more than 55% below its January high of Rp 8,450.</div></div></div>"
+    },
+    {
+      "role": "content",
+      "asOf": "31 Mar 2026",
+      "html": "<div class=\"stack\" style=\"gap:24px;flex:1;justify-content:center;\"><div class=\"kicker\">Q1 EARNINGS, YoY</div><div class=\"label\" style=\"margin-top:4px;\">NET PROFIT, Q1 2026</div><div class=\"num autofit\" style=\"font-size:172px;line-height:0.92;\">Rp 2.7T</div><div class=\"body\">A year earlier, in the same quarter, <span class=\"logo-inline\" data-logo=\"AMMN\"></span>AMMN posted a Rp 2.3 trillion loss, while its new copper smelter was still in trial and barely selling anything. This quarter, with the smelter running, it <span class=\"gradient-text\">swung to a profit</span>.</div></div>"
+    },
+    {
+      "role": "content",
+      "asOf": "31 Mar 2026",
+      "html": "<div class=\"stack\" style=\"gap:28px;flex:1;justify-content:space-between;\"><div><div class=\"kicker\">REVENUE · Q1</div><div class=\"title\" style=\"margin-top:14px;\">The smelter trial <span class=\"gradient-text\">froze sales</span> a year ago</div><div class=\"caption-t\" style=\"margin-top:10px;\">quarterly revenue · Rp trillion</div></div><div data-chart=\"bar\" data-spec='{\"bars\":[{\"label\":\"Q1 2025\",\"value\":0.035,\"display\":\"Rp 0.04T\"},{\"label\":\"Q1 2026\",\"value\":13.73,\"display\":\"Rp 13.7T\"}]}'></div><div class=\"body\">Export limits during the smelter's trial period nearly zeroed out first-quarter sales in 2025. A year later, with exports resumed, <span class=\"logo-inline\" data-logo=\"AMMN\"></span>AMMN booked Rp 13.7 trillion in the same quarter.</div></div>"
+    },
+    {
+      "role": "content",
+      "asOf": "3 Jul 2026",
+      "html": "<div class=\"stack\" style=\"gap:40px;flex:1;justify-content:center;\"><div class=\"kicker\">WHERE IT STANDS TODAY</div><div class=\"title\">The comeback still costs a <span class=\"gradient-text\">premium</span></div><div class=\"b-keyfacts cols-2\"><div class=\"glass card\"><div class=\"label\">OFF JAN HIGH</div><div class=\"value num\">-58.6%</div></div><div class=\"glass card\"><div class=\"label\">OFF 52W HIGH</div><div class=\"value num\">-61.5%</div></div><div class=\"glass card\"><div class=\"label\">P/E, TRAILING</div><div class=\"value num\">27.5×</div></div><div class=\"glass card\"><div class=\"label\">PEER AVG P/E</div><div class=\"value num\">9.1×</div></div></div><div class=\"body\">Even after the rebound, <span class=\"logo-inline\" data-logo=\"AMMN\"></span>AMMN trades at roughly three times its mining peers' average earnings multiple.</div></div>"
+    },
+    {
+      "role": "content",
+      "asOf": "3 Jul 2026",
+      "html": "<div class=\"stack\" style=\"gap:36px;flex:1;justify-content:space-between;\"><div class=\"title\">Insiders <span class=\"gradient-text\">kept buying</span>, before and after the pop</div><div class=\"glass\"><div class=\"body\">Two of the three bought <span class=\"logo-inline\" data-logo=\"AMMN\"></span>AMMN before its biggest jump of the week: Sidarto on June 30, Mathias across July 1 and 2. The stock then rose 8% in a single session on July 3. Three days later, the third insider bought anyway, at a price roughly 14% above what the first had paid.</div></div><div class=\"glass card\" style=\"align-self:center;padding:28px 40px;\"><div class=\"label\">STOCK SINCE THE FIRST BUY, 30 JUN</div><div class=\"value num\">+12.7%</div></div></div>"
+    }
+  ]
+}

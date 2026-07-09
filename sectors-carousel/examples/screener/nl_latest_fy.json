@@ -1,0 +1,57 @@
+{
+  "_status": 200,
+  "_params": {
+    "q": "5 banks with the highest ROE in the latest year",
+    "include_query_values": "true"
+  },
+  "data": {
+    "results": [
+      {
+        "symbol": "BBCA.JK",
+        "company_name": "PT Bank Central Asia Tbk.",
+        "query_values": {
+          "sub_sector": "Banks",
+          "roe[2025]": 0.204259243898794
+        }
+      },
+      {
+        "symbol": "BMRI.JK",
+        "company_name": "PT Bank Mandiri (Persero) Tbk",
+        "query_values": {
+          "sub_sector": "Banks",
+          "roe[2025]": 0.171941375873949
+        }
+      },
+      {
+        "symbol": "BBRI.JK",
+        "company_name": "PT Bank Rakyat Indonesia (Persero) Tbk",
+        "query_values": {
+          "sub_sector": "Banks",
+          "roe[2025]": 0.171185527648375
+        }
+      },
+      "__+2_more (total 5)__"
+    ],
+    "pagination": {
+      "total_count": 46,
+      "showing": 5,
+      "limit": 5,
+      "offset": 0,
+      "has_next": true,
+      "has_previous": false,
+      "next_offset": 5,
+      "previous_offset": null
+    },
+    "llm_translation": {
+      "natural_query": "5 banks with the highest ROE in the latest year",
+      "translated_params": {
+        "where": "sub_sector = 'Banks' and roe[2025] IS NOT NULL",
+        "order_by": "-roe[2025]",
+        "limit": 5,
+        "offset": null,
+        "include_query_values": true
+      },
+      "message": null
+    }
+  }
+}

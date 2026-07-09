@@ -1,0 +1,39 @@
+{
+  "_status": 200,
+  "_params": {
+    "limit": "10"
+  },
+  "data": {
+    "results": [
+      {
+        "symbol": "FORU.JK",
+        "suspension_date": "2026-06-11",
+        "reason": "Terjadinya peningkatan harga kumulatif yang signifikan pada saham FORU.JK, dalam rangka cooling down sebagai bentuk perlindungan bagi investor",
+        "pdf_url": "https://www.idx.co.id/Portals/0/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/Exchange/2026/JUN/20260610-WAS_Suspensi_FORU.pdf"
+      },
+      {
+        "symbol": "IFSH.JK",
+        "suspension_date": "2026-06-10",
+        "reason": "Dalam rangka cooling down sebagai bentuk perlindungan bagi investor",
+        "pdf_url": "https://www.idx.co.id/Portals/0/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/Exchange/2026/JUN/20260609-WAS_Suspensi_IFSH.pdf"
+      },
+      {
+        "symbol": "SHIP.JK",
+        "suspension_date": "2026-06-09",
+        "reason": "Terjadinya penurunan harga kumulatif yang signifikan pada saham SHIP.JK",
+        "pdf_url": "https://www.idx.co.id/Portals/0/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/Exchange/2026/JUN/20260608-WAS_Suspensi_SHIP.pdf"
+      },
+      "__+7_more (total 10)__"
+    ],
+    "pagination": {
+      "total_count": 552,
+      "showing": 10,
+      "limit": 10,
+      "offset": 0,
+      "has_next": true,
+      "has_previous": false,
+      "next_offset": 10,
+      "previous_offset": null
+    }
+  }
+}

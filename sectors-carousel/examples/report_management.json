@@ -1,0 +1,45 @@
+{
+  "_status": 200,
+  "data": {
+    "symbol": "BBCA.JK",
+    "company_name": "PT Bank Central Asia Tbk.",
+    "management": {
+      "key_executives": [
+        {
+          "name": "Gregory Hendra Lembong",
+          "position": "President Director"
+        },
+        {
+          "name": "Armand Wahyudi Hartono",
+          "position": "Vice President Director"
+        },
+        {
+          "name": "John Kosasih",
+          "position": "Vice President Director"
+        },
+        "__+9_more (total 12)__"
+      ],
+      "executives_shareholdings": [
+        {
+          "name": "Armand Wahyudi Hartono",
+          "position": "Vice President Director",
+          "share_amount": 4256065,
+          "share_percentage": 3e-05
+        },
+        {
+          "name": "Frengky Chandra Kusuma",
+          "position": "Director",
+          "share_amount": 2835916,
+          "share_percentage": 2e-05
+        },
+        {
+          "name": "Gregory Hendra Lembong",
+          "position": "President Director",
+          "share_amount": 2666921,
+          "share_percentage": 2e-05
+        },
+        "__+5_more (total 8)__"
+      ]
+    }
+  }
+}

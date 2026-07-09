@@ -1,0 +1,76 @@
+{
+  "_status": 200,
+  "data": {
+    "symbol": "BBCA.JK",
+    "company_name": "PT Bank Central Asia Tbk.",
+    "dividend": {
+      "historical_dividends": {
+        "2020": {
+          "breakdown": [
+            {
+              "date": "2020-12-08",
+              "total": 98,
+              "yield": 0.0032565901055932
+            },
+            {
+              "date": "2020-04-21",
+              "total": 455,
+              "yield": 0.015119899995625
+            }
+          ],
+          "total_yield": 0.0183764901012182,
+          "total_dividend": 553
+        },
+        "2021": {
+          "breakdown": [
+            {
+              "date": "2021-11-17",
+              "total": 25,
+              "yield": 0.0037154599558562
+            },
+            {
+              "date": "2021-04-08",
+              "total": 432,
+              "yield": 0.0128405997529626
+            }
+          ],
+          "total_yield": 0.0165560597088188,
+          "total_dividend": 457
+        },
+        "2022": {
+          "breakdown": [
+            {
+              "date": "2022-12-02",
+              "total": 35,
+              "yield": 0.00437327986583114
+            },
+            {
+              "date": "2022-03-28",
+              "total": 120,
+              "yield": 0.0149940997362137
+            }
+          ],
+          "total_yield": 0.0193673796020448,
+          "total_dividend": 155
+        },
+        "__truncated__": "+4 more keys (total 7)"
+      },
+      "upcoming_dividends": [
+        {
+          "ex_date": "2026-06-17",
+          "payment_date": "2026-06-26",
+          "dividend_amount": 20
+        }
+      ],
+      "yield_ttm": 0.0594690265486726,
+      "dividend_yield_avg": {
+        "period": 5,
+        "avg_yield": 0.0283050359692425
+      },
+      "dividend_ttm": 336.0,
+      "payout_ratio": 0.705343372896815,
+      "cash_payout_ratio": 2.59626062355518,
+      "last_ex_dividend_date": "2026-03-30"
+    }
+  }
+}

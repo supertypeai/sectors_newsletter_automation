@@ -1,0 +1,60 @@
+{
+  "_status": 200,
+  "_params": {
+    "start": "2026-05-26",
+    "end": "2026-06-11"
+  },
+  "data": {
+    "broker_code": "MG",
+    "start": "2026-05-26",
+    "end": "2026-06-11",
+    "top_accumulations": [
+      {
+        "rank": 1,
+        "symbol": "TPIA.JK",
+        "net_idr": 179715637500,
+        "buy_idr": 3130222595000,
+        "sell_idr": 2950506957500
+      },
+      {
+        "rank": 2,
+        "symbol": "DSSA.JK",
+        "net_idr": 64111056900,
+        "buy_idr": 500703680600,
+        "sell_idr": 436592623700
+      },
+      {
+        "rank": 3,
+        "symbol": "CUAN.JK",
+        "net_idr": 42850285000,
+        "buy_idr": 544778463500,
+        "sell_idr": 501928178500
+      },
+      "__+7_more (total 10)__"
+    ],
+    "top_distributions": [
+      {
+        "rank": 1,
+        "symbol": "MDKA.JK",
+        "net_idr": -90487845000,
+        "buy_idr": 46258023000,
+        "sell_idr": 136745868000
+      },
+      {
+        "rank": 2,
+        "symbol": "GOTO.JK",
+        "net_idr": -78722540000,
+        "buy_idr": 50755000,
+        "sell_idr": 78773295000
+      },
+      {
+        "rank": 3,
+        "symbol": "BUMI.JK",
+        "net_idr": -70315842800,
+        "buy_idr": 397161714900,
+        "sell_idr": 467477557700
+      },
+      "__+7_more (total 10)__"
+    ]
+  }
+}

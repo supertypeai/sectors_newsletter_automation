@@ -1,0 +1,117 @@
+{
+  "_status": 200,
+  "data": {
+    "results": [
+      {
+        "title": "Haryanto Tiara Budiman buys shares of Bank Central Asia",
+        "body": "This transaction is part of a cluster-buy transaction amidst other insider buys during the last 6 months. Haryanto Tiara Budiman's insider purchase comes after Santoso, Lianawaty Suwono, Frengky Chandra Kusuma, Jahja Setia Atmadja and 2 other insiders in Bank Central Asia, totaling an accumulation of 2,841,801 shares transacted at an average price of IDR 7,005.",
+        "source": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_KSEI/LK-26032026-2130-00.pdf-0.pdf",
+        "timestamp": "2026-03-26T17:05:49",
+        "sector": "financials",
+        "sub_sector": "banks",
+        "tags": [
+          "investment"
+        ],
+        "symbol": "BBCA.JK",
+        "transaction_type": "buy",
+        "holder_type": "insider",
+        "holder_name": "Haryanto Tiara Budiman",
+        "holding_before": 1057378,
+        "holding_after": 1436806,
+        "amount_transaction": 379428,
+        "price": 6982.0,
+        "transaction_value": 2649166296.0,
+        "price_transaction": [
+          {
+            "date": "2026-03-25",
+            "type": "buy",
+            "price": 6982,
+            "amount_transacted": 379428
+          }
+        ],
+        "share_percentage_before": 0.001,
+        "share_percentage_after": 0.001,
+        "share_percentage_transaction": 0.0,
+        "idx_investor_slug": null,
+        "idx_conglomerates_group_slug": null
+      },
+      {
+        "title": "Hendra Tanumihardja buys shares of Bank Central Asia",
+        "body": "This transaction is part of a cluster-buy transaction amidst other insider buys during the last 6 months. Hendra Tanumihardja's insider purchase comes after Santoso, Lianawaty Suwono, Frengky Chandra Kusuma, Jahja Setia Atmadja and 1 other insiders in Bank Central Asia, totaling an accumulation of 2,462,373 shares transacted at an average price of IDR 7,008.",
+        "source": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_KSEI/LK-26032026-1487-00.pdf-0.pdf",
+        "timestamp": "2026-03-26T17:04:12",
+        "sector": "financials",
+        "sub_sector": "banks",
+        "tags": [
+          "investment"
+        ],
+        "symbol": "BBCA.JK",
+        "transaction_type": "buy",
+        "holder_type": "insider",
+        "holder_name": "Hendra Tanumihardja",
+        "holding_before": 193206,
+        "holding_after": 341139,
+        "amount_transaction": 147933,
+        "price": 6982.0,
+        "transaction_value": 1032868206.0,
+        "price_transaction": [
+          {
+            "date": "2026-03-25",
+            "type": "buy",
+            "price": 6982,
+            "amount_transacted": 147933
+          }
+        ],
+        "share_percentage_before": 0.0,
+        "share_percentage_after": 0.0,
+        "share_percentage_transaction": 0.0,
+        "idx_investor_slug": null,
+        "idx_conglomerates_group_slug": null
+      },
+      {
+        "title": "A. Widodo Mulyono buys shares of Bank Central Asia",
+        "body": "This transaction is part of a cluster-buy transaction amidst other insider buys during the last 6 months. A. Widodo Mulyono's insider purchase comes after Santoso, Lianawaty Suwono, Frengky Chandra Kusuma and Jahja Setia Atmadja in Bank Central Asia, totaling an accumulation of 2,314,440 shares transacted at an average price of IDR 7,010.",
+        "source": "https://www.idx.co.id/StaticData/NewsAndAnnouncement/ANNOUNCEMENTSTOCK/From_KSEI/LK-26032026-9048-00.pdf-0.pdf",
+        "timestamp": "2026-03-26T17:03:02",
+        "sector": "financials",
+        "sub_sector": "banks",
+        "tags": [
+          "investment"
+        ],
+        "symbol": "BBCA.JK",
+        "transaction_type": "buy",
+        "holder_type": "insider",
+        "holder_name": "A. Widodo Mulyono",
+        "holding_before": 440838,
+        "holding_after": 681407,
+        "amount_transaction": 240569,
+        "price": 6982.0,
+        "transaction_value": 1679652758.0,
+        "price_transaction": [
+          {
+            "date": "2026-03-25",
+            "type": "buy",
+            "price": 6982,
+            "amount_transacted": 240569
+          }
+        ],
+        "share_percentage_before": 0.0,
+        "share_percentage_after": 0.001,
+        "share_percentage_transaction": 0.001,
+        "idx_investor_slug": null,
+        "idx_conglomerates_group_slug": null
+      },
+      "__+7_more (total 10)__"
+    ],
+    "pagination": {
+      "total_count": 10,
+      "showing": 10,
+      "limit": 20,
+      "offset": 0,
+      "has_next": false,
+      "has_previous": false,
+      "next_offset": null,
+      "previous_offset": null
+    }
+  }
+}

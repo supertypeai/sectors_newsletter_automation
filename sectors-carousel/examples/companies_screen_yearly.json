@@ -1,0 +1,30 @@
+{
+  "_status": 200,
+  "data": {
+    "results": [
+      {
+        "symbol": "BREN.JK",
+        "company_name": "PT Barito Renewables Energy Tbk."
+      },
+      {
+        "symbol": "MORA.JK",
+        "company_name": "PT Ekamas Mora Republik Tbk"
+      },
+      {
+        "symbol": "TLKM.JK",
+        "company_name": "PT Telkom Indonesia (Persero) Tbk"
+      },
+      "__+7_more (total 10)__"
+    ],
+    "pagination": {
+      "total_count": 757,
+      "showing": 10,
+      "limit": 10,
+      "offset": 0,
+      "has_next": true,
+      "has_previous": false,
+      "next_offset": 10,
+      "previous_offset": null
+    }
+  }
+}

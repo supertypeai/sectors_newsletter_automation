@@ -1,0 +1,67 @@
+{
+  "_status": 200,
+  "_params": null,
+  "data": {
+    "symbol": "BBCA.JK",
+    "corporate_actions": {
+      "agm": [
+        {
+          "agm_date": "2025-03-12",
+          "agm_time": "09:30:00",
+          "agm_place": "Menara Bca, Grand Indonesia, Jl. M. H. Thamrin No. 1, Jakarta 10310 Kota Adm. Jakarta Pusat",
+          "agm_result": null
+        },
+        {
+          "agm_date": "2024-08-28",
+          "agm_time": "15:00:00",
+          "agm_place": "IDX Public Expose",
+          "agm_result": null
+        },
+        {
+          "agm_date": "2025-09-11",
+          "agm_time": "16:00:00",
+          "agm_place": "IDX Public Expose",
+          "agm_result": null
+        },
+        "__+6_more (total 9)__"
+      ],
+      "bonus": null,
+      "warrant": null,
+      "dividend": [
+        {
+          "ex_date": "2025-12-03",
+          "payment_date": "2025-12-22",
+          "dividend_yield": 0.00641717,
+          "dividend_amount": 55
+        },
+        {
+          "ex_date": "2026-03-30",
+          "payment_date": "2026-04-08",
+          "dividend_yield": null,
+          "dividend_amount": 281
+        },
+        {
+          "ex_date": "2024-03-25",
+          "payment_date": "2024-04-04",
+          "dividend_yield": 0.0227933,
+          "dividend_amount": 227.5
+        },
+        "__+10_more (total 13)__"
+      ],
+      "right_issue": null,
+      "stock_split": [
+        {
+          "date": "2021-10-13",
+          "split_ratio": 5
+        }
+      ],
+      "upcoming_dividend": [
+        {
+          "ex_date": "2026-06-17",
+          "payment_date": "2026-06-26",
+          "dividend_amount": 20
+        }
+      ]
+    }
+  }
+}

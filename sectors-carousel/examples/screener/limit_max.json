@@ -1,0 +1,34 @@
+{
+  "_status": 200,
+  "_params": {
+    "where": "market_cap > 0",
+    "limit": "200"
+  },
+  "data": {
+    "results": [
+      {
+        "symbol": "AADI.JK",
+        "company_name": "PT Adaro Andalan Indonesia Tbk"
+      },
+      {
+        "symbol": "AALI.JK",
+        "company_name": "Astra Agro Lestari Tbk"
+      },
+      {
+        "symbol": "ABBA.JK",
+        "company_name": "Mahaka Media Tbk"
+      },
+      "__+197_more (total 200)__"
+    ],
+    "pagination": {
+      "total_count": 957,
+      "showing": 200,
+      "limit": 200,
+      "offset": 0,
+      "has_next": true,
+      "has_previous": false,
+      "next_offset": 200,
+      "previous_offset": null
+    }
+  }
+}

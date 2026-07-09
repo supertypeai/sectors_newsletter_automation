@@ -1,0 +1,18 @@
+{
+  "_status": 200,
+  "data": [
+    {
+      "subsector": "oil-gas-coal",
+      "industry": "oil-gas"
+    },
+    {
+      "subsector": "investment-service",
+      "industry": "investment-services"
+    },
+    {
+      "subsector": "apparel-luxury-goods",
+      "industry": "apparel-luxury-goods"
+    },
+    "__+55_more (total 58)__"
+  ]
+}

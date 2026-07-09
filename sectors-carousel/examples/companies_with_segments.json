@@ -1,0 +1,21 @@
+{
+  "_status": 200,
+  "data": {
+    "AADI.JK": {
+      "financial_year": [
+        2024
+      ]
+    },
+    "AALI.JK": {
+      "financial_year": [
+        2024
+      ]
+    },
+    "ABDA.JK": {
+      "financial_year": [
+        2024
+      ]
+    },
+    "__truncated__": "+216 more keys (total 219)"
+  }
+}

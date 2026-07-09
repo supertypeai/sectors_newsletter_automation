@@ -1,0 +1,35 @@
+{
+  "_status": 200,
+  "_params": {
+    "where": "net_profit_margin[2024] > 0.3",
+    "order_by": "-net_profit_margin[2024]",
+    "limit": "5"
+  },
+  "data": {
+    "results": [
+      {
+        "symbol": "PALM.JK",
+        "company_name": "PT Provident Investasi Bersama Tbk"
+      },
+      {
+        "symbol": "VIVA.JK",
+        "company_name": "PT Visi Media Asia Tbk"
+      },
+      {
+        "symbol": "SRTG.JK",
+        "company_name": "PT Saratoga Investama Sedaya Tbk"
+      },
+      "__+2_more (total 5)__"
+    ],
+    "pagination": {
+      "total_count": 76,
+      "showing": 5,
+      "limit": 5,
+      "offset": 0,
+      "has_next": true,
+      "has_previous": false,
+      "next_offset": 5,
+      "previous_offset": null
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "_status": 200,
+  "data": [
+    {
+      "symbol": "INPC.JK",
+      "company_name": "Bank Artha Graha Internasional Tbk",
+      "free_float": 0.591
+    },
+    {
+      "symbol": "BBYB.JK",
+      "company_name": "PT Bank Neo Commerce Tbk.",
+      "free_float": 0.495
+    },
+    {
+      "symbol": "BANK.JK",
+      "company_name": "PT Bank Aladin Syariah Tbk",
+      "free_float": 0.492
+    },
+    "__+45_more (total 48)__"
+  ]
+}

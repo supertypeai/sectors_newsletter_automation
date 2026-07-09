@@ -1,0 +1,28 @@
+{
+  "_status": 200,
+  "_params": null,
+  "data": [
+    {
+      "code": "AD",
+      "name": "Sukadana Prima Sekuritas",
+      "is_foreign": false,
+      "cohort": "institutional",
+      "license_type": "Online, Online AO, Penjamin Emisi Efek, Perantara Pedagang Efek, RT AO"
+    },
+    {
+      "code": "AF",
+      "name": "Harita Kencana Sekuritas",
+      "is_foreign": false,
+      "cohort": "mixed",
+      "license_type": "Perantara Pedagang Efek, RT AO"
+    },
+    {
+      "code": "AG",
+      "name": "Kiwoom Sekuritas Indonesia",
+      "is_foreign": true,
+      "cohort": "institutional",
+      "license_type": "DMA, DMA AO, Margin, Online, Online AO, Perantara Pedagang Efek, RT AO"
+    },
+    "__+85_more (total 88)__"
+  ]
+}

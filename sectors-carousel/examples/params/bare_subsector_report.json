@@ -1,0 +1,7 @@
+{
+  "_status": 400,
+  "_params": null,
+  "data": {
+    "error": "Please provide a valid sector."
+  }
+}

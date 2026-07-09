@@ -1,0 +1,73 @@
+{
+  "_status": 200,
+  "_params": {
+    "broker_code": "MG",
+    "start": "2026-05-26",
+    "end": "2026-06-11"
+  },
+  "data": {
+    "symbol": "BBCA.JK",
+    "start": "2026-05-26",
+    "end": "2026-06-11",
+    "data": [
+      {
+        "date": "2026-05-26",
+        "summary": [
+          {
+            "broker_code": "MG",
+            "bfreq": 19,
+            "blot": 1402,
+            "bval": 843525000,
+            "bavg_per_share": 6016.5835,
+            "sfreq": 122,
+            "slot": 19279,
+            "sval": 11583137500,
+            "savg_per_share": 6008.163,
+            "nlot": -17877,
+            "nval": -10739612500,
+            "navg_per_share": 6008.163
+          }
+        ]
+      },
+      {
+        "date": "2026-05-29",
+        "summary": [
+          {
+            "broker_code": "MG",
+            "bfreq": 424,
+            "blot": 226581,
+            "bval": 129845795000,
+            "bavg_per_share": 5730.6568,
+            "sfreq": 1779,
+            "slot": 110544,
+            "sval": 64641845000,
+            "savg_per_share": 5847.6123,
+            "nlot": 116037,
+            "nval": 65203950000,
+            "navg_per_share": 5730.6568
+          }
+        ]
+      },
+      {
+        "date": "2026-06-02",
+        "summary": [
+          {
+            "broker_code": "MG",
+            "bfreq": 21,
+            "blot": 413,
+            "bval": 238582500,
+            "bavg_per_share": 5776.816,
+            "sfreq": 902,
+            "slot": 54956,
+            "sval": 31992840000,
+            "savg_per_share": 5821.5372,
+            "nlot": -54543,
+            "nval": -31754257500,
+            "navg_per_share": 5821.5372
+          }
+        ]
+      },
+      "__+7_more (total 10)__"
+    ]
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "_status": 200,
+  "data": {
+    "results": [
+      {
+        "title": "PT Bank Maybank Indonesia Tbk to Issue Sustainable Bond Up to Rp 2 Trillion",
+        "body": "PT Bank Maybank Indonesia Tbk announced it will issue a Phase I Sustainable Bond in 2026 with a maximum principal amount of Rp 2 trillion, part of a broader Rp 5 trillion sustainable‑bond program. The bond will be offered in three series with tenors of 370 days, three years and five years, priced at 100 % of principal and paying interest quarterly, with the initial offering period set for 10–18 June 2026 and listing on the Indonesia Stock Exchange scheduled for 3 July 2026. The issuance received an idAAA rating from PT Pemeringkat Efek Indonesia. In 2025 the bank reported net profit of Rp 1.7 trillion (up 42.01 % YoY), pre‑tax profit of Rp 2.2 trillion, net interest income of Rp 7.2 trillion, a gross NPL ratio of 2.31 %, net NPL of 1.41 %, capital adequacy ratio of 25.47 % and a loan‑to‑deposit ratio of 90.31 %.",
+        "source": "https://keuangan.kontan.co.id/news/maybank-indonesia-bakal-terbitkan-obligasi-berkelanjutan-senilai-rp-2-triliun",
+        "thumbnail": "https://foto.kontan.co.id/73xo7iGoes-h6m7kCcmWhvcSD5g=/smart/2017/03/07/1816537236t.jpg",
+        "timestamp": "2026-06-11T18:32:00",
+        "sector": "financials",
+        "sub_sector": [
+          "banks"
+        ],
+        "tags": [
+          "Bonds",
+          "ESG",
+          "Debt Issuance",
+          "__+2_more (total 5)__"
+        ],
+        "symbols": [
+          "BNII.JK"
+        ],
+        "dimension": {
+          "future": 1,
+          "dividend": 0,
+          "ownership": 0,
+          "technical": 0,
+          "valuation": 0,
+          "financials": 2,
+          "management": 0,
+          "sustainability": 2
+        }
+      },
+      {
+        "title": "Higher Yields Prompt Banks to Boost SRBI Purchases Amid Slowing Credit Demand",
+        "body": "Bank Indonesia raised the SRBI auction rate to 7.1%–8.65%, up from 4.78%–5.25% earlier in the year, making the instrument more attractive. As a result, banks now hold Rp 677.89 trillion of SRBI (69.18% of total outstanding), up from 62.03% a year earlier. Major banks highlighted their SRBI allocations: Bank Central Asia's securities holdings rose 17.54% YoY to Rp 425.41 trillion while its credit portfolio grew 4.54% YoY to Rp 965.01 trillion; CIMB Niaga's securities fell 1.57% YoY to Rp 75.62 trillion as its credit grew 6.99% YoY to Rp 171.39 trillion; OK Bank's securities rose 16.69% YoY to Rp 1.85 trillion as its credit expanded 6.26% YoY to Rp 10.12 trillion. Analysts note that banks with ample cheap liquidity are likely to continue parking funds in SRBI, while those with tighter liquidity may limit exposure amid competitive funding costs.",
+        "source": "https://keuangan.kontan.co.id/news/bunga-naik-akankah-bank-lebih-masif-beli-srbi-di-tengah-landainya-permintaan-kredit",
+        "thumbnail": "https://foto.kontan.co.id/mYTbfROBrcy4x3lRdFtiIbZS-ys=/smart/2026/04/14/609018679t.jpg",
+        "timestamp": "2026-06-11T18:28:00",
+        "sector": "financials",
+        "sub_sector": [
+          "banks"
+        ],
+        "tags": [
+          "Interest Rate",
+          "Credit",
+          "Bonds",
+          "__+2_more (total 5)__"
+        ],
+        "symbols": [
+          "BBCA.JK",
+          "BNGA.JK"
+        ],
+        "dimension": {
+          "future": 0,
+          "dividend": 0,
+          "ownership": 0,
+          "technical": 0,
+          "valuation": 0,
+          "financials": 2,
+          "management": 0,
+          "sustainability": 0
+        }
+      },
+      {
+        "title": "PT Bank Central Asia Tbk continues its share buyback program with up to Rp5 trillion",
+        "body": "PT Bank Central Asia Tbk (BBCA) received approval at its 2025 Annual General Meeting held on 12 March 2026 to continue its share buyback program. The buyback, authorized for a maximum of Rp5 trillion including transaction costs, will run for 12 months from 12 March 2026 to 11 March 2027, subject to earlier termination under applicable law. The company announced the continuation on 11 June 2026, stating the action reflects confidence in Indonesia’s capital market and its own fundamentals. BBCA’s shares closed up 3.10% (175 points) at 5,825 per share, on volume of 543.3 million shares and transaction value of Rp3.1 trillion.",
+        "source": "https://investor.id/corporate-action/442405/bbca-lanjutkan-aksi-buybacksaham",
+        "thumbnail": "https://img2.beritasatu.com/cache/investor/253x142-2/2025/10/1760968082-1600x1066.webp",
+        "timestamp": "2026-06-11T18:27:15",
+        "sector": "financials",
+        "sub_sector": [
+          "banks"
+        ],
+        "tags": [
+          "Stock Buyback",
+          "Capital & Funding",
+          "Shareholders General Meeting",
+          "__+1_more (total 4)__"
+        ],
+        "symbols": [
+          "BBCA.JK"
+        ],
+        "dimension": {
+          "future": 1,
+          "dividend": 0,
+          "ownership": 0,
+          "technical": 2,
+          "valuation": 2,
+          "financials": 0,
+          "management": 0,
+          "sustainability": 0
+        }
+      },
+      "__+2_more (total 5)__"
+    ],
+    "pagination": {
+      "total_count": 1251,
+      "showing": 5,
+      "limit": 5,
+      "offset": 0,
+      "has_next": true,
+      "has_previous": false,
+      "next_offset": 5,
+      "previous_offset": null
+    }
+  }
+}

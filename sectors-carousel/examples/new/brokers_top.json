@@ -1,0 +1,34 @@
+{
+  "_status": 200,
+  "_params": {
+    "metric": "net",
+    "n_brokers": "10"
+  },
+  "data": {
+    "date": "2026-06-11",
+    "metric": "net",
+    "origin": "all",
+    "cohort": "all",
+    "results": [
+      {
+        "rank": 1,
+        "broker_code": "CC",
+        "gross": 4616313142400,
+        "net": -639908303600
+      },
+      {
+        "rank": 2,
+        "broker_code": "RX",
+        "gross": 713714705400,
+        "net": 519627626600
+      },
+      {
+        "rank": 3,
+        "broker_code": "AK",
+        "gross": 5435441902500,
+        "net": -413050689700
+      },
+      "__+7_more (total 10)__"
+    ]
+  }
+}

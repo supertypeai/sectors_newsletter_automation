@@ -1,0 +1,21 @@
+{
+  "_status": 200,
+  "data": [
+    {
+      "symbol": "HKMU.JK",
+      "company_name": "PT HK Metals Utama Tbk",
+      "free_float": 1.0
+    },
+    {
+      "symbol": "WIRG.JK",
+      "company_name": "PT Wir Asia Tbk",
+      "free_float": 0.99994
+    },
+    {
+      "symbol": "PADI.JK",
+      "company_name": "Minna Padi Investama Sekuritas Tbk",
+      "free_float": 0.999
+    },
+    "__+953_more (total 956)__"
+  ]
+}

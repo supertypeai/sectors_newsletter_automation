@@ -1,0 +1,34 @@
+{
+  "_status": 200,
+  "_params": {
+    "where": "company_name like '%energi%'",
+    "limit": "5"
+  },
+  "data": {
+    "results": [
+      {
+        "symbol": "ARTI.JK",
+        "company_name": "Ratu Prabu Energi Tbk"
+      },
+      {
+        "symbol": "CBRE.JK",
+        "company_name": "PT Cakra Buana Resources Energi Tbk"
+      },
+      {
+        "symbol": "CNKO.JK",
+        "company_name": "Exploitasi Energi Indonesia Tbk"
+      },
+      "__+2_more (total 5)__"
+    ],
+    "pagination": {
+      "total_count": 15,
+      "showing": 5,
+      "limit": 5,
+      "offset": 0,
+      "has_next": true,
+      "has_previous": false,
+      "next_offset": 5,
+      "previous_offset": null
+    }
+  }
+}

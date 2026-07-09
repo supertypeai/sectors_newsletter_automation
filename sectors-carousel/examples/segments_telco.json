@@ -1,0 +1,25 @@
+{
+  "_status": 200,
+  "data": {
+    "symbol": "TLKM.JK",
+    "financial_year": 2024,
+    "revenue_breakdown": [
+      {
+        "value": 6260000000000,
+        "source": "Cellular telephone revenue",
+        "target": "Total Revenue"
+      },
+      {
+        "value": 479000000000,
+        "source": "Fixed line telephone revenue",
+        "target": "Total Revenue"
+      },
+      {
+        "value": 9187000000000,
+        "source": "Interconnection revenues",
+        "target": "Total Revenue"
+      },
+      "__+14_more (total 17)__"
+    ]
+  }
+}

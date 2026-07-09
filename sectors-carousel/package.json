@@ -1,0 +1,17 @@
+{
+  "name": "sectors-carousel-skill",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Renderer for the Sectors IDX Instagram-carousel skill (deck.json -> PNG slides via Puppeteer).",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build-fonts": "node scripts/build-fonts.mjs",
+    "render": "node scripts/render.mjs"
+  },
+  "dependencies": {
+    "puppeteer": "^25.2.1"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "_status": 200,
+  "_params": {
+    "where": "pe[2024] < pe_peer_avg[2024]",
+    "limit": "5"
+  },
+  "data": {
+    "results": [
+      {
+        "symbol": "AADI.JK",
+        "company_name": "PT Adaro Andalan Indonesia Tbk"
+      },
+      {
+        "symbol": "AALI.JK",
+        "company_name": "Astra Agro Lestari Tbk"
+      },
+      {
+        "symbol": "ABMM.JK",
+        "company_name": "ABM Investama Tbk"
+      },
+      "__+2_more (total 5)__"
+    ],
+    "pagination": {
+      "total_count": 426,
+      "showing": 5,
+      "limit": 5,
+      "offset": 0,
+      "has_next": true,
+      "has_previous": false,
+      "next_offset": 5,
+      "previous_offset": null
+    }
+  }
+}

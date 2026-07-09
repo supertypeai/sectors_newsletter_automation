@@ -1,0 +1,57 @@
+{
+  "_status": 200,
+  "data": {
+    "top_gainers": {
+      "7d": [
+        {
+          "name": "PT Sumber Global Energy Tbk",
+          "symbol": "SGER.JK",
+          "price_change": 0.296296296296296,
+          "last_close_price": 350,
+          "latest_close_date": "2026-06-10"
+        },
+        {
+          "name": "PT Pradiksi Gunatama Tbk",
+          "symbol": "PGUN.JK",
+          "price_change": 0.24609375,
+          "last_close_price": 7975,
+          "latest_close_date": "2026-06-10"
+        },
+        {
+          "name": "PT Sinar Mas Multiartha Tbk",
+          "symbol": "SMMA.JK",
+          "price_change": 0.196105702364395,
+          "last_close_price": 21500,
+          "latest_close_date": "2026-06-10"
+        },
+        "__+2_more (total 5)__"
+      ]
+    },
+    "top_losers": {
+      "7d": [
+        {
+          "name": "PT Super Bank Indonesia Tbk",
+          "symbol": "SUPA.JK",
+          "price_change": -0.218934911242604,
+          "last_close_price": 660,
+          "latest_close_date": "2026-06-10"
+        },
+        {
+          "name": "PT Solusi Sinergi Digital Tbk",
+          "symbol": "WIFI.JK",
+          "price_change": -0.205655526992288,
+          "last_close_price": 1545,
+          "latest_close_date": "2026-06-10"
+        },
+        {
+          "name": "PT Soho Global Health Tbk",
+          "symbol": "SOHO.JK",
+          "price_change": -0.196551724137931,
+          "last_close_price": 1165,
+          "latest_close_date": "2026-06-10"
+        },
+        "__+2_more (total 5)__"
+      ]
+    }
+  }
+}

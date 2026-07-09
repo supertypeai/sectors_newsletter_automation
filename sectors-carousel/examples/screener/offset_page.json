@@ -1,0 +1,36 @@
+{
+  "_status": 200,
+  "_params": {
+    "where": "market_cap > 0",
+    "order_by": "-market_cap",
+    "limit": "5",
+    "offset": "5"
+  },
+  "data": {
+    "results": [
+      {
+        "symbol": "BYAN.JK",
+        "company_name": "Bayan Resources Tbk"
+      },
+      {
+        "symbol": "MORA.JK",
+        "company_name": "PT Ekamas Mora Republik Tbk"
+      },
+      {
+        "symbol": "TLKM.JK",
+        "company_name": "PT Telkom Indonesia (Persero) Tbk"
+      },
+      "__+2_more (total 5)__"
+    ],
+    "pagination": {
+      "total_count": 957,
+      "showing": 5,
+      "limit": 5,
+      "offset": 5,
+      "has_next": true,
+      "has_previous": true,
+      "next_offset": 10,
+      "previous_offset": 0
+    }
+  }
+}

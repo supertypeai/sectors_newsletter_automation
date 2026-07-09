@@ -1,0 +1,25 @@
+{
+  "_status": 200,
+  "data": {
+    "symbol": "JSPT.JK",
+    "financial_year": 2024,
+    "revenue_breakdown": [
+      {
+        "value": 1259222918000,
+        "source": "Hotel room sales",
+        "target": "Total Revenue"
+      },
+      {
+        "value": 537007345000,
+        "source": "F&B sales",
+        "target": "Total Revenue"
+      },
+      {
+        "value": 51820396000,
+        "source": "Hotel supporting facilities",
+        "target": "Total Revenue"
+      },
+      "__+12_more (total 15)__"
+    ]
+  }
+}

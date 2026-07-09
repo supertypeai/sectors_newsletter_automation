@@ -1,0 +1,69 @@
+{
+  "_status": 200,
+  "data": {
+    "2026-03-16": [
+      {
+        "symbol": "GOTO.JK",
+        "company_name": "PT GoTo Gojek Tokopedia Tbk",
+        "volume": 6367062200,
+        "price": 52
+      },
+      {
+        "symbol": "BUMI.JK",
+        "company_name": "Bumi Resources Tbk",
+        "volume": 3325002300,
+        "price": 204
+      },
+      {
+        "symbol": "BIPI.JK",
+        "company_name": "PT Astrindo Nusantara Infrastruktur Tbk.",
+        "volume": 1254103900,
+        "price": 195
+      },
+      "__+2_more (total 5)__"
+    ],
+    "2026-03-17": [
+      {
+        "symbol": "GOTO.JK",
+        "company_name": "PT GoTo Gojek Tokopedia Tbk",
+        "volume": 4306491000,
+        "price": 51
+      },
+      {
+        "symbol": "BUMI.JK",
+        "company_name": "Bumi Resources Tbk",
+        "volume": 2059278600,
+        "price": 206
+      },
+      {
+        "symbol": "BRMS.JK",
+        "company_name": "Bumi Resources Minerals Tbk",
+        "volume": 1595833900,
+        "price": 680
+      },
+      "__+2_more (total 5)__"
+    ],
+    "2026-03-25": [
+      {
+        "symbol": "GOTO.JK",
+        "company_name": "PT GoTo Gojek Tokopedia Tbk",
+        "volume": 9934432100,
+        "price": 53
+      },
+      {
+        "symbol": "BUMI.JK",
+        "company_name": "Bumi Resources Tbk",
+        "volume": 4994553200,
+        "price": 226
+      },
+      {
+        "symbol": "ZATA.JK",
+        "company_name": "PT Bersama Zatta Jaya Tbk",
+        "volume": 2403429000,
+        "price": 81
+      },
+      "__+2_more (total 5)__"
+    ],
+    "__truncated__": "+49 more keys (total 52)"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "_status": 200,
+  "_params": {
+    "origin": "foreign",
+    "start": "2026-05-26",
+    "end": "2026-06-11"
+  },
+  "data": {
+    "symbol": "BBCA.JK",
+    "start": "2026-05-26",
+    "end": "2026-06-11",
+    "origin": "foreign",
+    "cohort": "all",
+    "top_buyers": [
+      {
+        "rank": 1,
+        "broker_code": "BK",
+        "net_idr": 893548412500,
+        "buy_idr": 3144137986000,
+        "sell_idr": 2250589573500
+      },
+      {
+        "rank": 2,
+        "broker_code": "YU",
+        "net_idr": 486554847500,
+        "buy_idr": 2210120509000,
+        "sell_idr": 1723565661500
+      },
+      {
+        "rank": 3,
+        "broker_code": "YP",
+        "net_idr": 360289533500,
+        "buy_idr": 1215508599500,
+        "sell_idr": 855219066000
+      },
+      "__+7_more (total 10)__"
+    ],
+    "top_sellers": [
+      {
+        "rank": 1,
+        "broker_code": "AK",
+        "net_idr": -2006699420500,
+        "buy_idr": 4898470604500,
+        "sell_idr": 6905170025000
+      },
+      {
+        "rank": 2,
+        "broker_code": "RX",
+        "net_idr": -1031175544000,
+        "buy_idr": 1188738246000,
+        "sell_idr": 2219913790000
+      },
+      {
+        "rank": 3,
+        "broker_code": "KZ",
+        "net_idr": -817129945500,
+        "buy_idr": 1013858356500,
+        "sell_idr": 1830988302000
+      },
+      "__+3_more (total 6)__"
+    ]
+  }
+}

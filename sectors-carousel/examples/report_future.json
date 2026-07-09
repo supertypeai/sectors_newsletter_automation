@@ -1,0 +1,107 @@
+{
+  "_status": 200,
+  "data": {
+    "symbol": "BBCA.JK",
+    "company_name": "PT Bank Central Asia Tbk.",
+    "future": {
+      "company_value_forecasts": [
+        {
+          "eps_estimate": 566.35,
+          "estimate_year": 2027,
+          "revenue_estimate": 137039999999999
+        },
+        {
+          "eps_estimate": 518.5,
+          "estimate_year": 2026,
+          "revenue_estimate": 126170000000000
+        },
+        {
+          "eps": 471.4536454633092,
+          "total_assets": 1586830000000000,
+          "total_equity": 281687555000000,
+          "total_revenue": 112006326000000,
+          "financial_year": 2025
+        }
+      ],
+      "company_growth_forecasts": [
+        {
+          "base_year": 2025,
+          "eps_growth": 0.201284539924113,
+          "estimate_year": 2027,
+          "revenue_growth": 0.223502322538452
+        },
+        {
+          "base_year": 2025,
+          "eps_growth": 0.099789989937308,
+          "estimate_year": 2026,
+          "revenue_growth": 0.12645423259397
+        }
+      ],
+      "technical_rating_breakdown": {
+        "summary": {
+          "buy": 14,
+          "sell": 3,
+          "neutral": 9,
+          "updated_on": "2025-04-25 10:29:15"
+        },
+        "oscillator": {
+          "buy": 1,
+          "data": [
+            {
+              "name": "Relative Strength Index (14)",
+              "value": 69,
+              "action": "Neutral"
+            },
+            {
+              "name": "Stochastic %K (14, 3, 3)",
+              "value": 90,
+              "action": "Neutral"
+            },
+            {
+              "name": "Commodity Channel Index (20)",
+              "value": 221,
+              "action": "Neutral"
+            },
+            "__+8_more (total 11)__"
+          ],
+          "sell": 2,
+          "neutral": 8,
+          "updated_on": "2025-04-25 10:29:15"
+        },
+        "moving_average": {
+          "buy": 13,
+          "data": [
+            {
+              "name": "Exponential Moving Average (10)",
+              "value": 2272,
+              "action": "Buy"
+            },
+            {
+              "name": "Simple Moving Average (10)",
+              "value": 2243,
+              "action": "Buy"
+            },
+            {
+              "name": "Exponential Moving Average (20)",
+              "value": 2210,
+              "action": "Buy"
+            },
+            "__+12_more (total 15)__"
+          ],
+          "sell": 1,
+          "neutral": 1,
+          "updated_on": "2025-04-25 10:29:15"
+        }
+      },
+      "analyst_rating_breakdown": {
+        "buy": 1,
+        "hold": 1,
+        "sell": 0,
+        "n_analyst": 23,
+        "strong_buy": 21,
+        "updated_on": "2026-05-07 18:03:41",
+        "strong_sell": 0
+      }
+    }
+  }
+}
