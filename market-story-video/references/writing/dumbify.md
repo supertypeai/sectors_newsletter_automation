@@ -27,7 +27,7 @@ This skill earns its keep on a markets carousel more than almost anywhere, becau
 1. **Define the deep jargon the first time, in one plain clause. Don't drop it in a glossary box.** The audience already shares *ticker, dividend, IDX, rupiah*; keep those, they're shared vocabulary, not friction. Translate the rest in passing: "P/E of 22, what you pay for each rupiah of annual profit"; "ROE of 21%, the profit earned on shareholders' money"; "an 80% payout, the share of profit paid out as dividends"; "free float, the slice of shares the public can actually trade"; "net foreign flow, foreign money in minus foreign money out."
 2. **One idea per sentence.** A slide isn't a paragraph; break nested clauses into separate lines.
 3. **Plain verbs over sell-side ones.** *pays out* not distributes, *owns* not holds a position in, *earns* not generates returns, *trades at* not is valued at a multiple of, *rose/fell* not appreciated/depreciated.
-4. **Concrete over abstract: a real number beats an adjective.** "Net profit rose 11% to Rp 54T" beats "strong earnings growth." The clarifying number must be a **real Sectors field, never invented** (see `../sectors-api/data-quality.md`). A vague adjective and a fabricated figure are both failures; the fix is the true number.
+4. **Concrete over abstract: a real number beats an adjective.** "Net profit rose 11% to IDR 54T" beats "strong earnings growth." The clarifying number must be a **real Sectors field, never invented** (see `../sectors-api/data-quality.md`). A vague adjective and a fabricated figure are both failures; the fix is the true number.
 5. **Active voice.** "BBCA earns 21% on equity," not "a 21% return on equity is generated."
 6. **Cut filler that adds no meaning.** "in order to," "it is worth noting that," "when it comes to."
 7. **Define a ratio by what it tells you, not its formula.** "ROE shows how hard a bank works its shareholders' money" lands faster than "ROE = net income / equity."
@@ -36,7 +36,7 @@ This skill earns its keep on a markets carousel more than almost anywhere, becau
 
 - **Rhythm (storytelling):** simplify the **words, not the cadence.** A slightly longer line is fine if it's plain words that read in one breath. **Never chop every slide into choppy fragments to "hit a grade level."** That flattens the music. Vary length, keep words plain. Defer rhythm to `./storytelling.md`.
 - **A slide already forces brevity.** The frame caps length for you, so here the job is mostly **word choice and jargon**, not cutting length. Don't pad a thin slide just to "simplify" it.
-- **Specificity (anti-ai-writing):** these *agree*. A concrete figure makes a slide easier to follow, not harder. "Foreign investors sold a net Rp 1.4T last month" is more specific *and* more readable than "foreign sentiment weakened." See `./anti-ai-writing.md`.
+- **Specificity (anti-ai-writing):** these *agree*. A concrete figure makes a slide easier to follow, not harder. "Foreign investors sold a net IDR 1.4T last month" is more specific *and* more readable than "foreign sentiment weakened." See `./anti-ai-writing.md`.
 - **Voice:** don't sand off the markets-desk confidence while simplifying. Keep the plain declaratives and the straight talk; cut the complexity *around* them, not the spine. `./brand-voice.md` is the target.
 
 ## How to gauge the level (no tool needed)
@@ -60,7 +60,7 @@ SIMPLIFY AUDIT (target ~8th grade, ~6th for the hook):
   Nested clause: FLAG: "The payout ratio, which has risen for five straight years, now sits at 80%"
                  → "The payout has climbed five years running. It now sits at 80% of profit."
   Abstraction:   FLAG: "foreign sentiment weakened materially"
-                 → "foreigners sold a net Rp 1.4T last month"
+                 → "foreigners sold a net IDR 1.4T last month"
   Reading level: ~12th grade → rewrite lands ~7th
   Rewrite: [plainer version, real Sectors figures, rhythm and voice preserved]
 ```

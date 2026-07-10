@@ -19,7 +19,7 @@ Fires on any story-driven or opinion deck (an earnings turn, a valuation re-rate
 - **Every beat needs a benchmark.** A number alone isn't a finding: "87% payout" means nothing until the reader knows what's normal. Pair each figure with a comparison anchor, the company's own history, a peer, or a category norm. No anchor, the beat is probably a restated fact, dig further or cut it. Rank beats before writing a line of copy: the single most surprising, hardest-to-explain-away number earns the top third of the deck, never a buried closing clause.
 
 **The arc, six moves (the first four do most of the work):**
-1. **The Dance (context vs conflict):** every transition is a BUT or a THEREFORE, never "and then another stat." "BBRI just posted its highest net profit ever. THEREFORE you'd expect the stock to rip. BUT foreign investors sold a net Rp 1.4T into the print." "And then" means the slide is filler, cut it or sharpen it into a turn.
+1. **The Dance (context vs conflict):** every transition is a BUT or a THEREFORE, never "and then another stat." "BBRI just posted its highest net profit ever. THEREFORE you'd expect the stock to rip. BUT foreign investors sold a net IDR 1.4T into the print." "And then" means the slide is filler, cut it or sharpen it into a turn.
 2. **Direction:** write the payoff slide (the last content slide, the "so what") first, then work backward to the cover. Make it the "last dab," memorable enough that reading only it would make someone send it. The outro is auto-appended, never author outro copy; the last authored slide is the payoff, not a sign-off.
 3. **Story Lens (the non-obvious angle):** a ticker isn't an angle. Push past the obvious one: invert the villain (the price drop isn't the real story, who sold is), jump to the second-order effect (don't cover the rate cut, cover what it re-rates), switch the POV (the foreign investor's seat, not local retail's). Pick the lens before writing.
 4. **Rhythm:** vary sentence length within a slide (short, medium, then one longer line that rolls to a close, a jagged left edge means it's working) and vary slide density across the deck (a big-number slide, a chart, a one-line insight, three dense charts in a row drones).
@@ -62,7 +62,7 @@ The moves:
 - **Define the deep jargon once, in one plain clause, not a glossary box.** Keep shared vocabulary as-is (ticker, dividend, IDX, rupiah); translate the rest in passing: "P/E of 22, what you pay for each rupiah of annual profit"; "ROE of 21%, the profit earned on shareholders' money"; "an 80% payout, the share of profit paid out as dividends."
 - One idea per sentence; break nested clauses into separate lines.
 - Plain verbs over sell-side ones: pays out not distributes, owns not holds a position in, earns not generates returns, trades at not is valued at a multiple of, rose/fell not appreciated/depreciated.
-- Concrete over abstract: a real number beats an adjective ("Net profit rose 11% to Rp 54T" beats "strong earnings growth"); the clarifying number must be a real Sectors field, never invented.
+- Concrete over abstract: a real number beats an adjective ("Net profit rose 11% to IDR 54T" beats "strong earnings growth"); the clarifying number must be a real Sectors field, never invented.
 - Active voice: "BBCA earns 21% on equity," not "a 21% return on equity is generated."
 - Cut filler: "in order to," "it is worth noting that," "when it comes to."
 - Define a ratio by what it tells you, not its formula: "ROE shows how hard a bank works its shareholders' money" beats "ROE = net income / equity."
@@ -75,7 +75,7 @@ The moves:
 
 **Specificity ladder, aim for Concrete minimum:** vague ("The bank faced headwinds") → specific ("Margins compressed") → concrete ("NIM fell 40bps to 5.2%") → lived/sourced ("NIM fell to 5.2% as BI held rates and deposit costs rose"). Every specific traces to a real field this run; never invent one to climb the ladder.
 
-**The negative-parallelism ban (the #1 AI tell):** "It's not X. It's Y." and its variants ("Not X. Y.", "The real story isn't X, it's Y.", "Most people think X, but..."), flagged whenever a pivot word (but, actually, really, instead, the truth is, the real, the hidden) follows a rejected frame. Fix: cut the rejected half, state the positive half as a direct claim with real specifics. "It's not about the price. It's about the story." → "The price rose 4%, but foreigners sold a net Rp 1.4T; the rally was domestic retail."
+**The negative-parallelism ban (the #1 AI tell):** "It's not X. It's Y." and its variants ("Not X. Y.", "The real story isn't X, it's Y.", "Most people think X, but..."), flagged whenever a pivot word (but, actually, really, instead, the truth is, the real, the hidden) follows a rejected frame. Fix: cut the rejected half, state the positive half as a direct claim with real specifics. "It's not about the price. It's about the story." → "The price rose 4%, but foreigners sold a net IDR 1.4T; the rally was domestic retail."
 Reconciled with the hook's allowed A-vs-B contrast: hollow B ("it's not about valuation, it's about conviction") is banned; concrete B (a real figure or named mechanism) is allowed.
 
 **Analogy control:** write literally by default; an analogy earns its place only if it clarifies, is shorter than the literal version, stays exact, and sounds natural aloud (zero on a slide ≤40 words). Banned metaphor families: journeys, battlefields, machines-for-people, ecosystems, engine/fuel, north star, flywheel, DNA, scaffolding, plumbing, iceberg, bridge, chess, sports, rollercoaster, bloodbath, storm/weather (headwinds/tailwinds), tide, perfect storm, David vs Goliath, printing money. Banned metaphor verbs: baked in, bolted on, woven, layered, distilled, unpacked, crystallized, surfaced, amplified, threaded, sculpted, anchored, framed; use rose, fell, paid, earned, sold, cut, added, caused, showed instead.
@@ -93,7 +93,7 @@ Reconciled with the hook's allowed A-vs-B contrast: hollow B ("it's not about va
 - Formatting tells: em dashes and hyphen-as-connector (use periods, commas, colons, parens), emoji/hashtag spam, walls of bullets, a rule-of-three list when the real count is 2 or 4. A "·" stitching two phrases inside a **running sentence** ("Profit rose · the stock fell") reads as a keyword list, rewrite it; this doesn't touch the "·" in kicker/label/chip rows ("IDX · DIVIDENDS"), fixed house-style chrome.
 - Other tells: false ranges ("from blue chips to penny stocks" with no middle); elegant variation (BBCA → the lender → the banking giant, use the ticker again); participle fake-depth ("...signaling strength, paving the way for growth"); throat-clearing openers; symmetric parallelism ("Strong balance sheet, strong margins, strong outlook").
 
-**Every pass:** re-check every number is a real, in-band, dated Sectors field, no prescriptive framing ("buy," "target Rp X," "cheap") slipped in, see Non-negotiables below.
+**Every pass:** re-check every number is a real, in-band, dated Sectors field, no prescriptive framing ("buy," "target IDR X," "cheap") slipped in, see Non-negotiables below.
 
 ### Voice
 

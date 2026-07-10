@@ -30,7 +30,7 @@ A content slide carries **either** `html` (the primary path, free-code) **or** `
 Author the slide body as HTML using the brand classes/tokens in **`visual-language.md`** (which has copy-paste patterns). The renderer wraps it in the brand frame, so don't write the stage, background, or footer. Placeholders (charts, logos) keep those elements on-brand, `data-spec` is single-quoted so its JSON uses double quotes (attribute order is flexible and extra attributes survive on a wrapper, but the spec must be valid single-quoted JSON and the div body empty; violations warn at render and ERROR in lint, see `references/charts.md`'s "Placeholder shape"):
 
 ```html
-<div data-chart="bar"        data-spec='{"bars":[{"label":"2025","value":57.5,"display":"57.5"}],"caption":"Rp T","benchmark":{"value":48.2,"label":"5Y AVG"}}'></div>
+<div data-chart="bar"        data-spec='{"bars":[{"label":"2025","value":57.5,"display":"57.5"}],"caption":"IDR T","benchmark":{"value":48.2,"label":"5Y AVG"}}'></div>
 <div data-chart="line"       data-spec='{"values":[100,98,103],"area":true,"w":920,"h":260,"benchmark":{"value":97,"label":"90D AVG"}}'></div>
 <div data-chart="donut"      data-spec='{"segments":[{"pct":55,"color":"#E5337E"}],"centerLabel":"55%","centerSub":"CONTROLLING"}'></div>
 <div data-chart="radar"      data-spec='{"axes":["ROE","NPL","CASA"],"series":[{"name":"BBRI","self":true,"values":[78,55,60]},{"name":"BBCA","values":[85,80,90]}],"maxValue":100}'></div>
@@ -38,8 +38,8 @@ Author the slide body as HTML using the brand classes/tokens in **`visual-langua
 <div data-chart="stackedbar" data-spec='{"bars":[{"label":"2025","segments":[{"value":48,"color":"#E5337E"},{"value":21,"color":"#DF9439"}]}],"legend":[{"label":"Micro","color":"#E5337E"},{"label":"Consumer","color":"#DF9439"}]}'></div>
 <div data-chart="waterfall"  data-spec='{"bars":[{"label":"Q1 2025","value":14.31,"isTotal":true,"display":"14.31"},{"label":"+NII","value":1.3},{"label":"Q1 2026","value":16.01,"isTotal":true,"display":"16.01"}]}'></div>
 <div data-chart="table"      data-spec='{"columns":["P/E","Yield"],"rows":[{"ticker":"DEWA","values":["2.67×","1.2%"]}]}'></div>
-<div data-chart="timeline"   data-spec='{"events":[{"date":"3 Mar 2026, afternoon","label":"Director buys 200,000 shares","detail":"14:29 · Rp 6,982/share"}]}'></div>
-<div data-chart="scatter"    data-spec='{"xLabel":"P/E","yLabel":"Market cap","yScale":"log","points":[{"x":11.9,"y":689500000000000,"label":"BBCA","self":true,"displayX":"11.9×","displayY":"Rp 689T"},{"x":9.4,"y":205000000000000,"label":"BBRI","displayX":"9.4×","displayY":"Rp 205T"}]}'></div>
+<div data-chart="timeline"   data-spec='{"events":[{"date":"3 Mar 2026, afternoon","label":"Director buys 200,000 shares","detail":"14:29 · IDR 6,982/share"}]}'></div>
+<div data-chart="scatter"    data-spec='{"xLabel":"P/E","yLabel":"Market cap","yScale":"log","points":[{"x":11.9,"y":689500000000000,"label":"BBCA","self":true,"displayX":"11.9×","displayY":"IDR 689T"},{"x":9.4,"y":205000000000000,"label":"BBRI","displayX":"9.4×","displayY":"IDR 205T"}]}'></div>
 <div data-chart="heatmap"    data-spec='{"mode":"diverging","rows":["Individual","Insurance"],"cols":["Nov","Dec"],"values":[[45000,-30000],[-8000,5000]]}'></div>
 <div data-chart="bump"       data-spec='{"days":[{"date":"23 Jun","entries":[{"symbol":"GOTO","value":6367,"display":"6.4B"},{"symbol":"BUMI","value":3325}]},{"date":"24 Jun","entries":[{"symbol":"GOTO","value":4306},{"symbol":"BUMI","value":2059}]}]}'></div>
 <div data-chart="sankey"     data-spec='{"unit":"T","links":[{"source":"Cellular","target":"Total Revenue","value":6.26},{"source":"Total Revenue","target":"Cost of Revenue","value":41.2},{"source":"Total Revenue","target":"Gross Profit","value":108.77}]}'></div>
@@ -72,7 +72,7 @@ Laws: the headline states the **verdict**, gradient (`class="gradient-text"`) go
 
 ## Rules the renderer assumes you followed
 
-- **Values are strings you pre-formatted** for display (`"Rp 689T"`, `"22.4×"`, `"+11.4%"`); chart `value`/`pct`/`dps` are raw numbers used only for geometry.
+- **Values are strings you pre-formatted** for display (`"IDR 689T"`, `"22.4×"`, `"+11.4%"`); chart `value`/`pct`/`dps` are raw numbers used only for geometry.
 - Keep content within the canvas height. Overflow is clipped; a sparse slide is better than a crammed one.
 
 See `samples/bbri-yield-vs-bonds.deck.json` for a complete worked example (a story-first, free-HTML deck: every slide states a verdict, gradient is emphasis-only).

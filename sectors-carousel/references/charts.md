@@ -31,7 +31,7 @@ Drop a placeholder div; the renderer replaces it with a brand SVG. `data-spec` i
 
 ```html
 <!-- vertical bars: trends, year-over-year. caption optional. -->
-<div data-chart="bar" data-spec='{"bars":[{"label":"2021","value":31.4,"display":"31.4"},{"label":"2025","value":57.5,"display":"57.5"}],"caption":"net profit · Rp trillion"}'></div>
+<div data-chart="bar" data-spec='{"bars":[{"label":"2021","value":31.4,"display":"31.4"},{"label":"2025","value":57.5,"display":"57.5"}],"caption":"net profit · IDR trillion"}'></div>
 
 <!-- bar + benchmark: a dashed reference line at Y(value), muted, with a right-aligned
      "label · value" tag, so a bar chart can answer "vs what" without the caption carrying it
@@ -70,7 +70,7 @@ Drop a placeholder div; the renderer replaces it with a brand SVG. `data-spec` i
      A segment's `label` and the chart's `centerLabel`/`centerSub` are plain strings (only
      `pct` itself must stay the share of the whole, geometry needs it for the arc), so any of
      them can carry an absolute figure alongside the percentage, e.g. a segment `label` of
-     "Public · 42% · Rp 310T", to show an ownership slide's absolute value with no renderer
+     "Public · 42% · IDR 310T", to show an ownership slide's absolute value with no renderer
      change. -->
 <div data-chart="donut" data-spec='{"segments":[{"pct":45,"color":"#1FB36A","label":"Strong Buy"},{"pct":30,"color":"#DF9439","label":"Buy"},{"pct":15,"color":"#A99F99","label":"Hold"},{"pct":10,"color":"#E0003B","label":"Sell"}],"centerLabel":"45%","centerSub":"STRONG BUY"}'></div>
 ```
@@ -123,8 +123,8 @@ Negative bar values render in `--loss` automatically. For a **declining-trend** 
 
 <!-- multiline "index":true: EVERY series shares ONE min/max scale (that's what makes them
      "comparable" in the first place), which silently breaks the moment two series live on
-     genuinely different natural scales, e.g. daily/{symbol} closes for BBCA (~Rp 9,000-9,800)
-     next to a small-cap peer (~Rp 150-200): the small-cap's whole range is under 2% of BBCA's,
+     genuinely different natural scales, e.g. daily/{symbol} closes for BBCA (~IDR 9,000-9,800)
+     next to a small-cap peer (~IDR 150-200): the small-cap's whole range is under 2% of BBCA's,
      so its line pins to one y value and reads as "flat, unmoving" when it may have moved just
      as much in percentage terms. Feeding pre-indexed values by hand (dividing every point by
      the series' own first value, times 100) works but invites a baseline slip, indexing off
@@ -191,10 +191,10 @@ Negative bar values render in `--loss` automatically. For a **declining-trend** 
      also warns and renders an empty cell rather than a fabricated placeholder. Mark the
      subject "self":true on a row that happens to be the piece's own ticker among peers (bold
      name, gold rank number), same convention as peerBars' r.self, most tables have no natural
-     self at all and that's fine, leave it unset. Keep values compact ("Rp 1,234T", not the
+     self at all and that's fine, leave it unset. Keep values compact ("IDR 1,234T", not the
      full integer): an unusually long value widens its whole column (columns are shared grid
      tracks across every row) and can crowd or overflow the card. -->
-<div data-chart="table" data-spec='{"columns":["P/E","Yield","Mkt Cap"],"rows":[{"ticker":"DEWA","values":["2.67×","1.2%","Rp 18T"],"self":true},{"ticker":"BBTN","values":["4.12×","4.8%","Rp 21T"]}]}'></div>
+<div data-chart="table" data-spec='{"columns":["P/E","Yield","Mkt Cap"],"rows":[{"ticker":"DEWA","values":["2.67×","1.2%","IDR 18T"],"self":true},{"ticker":"BBTN","values":["4.12×","4.8%","IDR 21T"]}]}'></div>
 
 <!-- timeline: dated event rows for a filing cluster or corporate-action sequence: an eval
      needed to show "4 lonely filings over 6 months, then 6 crammed into one afternoon" and
@@ -204,7 +204,7 @@ Negative bar values render in `--loss` automatically. For a **declining-trend** 
      therefore share one coarse date label ("3 Mar 2026, afternoon") with the precise time in
      `detail`, not each get a distinct per-minute timestamp as `date`, or every event gets its
      own header and the clustering effect you built this for is lost. -->
-<div data-chart="timeline" data-spec='{"events":[{"date":"12 Sep 2025","label":"Commissioner buys 50,000 shares"},{"date":"3 Mar 2026, afternoon","label":"President Commissioner buys 317,900 shares","detail":"14:26 · Rp 6,982/share"},{"date":"3 Mar 2026, afternoon","label":"Director A buys 200,000 shares","detail":"14:29 · Rp 6,982/share"}]}'></div>
+<div data-chart="timeline" data-spec='{"events":[{"date":"12 Sep 2025","label":"Commissioner buys 50,000 shares"},{"date":"3 Mar 2026, afternoon","label":"President Commissioner buys 317,900 shares","detail":"14:26 · IDR 6,982/share"},{"date":"3 Mar 2026, afternoon","label":"Director A buys 200,000 shares","detail":"14:29 · IDR 6,982/share"}]}'></div>
 
 <!-- scatter: two independent axes at once ("who's cheap AND big"), for entities that don't
      share one natural scale the way bar/multiline's y-axis does. A peers report's pe_ttm vs
@@ -224,11 +224,11 @@ Negative bar values render in `--loss` automatically. For a **declining-trend** 
      size legend. At most one `self`; a second one warns and demotes to peer (first wins, same
      "first self wins" convention radar/multiline's `resolveSeriesColors` already uses). Past
      ~12 points the dot field itself gets crowded, the renderer warns and suggests `table`.
-     `displayX`/`displayY` (optional, per point) are pre-formatted strings ("11.9×", "Rp 689T")
+     `displayX`/`displayY` (optional, per point) are pre-formatted strings ("11.9×", "IDR 689T")
      printed in place of the raw `x`/`y`, the same value/display split every other chart here
      uses; the axis's own min/max text reuses whichever point's displayX/displayY holds that
      extreme value, so the axis edge can never disagree with the label sitting next to it. -->
-<div data-chart="scatter" data-spec='{"xLabel":"P/E (trailing)","yLabel":"Market cap","yScale":"log","points":[{"x":11.9,"y":689500000000000,"label":"BBCA","self":true,"displayX":"11.9×","displayY":"Rp 689T"},{"x":9.4,"y":205000000000000,"label":"BBRI","displayX":"9.4×","displayY":"Rp 205T"},{"x":7.1,"y":142000000000000,"label":"BMRI","displayX":"7.1×","displayY":"Rp 142T"},{"x":14.2,"y":98000000000000,"label":"BBNI","displayX":"14.2×","displayY":"Rp 98T"}]}'></div>
+<div data-chart="scatter" data-spec='{"xLabel":"P/E (trailing)","yLabel":"Market cap","yScale":"log","points":[{"x":11.9,"y":689500000000000,"label":"BBCA","self":true,"displayX":"11.9×","displayY":"IDR 689T"},{"x":9.4,"y":205000000000000,"label":"BBRI","displayX":"9.4×","displayY":"IDR 205T"},{"x":7.1,"y":142000000000000,"label":"BMRI","displayX":"7.1×","displayY":"IDR 142T"},{"x":14.2,"y":98000000000000,"label":"BBNI","displayX":"14.2×","displayY":"IDR 98T"}]}'></div>
 
 <!-- heatmap: a category x time/metric matrix, one primitive covering three data shapes that
      used to force an either/or choice. shareholders-composition's holder-type x month mix is
@@ -298,7 +298,7 @@ Negative bar values render in `--loss` automatically. For a **declining-trend** 
      its throughput (the larger of what flows in vs. out), and every node prints its own name
      + total, not just the ribbons touching it.
 
-     UNIT: `unit` (optional, e.g. `"T"` for "Rp trillion") is appended directly to every
+     UNIT: `unit` (optional, e.g. `"T"` for "IDR trillion") is appended directly to every
      printed number, node totals AND link values alike, not just stated once in the `caption`,
      since a sankey this dense (TLKM's real tree prints 18 node totals and up to 17 link values on
      one canvas) has numbers far from the caption at the top, so the promise ("every chart

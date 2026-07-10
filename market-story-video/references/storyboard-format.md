@@ -69,8 +69,8 @@ underneath giving it a verdict. Use when one number carries the whole beat (caro
 ### `role: "chart"` — a trend across time or a small breakdown
 
 ```jsonc
-"chart": { "kind": "bar", "bars": [ { "label": "2025", "value": 56.7, "display": "56.7" } ], "caption": "Rp T · net profit" }
-"chart": { "kind": "line", "values": [100, 108, 121, 91, 88], "peakLabel": "ATH 9,174", "lowLabel": "Rp 775 · 8 Jun", "endLabel": "Rp 940 · now", "caption": "down ~31% this year" }
+"chart": { "kind": "bar", "bars": [ { "label": "2025", "value": 56.7, "display": "56.7" } ], "caption": "IDR T · net profit" }
+"chart": { "kind": "line", "values": [100, 108, 121, 91, 88], "peakLabel": "ATH 9,174", "lowLabel": "IDR 775 · 8 Jun", "endLabel": "IDR 940 · now", "caption": "down ~31% this year" }
 ```
 `bar` grows sequentially bar-by-bar; `line` draws on left-to-right with an area fill and up to
 three optional call-outs, each only appearing once the drawn line has actually reached that
@@ -111,7 +111,7 @@ outside 10-15s.
 - `emphasis` is an EXACT, case-sensitive substring of its `headline` (mirrors the carousel's
   `brand-lint.mjs` emphasis-match ERROR) — a mismatch throws at render time here, not just a
   lint warning, since there is no separate "flat fallback" render path.
-- Values in `stat`/`chart`/`breakdown` are pre-formatted display strings (`"Rp 689T"`,
+- Values in `stat`/`chart`/`breakdown` are pre-formatted display strings (`"IDR 689T"`,
   `"22.4×"`); `chart.bars[].value`/`chart.values` are raw numbers used only for geometry.
 - No em/en dashes anywhere (brand voice, `writing/writing.md` §3) — the lint catches this.
 - `badges`/`marker` are meaningful only in the "thread" theme; the noir theme ignores them.

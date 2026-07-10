@@ -47,7 +47,7 @@ Great stories alternate **context** (here is what's happening) and **conflict** 
 > BBRI posted record profit. And revenue grew. And the dividend rose. And ROE is high. And foreigners sold. And the stock fell.
 
 **Strong (but/therefore loops across slides):**
-> *S2:* BBRI just posted its highest net profit ever. *S3:* **THEREFORE** you'd expect the stock to rip. *S4:* **BUT** foreign investors sold a net Rp 1.4T into the print. *S5:* **THEREFORE** the story isn't the earnings beat... *S6 (payoff):* it's who's quietly walking out the door.
+> *S2:* BBRI just posted its highest net profit ever. *S3:* **THEREFORE** you'd expect the stock to rip. *S4:* **BUT** foreign investors sold a net IDR 1.4T into the print. *S5:* **THEREFORE** the story isn't the earnings beat... *S6 (payoff):* it's who's quietly walking out the door.
 
 Outline the deck as a column of beats and force a "but" or "therefore" between each. If "and then" fits the gap, that slide is filler. Cut it or sharpen it into a real turn.
 

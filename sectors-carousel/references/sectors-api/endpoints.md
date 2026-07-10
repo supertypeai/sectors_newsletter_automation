@@ -140,7 +140,7 @@ result with one `company/report/{symbol}/` per pick for the carousel's real deta
 - **Best banks by ROE**: `where=sub_sector = 'banks' and roe[2024] > 0.1 and roe[2024] < 0.6`, `order_by=-roe[2024]` (verified live 2026-07-02: 9 banks, BBCA on top at 0.20; the band excludes garbage-ROE small caps). `between` is NOT valid where-syntax, it 400s.
 - **Founder-owned**: `where=major_shareholders_name like '%<name>%'` or `free_float < 0.25`.
 - **Beat last quarter**: `where=earnings_q[Q4-2024] > earnings_q[Q3-2024]`.
-- **Scarcity/threshold**: `where=market_cap > 500000000000000`, `order_by=-market_cap` — a hard cutoff can return a strikingly short list (verified: exactly 2 companies above Rp500T), an instant hero-stat cover with no chart needed.
+- **Scarcity/threshold**: `where=market_cap > 500000000000000`, `order_by=-market_cap` — a hard cutoff can return a strikingly short list (verified: exactly 2 companies above IDR500T), an instant hero-stat cover with no chart needed.
 - **Founder/tycoon cross-company reach**: `where=key_executives_name like '%<name>%'` — one name can surface unrelated-looking companies sharing an executive or founder, a "who really owns Indonesia" angle (verified: one search surfaced 3 companies across banking, building materials, and petrochemicals).
 
 **When the ask is open** ("what's a good IDX story this week"), run 2-3 of these recipes plus
@@ -208,7 +208,7 @@ holder_type(insider/...), holder_name, holding_before, holding_after,
 amount_transaction, price, transaction_value, share_percentage_before/after,
 idx_conglomerates_group_slug, idx_investor_slug}}` (the two slugs are join keys
 toward conglomerate/whale angles).
-**Coverage skews big-cap but is not exclusive**: a ~Rp 296B small cap topped the
+**Coverage skews big-cap but is not exclusive**: a ~IDR 296B small cap topped the
 live stream on 2026-07-02. Don't assume a small cap is absent, and don't assume
 presence either (JSPT had zero on the last check); query, then null-guard.
 Filing-body numbers are unreliable (see data-quality.md).

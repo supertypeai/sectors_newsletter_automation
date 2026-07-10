@@ -20,7 +20,7 @@ This is the **last pass on every carousel**, after the rest of the pack has done
 This skill pushes hard for specifics. In finance, **the specific must be real.** Three rules sit above every craft rule below:
 
 1. **Never invent a number to satisfy the ladder.** A fabricated specific is worse than a vague true statement. If you don't have the figure, write the qualitative fact plainly ("profit grew, the filing didn't break out by how much") or drop the claim. Every number on a slide is a real Sectors API field this run, inside its plausibility band, with a date. See `../sectors-api/data-quality.md`.
-2. **Descriptive, never prescriptive.** Report what the data shows; never tell the reader what to do with the stock. "Buy / sell / load up / accumulate / target Rp X / it's cheap" is investment advice, and it is also an **AI-confidence tell**: the model sounds authoritative by issuing a verdict it has no business issuing. Cut it to the underlying figure.
+2. **Descriptive, never prescriptive.** Report what the data shows; never tell the reader what to do with the stock. "Buy / sell / load up / accumulate / target IDR X / it's cheap" is investment advice, and it is also an **AI-confidence tell**: the model sounds authoritative by issuing a verdict it has no business issuing. Cut it to the underlying figure.
 3. **Accuracy outranks everything.** When a stylish line and a true line conflict, the true line wins, every time.
 
 ## The 5 diseases (diagnose before you fix)
@@ -28,8 +28,8 @@ This skill pushes hard for specifics. In finance, **the specific must be real.**
 Most finance-AI copy fails for one of five reasons. Name the disease and the fix is obvious. If you can't name it, **read the line aloud** and it becomes audible.
 
 1. **Vagueness compression:** describes a category, not a thing. *"The bank faced headwinds"* → "net interest margin fell 40bps to 5.2% as deposit costs rose."
-2. **Significance inflation:** treats a normal quarter like a turning point. *"This marks a pivotal shift for Indonesian banking"* → state the fact ("net profit rose 11% to Rp 54T") and let the reader weigh it.
-3. **Hedged confidence:** has a position but won't commit. *"It could be argued GOTO is nearing profitability"* → "GOTO's adjusted EBITDA turned positive in Q4, at Rp 78B." Take the position the data supports, or cut the line.
+2. **Significance inflation:** treats a normal quarter like a turning point. *"This marks a pivotal shift for Indonesian banking"* → state the fact ("net profit rose 11% to IDR 54T") and let the reader weigh it.
+3. **Hedged confidence:** has a position but won't commit. *"It could be argued GOTO is nearing profitability"* → "GOTO's adjusted EBITDA turned positive in Q4, at IDR 78B." Take the position the data supports, or cut the line.
 4. **Rhythmic flatness:** every slide the same sentence length, every body three lines. Break the meter.
 5. **Borrowed authority:** reads like a sell-side research note or a finfluencer reel. No fingerprint. Say it the way the markets desk would tell one friend.
 
@@ -63,13 +63,13 @@ The biggest single tell of AI writing. The pattern:
 **The fix:** delete the rejected half, then rewrite the positive half as a direct claim with real specifics.
 > *"It's not about the price. It's about the story."*
 > → "It's about the story." (still hollow, no point)
-> → "The price rose 4%, but foreigners sold a net Rp 1.4T. The rally was domestic retail."
+> → "The price rose 4%, but foreigners sold a net IDR 1.4T. The rally was domestic retail."
 
 The reframe was hiding the fact that the writer had no point. The final version has a figure and a mechanism, the actual point.
 
 **Reconciliation with `./viral-hooks.md` (these skills must not fight):** hooks deliberately use A-vs-B contrast as a curiosity mechanic, and that's allowed. The line is **hollow vs earned**:
 - **Banned (hollow):** B is vague significance hiding the absence of a point: "It's not about valuation, it's about conviction." Cut it.
-- **Allowed (earned):** B is concrete and the slides deliver it: "Most people read the 4% pop. Foreigners sold a net Rp 1.4T that day; the buyers were local retail." The contrast opens a loop the foreign-flow slide pays off.
+- **Allowed (earned):** B is concrete and the slides deliver it: "Most people read the 4% pop. Foreigners sold a net IDR 1.4T that day; the buyers were local retail." The contrast opens a loop the foreign-flow slide pays off.
 - **Test (two parts):** (1) Is B concrete, **Level 3+ on the ladder** (a real figure, ratio, or named mechanism, not a category like "conviction" or "the story")? (2) Do the slides deliver it? **At hook stage the slides don't exist yet**, so judge B on part (1) alone, keep it provisionally, and re-check delivery on the post-draft pass. A vague-significance B fails part (1) and gets cut now. Hold this line hard: carousel copy is written prose, not a spoken hook, so there is no looser bar.
 
 ## Analogy & metaphor control
@@ -80,7 +80,7 @@ Use an analogy only if **all five** are true: (1) the subject is genuinely unfam
 
 **Banned metaphor families:** journeys, battlefields, machines-for-people, ecosystems, engine/fuel, North star, flywheel, DNA, scaffolding, plumbing, iceberg, bridge, chess, sports, plus the market clichés: rollercoaster, bloodbath, storm/weather (this is what "headwinds / tailwinds" are), tide, perfect storm, David vs Goliath, printing money. **Banned metaphor verbs:** baked in, bolted on, woven, layered, distilled, unpacked, crystallized, surfaced, amplified, threaded, sculpted, anchored, framed. Replace with literal verbs: rose, fell, paid, earned, sold, cut, added, caused, showed.
 
-> *"TLKM is a cash machine."* → "TLKM generates steady cash." → "TLKM converted 92% of EBITDA to free cash flow and paid Rp 16.9T in dividends."
+> *"TLKM is a cash machine."* → "TLKM generates steady cash." → "TLKM converted 92% of EBITDA to free cash flow and paid IDR 16.9T in dividends."
 
 ## Blocklists (starting points, the principle outlives the list)
 
@@ -100,7 +100,7 @@ Use an analogy only if **all five** are true: (1) the subject is genuinely unfam
 
 ## AI tells (generic even when no single rule is broken)
 
-- **Investment-advice confidence:** prescriptive framing ("buy", "sell", "load up", "accumulate", "target Rp X", "it's cheap"). The model sounds authoritative by issuing a verdict; cut to the figure and let the reader decide (brand-voice non-negotiable, data-integrity clause).
+- **Investment-advice confidence:** prescriptive framing ("buy", "sell", "load up", "accumulate", "target IDR X", "it's cheap"). The model sounds authoritative by issuing a verdict; cut to the figure and let the reader decide (brand-voice non-negotiable, data-integrity clause).
 - **False precision:** an exact number with no nameable source field and date. If you can't cite where it came from, it's a tell, drop it.
 - **Hype superlatives:** "best", "strongest ever", "record-smashing" on ordinary facts. State the number; let it be the superlative if it earns it.
 - **Rule of three reflex:** every list three items, every claim three supports. Real analysis has uneven counts.

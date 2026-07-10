@@ -48,7 +48,7 @@ of the rhythm library.)
   <div>
     <div class="kicker">EARNINGS · YOY</div>
     <div class="title" style="margin-top:14px;">Profit kept <span class="gradient-text">climbing</span> for five years</div>
-    <div class="caption-t" style="margin-top:10px;">annual net profit · Rp trillion</div>
+    <div class="caption-t" style="margin-top:10px;">annual net profit · IDR trillion</div>
   </div>
   <div data-chart="bar" data-spec='{"bars":[…]}'></div>
   <div class="body">Net profit rose 83% since 2021. The verdict is on the multiple, not the earnings.</div>
@@ -71,7 +71,7 @@ of the rhythm library.)
 ```html
 <div class="stack" style="gap:20px;flex:1;justify-content:center;">
   <div class="title">A quiet stretch, then a <span class="gradient-text">cluster</span> in one afternoon</div>
-  <div data-chart="timeline" data-spec='{"events":[{"date":"12 Sep 2025","label":"Commissioner buys 50,000 shares"},{"date":"3 Mar 2026, afternoon","label":"President Commissioner buys 317,900 shares","detail":"14:26 · Rp 6,982/share"},{"date":"3 Mar 2026, afternoon","label":"Director A buys 200,000 shares","detail":"14:29 · Rp 6,982/share"}]}'></div>
+  <div data-chart="timeline" data-spec='{"events":[{"date":"12 Sep 2025","label":"Commissioner buys 50,000 shares"},{"date":"3 Mar 2026, afternoon","label":"President Commissioner buys 317,900 shares","detail":"14:26 · IDR 6,982/share"},{"date":"3 Mar 2026, afternoon","label":"Director A buys 200,000 shares","detail":"14:29 · IDR 6,982/share"}]}'></div>
 </div>
 ```
 
@@ -184,7 +184,7 @@ of the rhythm library.)
 ```html
 <div class="stack" style="gap:28px;flex:1;justify-content:center;">
   <div class="title">The exit was about <span class="gradient-text">Indonesia</span>, not the bank.</div>
-  <div class="glass"><div class="body">ROE held at 20.4% through six months of selling. When MSCI flagged Indonesia's transparency, foreign funds trimmed their most liquid position. Net Q2 outflow: Rp 8.9T. The November review is the next checkpoint.</div></div>
+  <div class="glass"><div class="body">ROE held at 20.4% through six months of selling. When MSCI flagged Indonesia's transparency, foreign funds trimmed their most liquid position. Net Q2 outflow: IDR 8.9T. The November review is the next checkpoint.</div></div>
 </div>
 ```
 

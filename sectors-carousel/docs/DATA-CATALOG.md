@@ -6,7 +6,7 @@ content angle → source field**. Every field here was live-verified (see
 `ENDPOINTS.md`).
 
 Units: IDR amounts are raw rupiah (BBCA market_cap `689,538,992,175,000` =
-~Rp 689.5 T). Ratios/yields/changes are decimals (`0.097` = +9.7%).
+~IDR 689.5 T). Ratios/yields/changes are decimals (`0.097` = +9.7%).
 
 ---
 
@@ -88,7 +88,7 @@ same folder, which already has the corrected figure; this file was stale).
 ## Coverage reality check (verified)
 - **News:** big-cap-skewed. BBCA = 443 news (2026-07-02); **JSPT = 0**. For small
   caps, drop the news card or use `sub_sector` news. **Filings:** skew big-cap but
-  are not exclusive (a ~Rp 296B small cap topped the live stream on 2026-07-02);
+  are not exclusive (a ~IDR 296B small cap topped the live stream on 2026-07-02);
   query per symbol, then null-guard.
 - **ESG, analyst ratings, forecasts, forward_pe, indices, affiliates:** populated
   for blue chips, `null` for small caps (JSPT). Always null-guard before render.

@@ -16,7 +16,7 @@ Retail investors and finance-curious people on Instagram who follow IDX (Indones
 
 - **Language: English.** Indonesian market context, English copy. (The studio publishes in English; Indonesian phrasing in a draft is a bug.)
 - **Confident and plain.** Short declaratives. Say the thing. "BBCA earns more on every rupiah of equity than any big bank on the exchange." Not "BBCA demonstrates superior return metrics."
-- **Specific over impressive.** A real number always beats an adjective. "Net profit up 11% to Rp 54T" beats "strong profit growth."
+- **Specific over impressive.** A real number always beats an adjective. "Net profit up 11% to IDR 54T" beats "strong profit growth."
 - **Curious, not breathless.** We open loops and pay them off. We do not yell "GAME CHANGER."
 - **Numerate but humble about it.** We explain what a ratio means in one clause the first time it appears ("ROE, profit earned on shareholder money, hit 21%").
 
@@ -30,7 +30,7 @@ Retail investors and finance-curious people on Instagram who follow IDX (Indones
 
 ## Vocabulary
 
-- **Use:** the company's real name and ticker, plain verbs (rose, fell, earns, pays, owns, trades at), concrete units (Rp, %, ×, T for trillion). Indonesian rupiah is `Rp` (e.g. `Rp 10,150`); large numbers compact as `Rp 689.5T`.
+- **Use:** the company's real name and ticker, plain verbs (rose, fell, earns, pays, owns, trades at), concrete units (IDR, %, ×, T for trillion). Indonesian rupiah is `IDR` (e.g. `IDR 10,150`); large numbers compact as `IDR 689.5T`.
 - **Lose:** the AI/LinkedIn tells (delve, leverage, robust, pivotal, testament, landscape, in today's market), the finfluencer tells (secret, nobody's talking about, this is your sign), and dash-connectors as pauses (use periods/commas).
 
 ## Voice in one line, good vs off-brand
@@ -39,8 +39,8 @@ Retail investors and finance-curious people on Instagram who follow IDX (Indones
 |---|---|
 | "BBCA is crushing it this quarter! 🚀" | "BBCA just posted its highest ROE in five years." |
 | "This stock is a must-buy at these levels." | "It trades at 22× earnings, a premium to the 14× sector median." |
-| "The dividend landscape is evolving." | "The payout has climbed five years straight, from Rp 120 to Rp 315 a share." |
+| "The dividend landscape is evolving." | "The payout has climbed five years straight, from IDR 120 to IDR 315 a share." |
 | "Unlock the power of IDX's top bank." | "Indonesia's most valuable company, by the numbers." |
-| "Foreign investors are fleeing!" | "Foreign investors sold a net Rp 1.4T over the last month." |
+| "Foreign investors are fleeing!" | "Foreign investors sold a net IDR 1.4T over the last month." |
 
 When the writing skills tell you to "read your top posts for cadence," read this file instead. The voice above is the target.

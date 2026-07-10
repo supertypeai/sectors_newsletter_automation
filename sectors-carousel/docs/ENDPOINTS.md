@@ -184,7 +184,7 @@ transaction_type(buy/sell), holder_type(insider/...), holder_name,
 holding_before, holding_after, amount_transaction, price, transaction_value,
 price_transaction[]{date,type,price,amount_transacted}, share_percentage_before/after/transaction,
 idx_conglomerates_group_slug, idx_investor_slug}}`.
-Coverage skews big-cap but is **not exclusive**: a ~Rp 296B small cap topped the
+Coverage skews big-cap but is **not exclusive**: a ~IDR 296B small cap topped the
 live stream on 2026-07-02, while JSPT had zero filings on the last check.
 
 ---
