@@ -1,0 +1,54 @@
+{
+  "theme": "noir",
+  "tickers": ["BBRI"],
+  "sourceDate": "9 Jul 2026",
+  "scenes": [
+    {
+      "role": "cover",
+      "duration": 3.0,
+      "kicker": "IDX · DIVIDENDS",
+      "headline": "A high yield, the hard way.",
+      "emphasis": "hard way",
+      "tickers": ["BBRI"],
+      "stat": { "value": "12%", "label": "DIVIDEND YIELD", "compare": { "value": "6.8%", "label": "10Y BOND" } }
+    },
+    {
+      "role": "chart",
+      "duration": 3.3,
+      "kicker": "THE YIELD GAP",
+      "headline": "Profit kept falling for three years",
+      "emphasis": "falling",
+      "tickers": ["BBRI"],
+      "chart": {
+        "kind": "bar",
+        "bars": [
+          { "label": "2023", "value": 62.1, "display": "62.1" },
+          { "label": "2024", "value": 58.3, "display": "58.3" },
+          { "label": "2025", "value": 56.7, "display": "56.7" }
+        ],
+        "caption": "Rp T · net profit"
+      },
+      "body": "Yet the payout ratio held near 85%."
+    },
+    {
+      "role": "stat",
+      "duration": 2.6,
+      "kicker": "PAYOUT RATIO",
+      "stat": { "value": "85%", "label": "OF NET PROFIT PAID OUT" },
+      "headline": "The dividend isn't growing. It's being defended.",
+      "emphasis": "defended."
+    },
+    {
+      "role": "takeaway",
+      "duration": 1.9,
+      "kicker": "THE TAKEAWAY",
+      "headline": "A high yield can be a warning, not a reward.",
+      "emphasis": "warning, not a reward."
+    }
+  ],
+  "outro": {
+    "headline": "Yield alone doesn't tell you the whole story.",
+    "emphasis": "whole story.",
+    "tagline": "sectors.app/idx/bbri"
+  }
+}
