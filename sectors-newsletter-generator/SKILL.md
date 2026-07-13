@@ -3,20 +3,26 @@ name: sectors-newsletter-generator
 description: >-
   Generate an on-brand, data-backed Markdown newsletter about the Indonesian stock
   market (IDX) from live Sectors data and cited research. Use whenever the user wants
-  to write, draft, or produce the Sectors subscriber newsletter, a market newsletter
-  issue, or a twice-weekly email piece. Handles three issue types the user picks from
-  on each run: a "weekly wrap" / "Saturday market wrap" (the week's index moves, sector
-  and ticker standouts, flows, all from real data); a "macro-reaction piece" / "macro
-  newsletter" (tie the last ~2 days of macro news to the sectors and tickers likely
-  affected, then report each name's fundamentals and valuation context); and a "three
-  stocks story" / "three-stock storytelling" piece (three companies' history, people,
-  fun facts, and attributed forward outlook). Trigger on phrases like "write the
-  newsletter", "do this week's Saturday wrap", "macro newsletter piece on the rate
-  cut", "three-stocks story for the newsletter", or "draft a Sectors newsletter issue".
-  Do NOT use it for Instagram carousels or slides (use sectors-carousel), for video, or
-  for non-IDX markets. This skill's deliverable is Markdown text and tables, bite-sized
-  and scannable rather than long-form prose, plus at most one optional generated chart
-  image for the issue's single hero trend, it is not a slides or video renderer.
+  to write, draft, or produce a Sectors subscriber newsletter issue. Handles eight
+  built issue types the user picks from on each run, across four families: MARKET
+  PERFORMANCE ("weekly wrap" / "Saturday market wrap"; "daily market pulse" end-of-day
+  movers and volume); MARKET INSIGHTS ("macro-reaction" / "macro newsletter" tying the
+  last ~2 days of macro news to affected sectors and tickers); COMPANY INSIGHTS ("three
+  stocks story" history/people/fun-facts/attributed-outlook; "single company deep dive"
+  off an earnings or corporate-action trigger; "sector spotlight" peer-comparing one
+  sub-sector's names on valuation); and SECTORS-ORG announcements ("new feature release"
+  enablement copy sourced from the Sectors release notes; "upcoming event" promo for a
+  Sectors in-house workshop, built from user-supplied event details, not market data).
+  Trigger on phrases like "write the newsletter", "do this week's Saturday wrap", "daily
+  pulse", "macro piece on the rate cut", "deep dive on BBRI earnings", "sector spotlight
+  on the banks", "three-stocks story", "write up the new feature release", or "announce
+  the upcoming workshop". Do NOT use it for Instagram carousels or slides (use sectors-carousel),
+  for video, or for non-IDX markets, and do NOT use it for lifecycle/CRM/transactional
+  email (onboarding nudges, credit/plan reminders, upgrade/win-back, personal portfolio
+  digests) or for deciding recipients/frequency, those need live user-account data this
+  skill does not have. This skill's deliverable is Markdown text and tables, bite-sized
+  and scannable, plus at most one optional generated chart image for the issue's single
+  hero trend, it is not a slides or video renderer.
 ---
 
 # Sectors Newsletter Generator
@@ -32,21 +38,71 @@ skill govern everything here:
 
 ## Pick the issue type (always first)
 
-When this skill is invoked, present the user three options and wait for a pick — this
-is **one issue per run**, never all three at once:
+This is **one issue per run**, never several at once. Eight issue types are built,
+grouped by content family (mirroring the newsletter content plan's type catalog). Each
+maps to a workflow doc in `references/workflows/` and an issue-type slug:
 
-1. **Weekly wrap** — the week's market conclusion: index moves, sector/ticker
-   standouts, flows. Intended send: Saturday morning.
-2. **Macro-reaction piece** — tie the last ~2 days of macro news to the sectors/tickers
-   likely affected, then report each name's fundamentals and valuation context.
-3. **Three-stock storytelling** — three companies' history, people, fun facts, and
-   attributed forward outlook.
+**Market Performance**
+1. **Weekly wrap** (`weekly-wrap`) — the week's conclusion: index moves, sector/ticker
+   standouts, flows. Saturday send.
+2. **Daily market pulse** (`daily-market-pulse`) — end-of-day movers, volume leaders,
+   brokers. Tight, table-first, read in under a minute.
+
+**Market Insights**
+3. **Macro-reaction** (`macro-reaction`) — tie the last ~2 days of macro news to affected
+   sectors/tickers, then report each name's fundamentals and valuation context.
+
+**Company Insights**
+4. **Three-stock storytelling** (`three-stock-story`) — three companies' history, people,
+   fun facts, attributed forward outlook.
+5. **Single company deep dive** (`single-company-deep-dive`) — one name read in depth off
+   a real earnings / corporate-action / ownership trigger.
+6. **Sector spotlight** (`sector-spotlight`) — one sub-sector's names peer-compared on
+   valuation ("which one is actually cheap," as context, not a call).
+
+**Sectors-org announcements** (about Sectors itself, not the market)
+7. **New feature release** (`new-feature-release`) — enablement copy off a real Sectors
+   release note (`sectors.app/release`), optionally showing the capability on real data.
+8. **Upcoming event** (`upcoming-event`) — promo for a Sectors in-house workshop (online
+   or offline, teaching participants to build on live Sectors API data). Content is
+   **user-supplied**: ask for date/time/venue, agenda/speaker/target audience,
+   registration link, and marketing banner before drafting. Not market-data driven.
 
 **Skip the menu when the ask already resolves it**: if the user names the type and/or
-subject ("do the Saturday wrap," "macro piece on the BI rate cut"), go straight into
-that pipeline. If they delegate the choice ("you pick this week's issue"), choose and
-state a one-line "why this, why now" as you proceed. Only a bare "write the newsletter"
-with no type named gets the three-option menu.
+subject ("do the Saturday wrap," "deep dive on BBRI earnings," "spotlight the banks"), go
+straight into that pipeline. If they delegate the choice ("you pick this week's issue"),
+choose and state a one-line "why this, why now" as you proceed. Only a bare "write the
+newsletter" with no type named gets the menu, offer the eight above grouped by family.
+
+### Not yet built (in scope, will be added iteratively)
+
+These are valid market/editorial content this skill's engine *can* produce, they just
+don't have a workflow doc yet. If the user asks for one, say it's not built yet and offer
+the closest built type, or build it by following the nearest existing workflow doc as a
+template (don't fake it with an ad-hoc pipeline):
+
+- Market Insights: Regulatory / index event, Global spillover, Broker flow digest
+- Market Performance: Monthly recap
+- Company Insights: Insider activity signal
+- FOMO (market content only, targeting is external): Missed rally, Missed dividend,
+  Sector rotation miss, Caught it
+- Educational: Concept explainer, How-to guide, Use-case walkthrough
+- Product Update: Feature enhancement, Deprecation notice
+
+### Out of scope (do not attempt here)
+
+These need live **user-account, billing, or product-usage data** this skill cannot fetch
+(`quest_completed`, `credits_used`, watchlist/workflow history, renewal dates). They are
+lifecycle/CRM/transactional email, a different system, not market content. Decline and say
+why:
+
+- Reminder: onboarding nudge, setup nudge, credit-expiry, plan-renewal
+- Account & Value: value recap, upgrade prompt, win-back reoffer
+- Market Performance: personal portfolio digest (needs the user's own watchlist history)
+
+**Recipient grouping, segmentation, frequency caps, and send scheduling are also out of
+scope.** This skill generates one content piece; who receives it and when is decided by
+the delivery/CRM system that consumes the output, not here.
 
 ## Shared pipeline shape
 
@@ -88,6 +144,41 @@ management/ownership/financials from the API, and write any forward statement as
 **attributed** ("management has guided…," "consensus estimates…"), never as the
 newsletter's own prediction.
 
+### Single company deep dive
+Open `references/workflows/single-company-deep-dive.md`, and open `references/compliance.md`
+before the valuation section (this is the type most likely to drift into "looks cheap,
+buy it"). In brief: anchor a real recent trigger (earnings, corporate action, ownership
+change), pull one sliced `company/report` plus the price series and, for earnings, the
+quarterly call; state one benchmarked read and prove it; report valuation as context, not
+a call.
+
+### Sector spotlight
+Open `references/workflows/sector-spotlight.md`. In brief: pick one sub-sector with a
+current hook, pull `subsector/report` for the group median as the benchmark, screen and
+`report` 2-4 members, and lead with a comparison table reading each name against the group
+median and its own history, valuation context only, never "the one to buy."
+
+### Daily market pulse
+Open `references/workflows/daily-market-pulse.md`. In brief: one batched call for the
+day's `top-changes` (`periods=1d`), `most-traded`, `brokers/top`, and `idx-total`; write a
+one-line index read and two/three small tables; keep it short by design.
+
+### New feature release
+Open `references/workflows/new-feature-release.md`, and read `references/sourcing.md`'s
+**gated sectors.app / docs.sectors.app fetch** note first. In brief: fetch
+`sectors.app/release` live with a browser user-agent, pick the newest net-new feature,
+write enablement copy (optionally showing the capability on one real band-checked data
+example), cite the release page.
+
+### Upcoming event
+Open `references/workflows/upcoming-event.md`. This type is **not** market-data driven,
+it's a promo for a Sectors in-house workshop, and the content comes from the user. Before
+drafting, ask for all four: date/time/venue, agenda/speaker/target audience, registration
+link, and marketing banner. Never invent any of them. Optionally include one real
+`sectors.mjs` data teaser of what participants will build. This is the pipeline's one
+exception to the "research the angle / fetch and validate data" opening stages, the
+research step is the intake questions, and the only data fetch is the optional teaser.
+
 ## Hard rules (override style every time)
 
 1. **Never fabricate a number.** Every figure traces to a real Sectors API field this
@@ -123,12 +214,17 @@ Finished issues land at:
 /Users/evelyn/Desktop/newsletter/newsletter_<YYYY-MM-DD>_<type-slug>/
     newsletter.md
     chart-<slug>.svg           only if the issue includes the optional hero chart
+    banner-<slug>.<ext>        upcoming-event only: the user-supplied banner, copied in
 ```
 
-- `<type-slug>` is `weekly-wrap`, `macro-reaction`, or `three-stock-story`.
+- `<type-slug>` is one of the eight built slugs: `weekly-wrap`, `daily-market-pulse`,
+  `macro-reaction`, `three-stock-story`, `single-company-deep-dive`, `sector-spotlight`,
+  `new-feature-release`, `upcoming-event`.
 - `<YYYY-MM-DD>` is the issue/send date.
 - Any generated chart file lands in this same folder, next to `newsletter.md`, and is
-  referenced from it by a relative Markdown image link.
+  referenced from it by a relative Markdown image link. For `upcoming-event`, a
+  user-supplied local banner is copied in the same way; a banner given as a URL is
+  referenced inline, not copied.
 - Scratch fetches (raw `sectors.mjs --save-dir` JSON) go to the scratchpad or a
   `_draft`/`data` subfolder, not into the delivered folder.
 - `newsletter/` is a plain folder, separate from the skills repo and from the
@@ -144,12 +240,17 @@ references/
                                    section skeletons, disclaimer footer
   compliance.md                   hard rules + the advice-reconciliation guidance
   sourcing.md                     web research + citation rules
-  workflows/
+  workflows/                      one doc per built issue type (eight)
     weekly-wrap.md                API recipe + section outline, Saturday issue
+    daily-market-pulse.md         one-day movers/volume/brokers recipe, table-first
     macro-reaction.md             macro sourcing + affected-ticker + valuation-context
                                    recipe, non-advice framing
     three-stock-story.md          stock-pick discovery + history/people research +
                                    attributed-forecast recipe
+    single-company-deep-dive.md   trigger-anchored one-stock read, earnings/action/owner
+    sector-spotlight.md           one sub-sector peer-comparison on valuation
+    new-feature-release.md        release-note-sourced product enablement copy
+    upcoming-event.md             in-house workshop promo, user-supplied event details
   sectors-api/                    endpoints, data-quality, README (the data layer, v2 —
                                    a synced copy shared with sectors-carousel)
   writing/

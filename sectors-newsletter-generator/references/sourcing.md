@@ -35,6 +35,29 @@ with `start`/`end`) as a second, IDX-tagged source once you have a candidate sto
 big-cap-skewed (see `sectors-api/data-quality.md`), so use it to corroborate and find affected
 tickers, not as your only macro-news source.
 
+## Gated sectors.app / docs.sectors.app fetch (feature-release & how-to issues)
+
+`sectors.app` and `docs.sectors.app` sit behind Cloudflare. A **default fetch user-agent
+gets a 403/429**, which reads like an auth wall but is a bot block, not a credential
+problem. Fetch these pages with a real browser user-agent and they return 200:
+
+```bash
+curl -s -A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36" \
+  "https://sectors.app/release"
+```
+
+- **Release notes**: `https://sectors.app/release` (feature-release / enhancement /
+  deprecation issues). The main domain rate-limits (429) more aggressively than the docs
+  host, retry once on a 429 before treating it as down.
+- **How-to recipes**: `https://docs.sectors.app/recipes` and its children (e.g.
+  `.../recipes/generative-ai-python`) for how-to and use-case-walkthrough issues.
+- **Docs index**: `https://docs.sectors.app/llms.txt` enumerates every docs page, fetch it
+  first to discover the right recipe URL instead of guessing paths.
+
+These pages are citable sources like any outlet (name + date + link in the **Sources**
+list). A feature or how-to claim that isn't on one of these pages gets cut, don't describe
+product behaviour from memory.
+
 ## What counts as a citable source
 
 **Yes**: a named, dated outlet or primary document — Reuters, Bloomberg, an official Bank

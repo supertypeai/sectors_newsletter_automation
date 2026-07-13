@@ -9,7 +9,7 @@ The prose equivalent of the carousel skill's `deck-format.md`. Every issue is a 
 ---
 subject: <the email subject line>
 preview: <the inbox preview/preheader text>
-issue_type: weekly-wrap | macro-reaction | three-stock-story
+issue_type: weekly-wrap | macro-reaction | three-stock-story | single-company-deep-dive | sector-spotlight | daily-market-pulse | upcoming-event | new-feature-release
 date: <YYYY-MM-DD, the issue/send date>
 data_as_of: <YYYY-MM-DD, the API's as-of date>
 ---
@@ -20,7 +20,7 @@ data_as_of: <YYYY-MM-DD, the API's as-of date>
   Week in Banks." No hype, no advice framing (never "3 stocks to buy now").
 - **`preview`**: ~40-90 characters. Re-angles the subject with a second detail; never
   restates it verbatim (same rule as the carousel caption's first line).
-- **`issue_type`**: one of the three workflow slugs, matches the folder/file naming in
+- **`issue_type`**: one of the built workflow slugs, matches the folder/file naming in
   the delivery convention (see SKILL.md).
 - **`date`** and **`data_as_of`**: the API "today" lags ~1 day (UTC), so these can differ
   from the actual send date. Always show both.
@@ -206,6 +206,66 @@ no-dash/no-AI-tell rules, it constrains *shape*.
    - *The outlook* — attributed forward statements only (`compliance.md`).
 3. Closing line.
 4. **Sources** list + disclaimer footer.
+
+### Single company deep dive
+1. **The trigger** — one paragraph, the real recent event (earnings, corporate action,
+   ownership change) that makes this issue timely. Cited.
+2. **The read** — the one-line verdict, benchmarked (beat/missed vs what, cheap/dear vs
+   what). Stated before the detail that proves it.
+3. **The numbers** — the fundamentals that carry the read, as a small table when several
+   metrics or periods compare (revenue/earnings by year or quarter, ROE, margins). Good
+   candidate for the hero chart (price over 90 days with the trigger marked, or an
+   earnings bar series).
+4. **Valuation context** — P/E vs the name's own history and the peer average, dividend
+   yield if relevant. Reported as context, never as a buy/sell call.
+5. **What to watch** — objective, non-prescriptive close (next print, ex-dividend date).
+6. **Sources** list + disclaimer footer.
+
+### Sector spotlight
+1. **The hook** — one paragraph, why this sector now (led/lagged the week, a macro
+   repricing, earnings season). Cited.
+2. **The group** — the sub-sector's own read: median P/E and 1w/ytd cap move
+   (`subsector/report`), the benchmark every pick is measured against.
+3. **The comparison** — a **Markdown table**, one row per pick, columns = the shared
+   metrics that matter for this sector (price, P/E vs group median, ROE, dividend yield),
+   then a short paragraph per pick for what doesn't fit a column. State the metric being
+   ranked on.
+4. **The takeaway** — valuation context, not a recommendation ("cheap vs its own history"
+   never "the one to buy").
+5. **Sources** list + disclaimer footer.
+
+### Daily market pulse
+Tightest type, tables first, built to read in under a minute.
+1. **Index in one line** — up/down and whether broad or led by a handful.
+2. **Top gainers** and **top losers** — two small tables (never a signed column).
+3. **Most traded** — a short table (ticker, volume, price).
+4. **Flow/broker line** — one line only if there's a genuine signal; skip rather than pad.
+5. Disclaimer footer (Sources only if a "why" line was web-sourced). No hero chart unless
+   one name genuinely warrants it.
+
+### Upcoming event
+Promo for a Sectors in-house workshop. Content is **user-supplied** (date/venue, agenda,
+speaker, registration link, banner), not market data. Ask for all four detail sets first
+(workflow doc), never invent them.
+1. **Hook headline** — what the participant walks away able to do + the most compelling
+   logistical fact (named speaker, hard date, "hands-on, live data").
+2. **Banner** — the user's marketing image right after the headline, one-line caption.
+3. **Essentials block/small table** — date/time (with timezone), venue/format, who it's
+   for. Catchable in one glance.
+4. **Agenda** (short list) + **speaker(s)** (name + role).
+5. **Optional data teaser** — one real band-checked `sectors.mjs` result showing what
+   participants will build (cited `sectors.app`), skip if the agenda speaks for itself.
+6. **CTA** — the registration link, plainly stated, repeated once near the close.
+7. Disclaimer footer (Sources only if a data teaser was used). No market-advice framing.
+
+### New feature release
+Product enablement, not market analysis. Source is the release page, not the market API.
+1. **What you can now do** — one line, the capability, not a hype opener.
+2. **How to use it** — where it lives, the steps, the plan tier if gated; link the docs
+   recipe if one exists.
+3. **Optional real example** — if the feature produces data, one real band-checked
+   `sectors.mjs` result showing what it surfaces (as capability demo, never a buy call).
+4. **Sources** — the release page (and docs recipe) + disclaimer footer.
 
 ## Standard disclaimer footer (fixed text, appended to every issue)
 

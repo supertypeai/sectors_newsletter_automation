@@ -1,0 +1,96 @@
+# Single company deep dive, workflow
+
+One company, read in depth off a real current trigger: an earnings release, an
+ownership change, a dividend declaration, or another major corporate action. Read
+`../newsletter-format.md`'s single-company-deep-dive skeleton, `../sourcing.md`, and
+`../compliance.md` before drafting. The compliance line matters here: a deep dive is the
+issue type most likely to drift into "this looks cheap, buy it" without noticing.
+
+## 1. Anchor the trigger (recency discipline, non-negotiable)
+
+The lead has to be something that happened or changed recently, not a standing fact.
+Establish the "why now" first:
+
+- Web-search the last few days for this ticker: earnings, a corporate action, an
+  ownership/insider filing, a guidance change (`../sourcing.md`).
+- Cross-check the API's IDX-tagged feeds:
+
+```bash
+node ../../scripts/sectors.mjs \
+  "news/?symbols=<TICKER>&limit=10" \
+  "filings/?symbol=<TICKER>&limit=10" \
+  "company/corporate-actions/<TICKER>/" \
+  --save-dir <scratch-dir>
+```
+
+- `news/` is big-cap-skewed; fall back to `sub_sector` news if the ticker returns little.
+- `filings/` gives insider/major-holder transactions (`transaction_type`, `holder_name`,
+  `share_percentage_before/after`). Never trust the filing `body`'s own numbers, use the
+  structured fields (see `../sectors-api/data-quality.md`).
+- `corporate-actions` types return `null`, not `[]` when empty, null-guard before
+  iterating. `upcoming_dividend[]`, `agm[]`, `stock_split[]`, `right_issue[]`.
+
+If the "why now" search comes up empty, re-angle or pick a different name. Do not run a
+history-only profile and call it news.
+
+## 2. Fetch the company (one report call carries most of it)
+
+```bash
+node ../../scripts/sectors.mjs \
+  "company/report/<TICKER>/?sections=overview,valuation,financials,dividend,future,ownership" \
+  "daily/<TICKER>/?start=<~90d-ago>&end=<data_as_of>" \
+  --save-dir <scratch-dir>
+```
+
+Slice `sections=` to only what the issue's argument needs, cost tracks the section count.
+For an earnings-driven issue also pull the quarter directly:
+
+```bash
+node ../../scripts/sectors.mjs \
+  "company/get_quarterly_financial_dates/<TICKER>/" \
+  "financials/quarterly/<TICKER>/?report_date=<latest-quarter-end>" \
+  --save-dir <scratch-dir>
+```
+
+Key fields by trigger:
+- **Earnings**: `financials.historical_financials[]`, `yoy_quarter_earnings_growth`,
+  `yoy_quarter_revenue_growth`, `historical_financial_ratio[]` (roe/roa/margins), plus
+  the quarterly call above. Banks fill `financials_sector_metrics{net_interest_income,
+  gross_loan, casa,...}`; non-banks leave it `null`.
+- **Valuation context**: `valuation.historical_valuation[]{pe,pb,ps,*_peer_avg,year}`,
+  company vs its own history and the peer average. Never present `intrinsic_value` as
+  fair value.
+- **Dividend action**: `dividend.{yield_ttm, payout_ratio, upcoming_dividends[]}`.
+- **Ownership change**: `ownership.{major_shareholders[], top_transactions,
+  institutional_transaction_flow[]}`. `major_shareholders[].share_percentage` is a
+  **string**, `parseFloat` before any math.
+
+## 3. Validate
+
+- Band-check every ratio against `../sectors-api/data-quality.md` before it ships (a
+  `roe=262` or a `-88.5x` P/E is garbage, drop it and say so if it mattered).
+- Price series: use `daily/{symbol}`, don't mix it with `overview.all_time_price` summary
+  fields, they can disagree on the same date.
+- Confirm the `start`/`end` echoed back match what you asked, ranges silently clamp to
+  90 days.
+
+## 4. Find the read, then write it first
+
+The deep dive's job is one clear read on the trigger, benchmarked: earnings beat or missed
+*versus what* (its own prior quarter, consensus if disclosed, the sector), the stock
+cheap or dear *versus what* (its own 5-year P/E band, the peer average). A number without
+a benchmark is not a finding. Write the one-line verdict first, then fill the sections
+that prove it.
+
+The hero chart (optional) is usually the price series over 90 days with the trigger date
+marked, or an earnings/revenue bar series. Non-zero-based y-axis for price
+(`../newsletter-format.md`).
+
+## 5. Self-review before delivery
+
+- Is the lead a real recent trigger, not a standing historical fact?
+- Is every valuation/quality number benchmarked against its own history or peers?
+- Did any ratio fail a plausibility band and get left in anyway? Re-scan.
+- Is every forward statement attributed (consensus, guidance), never the newsletter's own
+  call? No "undervalued," no "good entry," no price target as our view (`../compliance.md`).
+- Was `share_percentage`'s string/float type gotcha handled before any comparison?
