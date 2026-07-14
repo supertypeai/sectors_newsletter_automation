@@ -1,15 +1,18 @@
 # Storyboard format (the `storyboard.json` contract)
 
-`node scripts/render.mjs <storyboard.json> --out <dir>` turns this JSON into a 10-15s MP4.
-You (the agent) author the storyboard; the renderer (Remotion) is deterministic. Every value
-must be real (see `sectors-api/data-quality.md`) and on-voice (`writing/writing.md`). Run
-`node scripts/storyboard-lint.mjs <storyboard.json>` before rendering.
+`node scripts/render.mjs <storyboard.json> --out <dir>` turns this JSON into an MP4, either a
+10-15s short or a ~45-75s long-form piece (see `"length"` below and `references/length.md` for
+which fits the ask). You (the agent) author the storyboard; the renderer (Remotion) is
+deterministic. Every value must be real (see `sectors-api/data-quality.md`) and on-voice
+(`writing/writing.md`). Run `node scripts/storyboard-lint.mjs <storyboard.json>` before
+rendering.
 
 ## Envelope
 
 ```jsonc
 {
   "theme": "noir",              // "noir" | "thread" — see themes.md for which fits the story
+  "length": "short",            // "short" (10-15s, default if omitted) | "long" (~45-75s) — see length.md
   "tickers": ["BBRI"],           // every ticker this piece is about
   "sourceDate": "9 Jul 2026",    // bare date, stamped once for the whole video (noir only; thread has no persistent footer)
   "scenes": [ /* Scene objects, see below */ ],
@@ -101,10 +104,17 @@ is the beat right before the brand sign-off; keep it to one sentence.
 
 ## Timing
 
-Total video length (all scenes + the ~2.2s outro) must land in **10-15 seconds**. 3-6 scenes
-is the readable range — fewer and the piece feels thin, more and no single beat gets room to
-land in a 10-15s format. `scripts/storyboard-lint.mjs` errors outside 9-16s total and warns
-outside 10-15s.
+Total video length (all scenes + the ~2.2s outro) must land in the story's target band for
+`storyboard.length`:
+
+| `length` | total target | scene count | `scripts/storyboard-lint.mjs` |
+|---|---|---|---|
+| `"short"` (default) | 10-15s | 3-6 scenes | errors outside 9-16s, warns outside 10-15s |
+| `"long"` | 45-75s | 8-18 scenes | errors outside 40-80s, warns outside 45-75s |
+
+Fewer scenes than the band and the piece feels thin; more and no single beat gets room to land.
+See `references/length.md` for how to pick between the two and how a long-form beat sequence
+differs from a short one.
 
 ## Rules the renderer assumes you followed
 

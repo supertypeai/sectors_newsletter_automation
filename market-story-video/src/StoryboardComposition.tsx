@@ -75,8 +75,8 @@ export const StoryboardComposition: React.FC<{ storyboard: Storyboard }> = ({ st
             <theme.Outro
               outro={
                 storyboard.outro ?? {
-                  headline: "Know who owns it.",
-                  emphasis: "owns it.",
+                  headline: "Get the full picture.",
+                  emphasis: "full picture.",
                   tagline: defaultTagline(storyboard),
                 }
               }

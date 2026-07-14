@@ -40,8 +40,8 @@ export const thread = {
 export const gradient = "linear-gradient(to right, #E5337E 0%, #DF9439 100%)";
 export const peerColorsNoir = [noir.muted, noir.peerBlue, noir.peerPlum] as const;
 
-// canvas: portrait video (Reels/TikTok/Shorts), 1080x1920, 30fps. A 10-15s story is
-// 300-450 frames at this rate.
+// canvas: portrait video (Reels/TikTok/Shorts), 1080x1920, 30fps. A short (10-15s) story
+// is 300-450 frames at this rate; a long-form (~45-75s) story is 1350-2250 frames.
 export const CANVAS = { width: 1080, height: 1920, fps: 30 } as const;
 
 // safe area: keep on-screen text clear of native platform UI (Reels caption bar bottom,

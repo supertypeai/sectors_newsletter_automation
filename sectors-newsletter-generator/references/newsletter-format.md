@@ -165,16 +165,39 @@ no-dash/no-AI-tell rules, it constrains *shape*.
 ## Section skeleton per issue type
 
 ### Weekly wrap
-1. One-paragraph **the week in one line** — the conclusion, stated first.
-2. **Index & market** — IDX composite / LQ45 / IDX30 moves, whole-market cap trend.
-   Good candidate for the issue's one hero chart (the index's daily path over the week).
-3. **Standouts** — the week's top gainers/losers, most-traded names, as **two Markdown
-   tables** (gainers, losers) per **Bite-sized & visual formatting** above, not prose.
-4. **Sector pulse** — which sub-sectors led/lagged, 1-week change. A table once there
-   are 3+ sub-sectors to compare.
-5. **Flows** — foreign flow or broker accumulation on one notable name.
-6. **The takeaway** — the non-obvious so-what, not a restatement of section 1.
-7. **Sources** list (if any web-sourced "why" was used) + disclaimer footer.
+The full "Sectors Weekly Insights" digest. **Delivered as a send-ready HTML email
+(`newsletter.html`), not just Markdown** — the two-column mover cards, colored +/- cells,
+CTA button and event banner don't survive plain Markdown, and the revamp's whole point is
+a self-contained, data-backed email with **no PDF attachment**. Keep a `newsletter.md`
+draft for review; ship the `.html`. Full recipe (API source per section, HTML delivery
+notes) in `workflows/weekly-wrap.md` §2b–2c.
+
+1. **IDX Total Market Cap** — the headline stat (`idx-total` level) with a 3-up snapshot:
+   7d (label it "rolling") / 30d / YTD.
+2. One-paragraph **the week in one line** — the conclusion, stated first.
+3. **Index & market** — IDX total mcap / LQ45 / IDX30 moves as a **this-week vs
+   prior-week** table (fetch the prior Mon-Fri for the compare column). Good candidate for
+   the issue's one hero chart (the index's daily path over the week).
+4. **Weekly Top Movers** — top gainers and top losers as **two side-by-side cards/tables**
+   (in HTML; two Markdown tables in the `.md` draft), never one signed column. Mind the
+   `top-changes` live-window gotcha in the workflow doc: label movers with the window they
+   belong to.
+5. **What actually traded** — `most-traded` volume leaders and the featured name's foreign
+   flow (a domestic-churn vs foreign-inflow read), short prose.
+6. **Sector pulse** — which sub-sectors led/lagged, valuation + 1-week change
+   (`subsector/report/{slug}/`). Optional; a table once there are 3+ to compare.
+7. **New Filings** — the 5 most recent insider / major-holder disclosures (`filings`) as a
+   table: date, holder → ticker, buy/sell, change, post-owned. Structured fields only.
+8. **New IPOs** — this week's listings with **first-day change** (`daily[0].close` vs
+   offering price) and market cap, as a table, each ticker linked to its report page.
+9. **Headlines** — 5 recent IDX-relevant `news` items (title + short body + source link);
+   drop off-topic non-IDX stories. Note there is **no 0-100 news score** in the API; rank
+   by recency + relevance.
+10. **Upcoming event** — the current Sectors workshop promo block, if one is running
+    (details sourced as in `workflows/upcoming-event.md`, never invented).
+11. **The takeaway** — the non-obvious so-what, not a restatement of section 2 — then a
+    CTA back to `sectors.app`, **Sources** list (if any web-sourced "why" was used), and
+    the disclaimer footer.
 
 ### Macro-reaction
 1. **The news** — what happened in the last ~2 days, cited. Bulleted, stat-first

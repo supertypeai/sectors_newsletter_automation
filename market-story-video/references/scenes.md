@@ -1,9 +1,13 @@
-# Scene kinds (the 10-15s story's building blocks)
+# Scene kinds (the story's building blocks)
 
-Unlike the carousel's 15 slide archetypes across 5 families, a 10-15s video only has room for
-3-6 scenes total, so the scene vocabulary is deliberately small: **five roles**, each doing one
-job. Pick the role by what the beat needs to prove, not by habit. Both themes render the same
-five roles (see `themes.md` for how the decoration differs).
+Unlike the carousel's 15 slide archetypes across 5 families, even a long-form video only has
+room for a double-digit handful of scenes, so the scene vocabulary is deliberately small:
+**five roles**, each doing one job. Pick the role by what the beat needs to prove, not by
+habit. Both themes render the same five roles (see `themes.md` for how the decoration
+differs). A `"short"` storyboard (10-15s) uses 3-6 of them; a `"long"` storyboard (~45-75s)
+chains more proof scenes back to back — see `references/length.md` for how that chain is built
+and `references/narrative-approaches.md` for how the ending (`takeaway` vs. a teaser) changes
+with the chosen narrative approach.
 
 ## Index
 
@@ -76,21 +80,33 @@ so don't skip the logo on a node that has a ticker.
 
 ## `takeaway`
 
-One plain sentence, the verdict the whole piece was building to. Never advice-framed ("buy",
+One plain sentence, the verdict the whole piece was building to — when the narrative approach
+is **storytelling** (see `references/narrative-approaches.md`). Never advice-framed ("buy",
 "sell", "should hold") — hard rule 2 applies here exactly as it does in the carousel skill.
 "A high yield can be a warning, not a reward." states a finding; "You should sell" prescribes
 one. If a draft takeaway reads like the second, rewrite it as the first before it ships.
 
+When the narrative approach is **teaser**, the final `takeaway` scene does NOT resolve the
+question the piece raised — it names the open question plainly and points at where the answer
+lives (the outro `tagline`, or an explicit "part 2" mention), still never advice-framed. See
+`references/narrative-approaches.md` for the copy pattern.
+
 ## Sequencing a story (which roles to combine)
 
-A 3-6 scene story almost always follows: **`cover` -> one or two proof scenes (`chart` /
-`stat` / `breakdown`, whichever the beats actually need) -> `takeaway`**. There's no fixed
-"always follow chart with stat" rule the way the carousel enforces family/density alternation
-across 8 slides — at 3-6 scenes there usually isn't a repeat to worry about. If a story DOES
-repeat a role (two `chart` scenes back to back, say a price crash then a recovery), that's
-fine as long as each proves something new; the tell that it's NOT fine is if the second one
-could caption the same chart with different numbers and still sound right (the same
+A `"short"` (3-6 scene) story almost always follows: **`cover` -> one or two proof scenes
+(`chart` / `stat` / `breakdown`, whichever the beats actually need) -> `takeaway`**. There's no
+fixed "always follow chart with stat" rule the way the carousel enforces family/density
+alternation across 8 slides — at 3-6 scenes there usually isn't a repeat to worry about. If a
+story DOES repeat a role (two `chart` scenes back to back, say a price crash then a recovery),
+that's fine as long as each proves something new; the tell that it's NOT fine is if the second
+one could caption the same chart with different numbers and still sound right (the same
 portability test the carousel's step-7 self-review uses).
+
+A `"long"` (8-18 scene) story is the same shape stretched: **`cover` -> a chain of proof scenes
+covering more ground (history/origin, structure, a metric over more years, a fun fact,
+ownership) -> `takeaway`**. More scenes means more ROOM for a history-timeline beat (a `chart`
+or `breakdown` scene dated years apart) and a fun-fact beat (usually a `stat` or `breakdown`
+scene) that a short piece has no room for — see `references/length.md`'s beat-budget table.
 
 ## Marker and badge decoration (thread theme only)
 

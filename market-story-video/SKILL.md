@@ -1,25 +1,32 @@
 ---
 name: market-story-video
 description: >-
-  Generate a 10-15 second vertical (1080x1920) story video about the Indonesian stock market
-  (IDX) from live Sectors financial data, in the visual style of the team's existing
-  Reels/TikTok/Shorts content. Use whenever the user wants a short video, a Reel, a TikTok, a
-  Short, or "video content" about an IDX-listed company or ticker, a market-wide move, a
-  regulatory/index event, or a company's ownership/history/plans and how they shaped its
-  financial performance. Trigger even when the user just says "make a video about GOTO",
-  "turn BBRI's dividend story into a video", or "what's a good market story to post this
-  week as a video", this skill handles the whole pipeline from topic to a finished MP4 with
-  on-screen text and motion, no voiceover. Do NOT use it for non-IDX markets, for a static
-  carousel/slides (use the sectors-carousel skill for that), or for a video with voiceover/
-  narration (this skill is visual-only: on-screen text and motion, no audio track).
+  Generate a vertical (1080x1920) story video, either a 10-15 second short or a ~45-75 second
+  long-form piece, about the Indonesian stock market (IDX) from live Sectors financial data, in
+  the visual style of the team's existing Reels/TikTok/Shorts content. Use whenever the user
+  wants a short video, a Reel, a TikTok, a Short, or "video content" about an IDX-listed
+  company or ticker, a market-wide move, a regulatory/index event, or a company's
+  ownership/history/plans and how they shaped its financial performance. Trigger even when the
+  user just says "make a video about GOTO", "turn BBRI's dividend story into a video", or
+  "what's a good market story to post this week as a video", this skill handles the whole
+  pipeline from topic to a finished MP4 with on-screen text and motion, no voiceover. Do NOT
+  use it for non-IDX markets, for a static carousel/slides (use the sectors-carousel skill for
+  that), or for a video with voiceover/narration (this skill is visual-only: on-screen text and
+  motion, no audio track).
 ---
 
 # Market Story Video
 
-Turn a topic into a finished 10-15 second vertical video about the Indonesian stock market:
-a real story found by research, real numbers from the Sectors API, a short storyboard where
-every scene lands a verdict, rendered to MP4 with on-screen text and motion via Remotion. No
-voiceover, no narration, no audio track — the story is told entirely through text and motion.
+Turn a topic into a finished vertical video about the Indonesian stock market: a real story
+found by research, real numbers from the Sectors API, a storyboard where every scene lands a
+verdict (or, for a teaser piece, an open question), rendered to MP4 with on-screen text and
+motion via Remotion. No voiceover, no narration, no audio track — the story is told entirely
+through text and motion.
+
+Every run of this skill decides three independent choices before a single scene gets written —
+**theme** (`references/themes.md`), **length** (`references/length.md`), and **narrative
+approach** (`references/narrative-approaches.md`). Step 1 below covers exactly when and how to
+ask.
 
 This skill is a sibling of **sectors-carousel**: the same story-first discipline (research
 before data, data before composition, approval before the expensive step), the same brand
@@ -40,9 +47,27 @@ choice is explicitly delegated** ("what's a good story this week", "surprise me"
 straight in, per below), or **neither** (a bare "make a video" names no subject — ask one
 quick question: what to cover, offering "you pick something timely" as an answer).
 
-Settle the **subject** and, this skill's addition, the **theme**: read `references/themes.md`
-and decide "noir" (a single company's history/structure/numbers) or "thread" (a market-wide/
-news-driven event). If genuinely unsure which fits, ask — the two read as different products.
+Settle the **subject** first, then form a recommendation on this skill's three product
+choices before you touch the API:
+
+- **Theme** (`references/themes.md`): "noir" (a single company's history/structure/numbers) or
+  "thread" (a market-wide/news-driven event) — driven by story shape.
+- **Length** (`references/length.md`): "short" (10-15s, 3-6 scenes) or "long" (~45-75s, 8-18
+  scenes, room for a history timeline and a fun fact) — driven by how much the story can
+  sustain and whether the ask wants a fuller deep-dive.
+- **Narrative approach** (`references/narrative-approaches.md`): "storytelling" (the piece
+  resolves with a plain-finding `takeaway`) or "teaser" (the piece raises a specific question
+  and closes by pointing at where it resolves — a follow-up post, or the ticker's own
+  `sectors.app` page) — driven by whether this is meant to stand alone or build anticipation
+  for something else.
+
+**Always confirm these three with the user before composing the storyboard**, even when a
+subject was named outright — present your recommended default for each (based on the story
+shape you can already see) alongside the alternative, in one `AskUserQuestion` call. Skip this
+confirmation only when the user's own request already pins down all three explicitly (e.g. "a
+quick 15-second teaser in the noir style about GOTO") — proceed straight in and just state
+which three choices you resolved and why. A request that only pins down one or two still gets
+asked about the rest.
 
 Then **use web search to find why this story matters now** — identical discipline to the
 carousel skill: a fresh earnings release, a notable move, a dividend/buyback, a regulatory or
@@ -57,10 +82,13 @@ the "why now", and present your pick with a one-line reason.
 ### 2. Form the story hypothesis (before you fetch data)
 
 Write the **thesis** in one line and the **beats**, now one beat per SCENE rather than per
-slide — a 10-15s video only fits 3-6 scenes, so be more ruthless about which beats survive
-than an 8-slide carousel would need to be. Open `references/writing/writing.md` §1-2 and
-`references/scenes.md`'s index to see which scene role (`cover`/`stat`/`chart`/`breakdown`/
-`takeaway`) each beat wants to become before you've even fetched the numbers.
+slide. A `"short"` video only fits 3-6 scenes, so be more ruthless about which beats survive
+than an 8-slide carousel would need to be; a `"long"` video fits 8-18, enough room for a
+history-timeline beat and a fun-fact beat (`references/length.md`'s beat-budget table), but
+every added scene still has to prove something new — don't pad. Open
+`references/writing/writing.md` §1-2 and `references/scenes.md`'s index to see which scene role
+(`cover`/`stat`/`chart`/`breakdown`/`takeaway`) each beat wants to become before you've even
+fetched the numbers.
 
 Every beat still needs a benchmark (a number alone isn't a finding), and you still rank beats
 before writing a word — the single most surprising number earns the `cover` or the first
@@ -89,11 +117,14 @@ Stop before writing `storyboard.json`. Rendering even a fast `--stills` pass cos
 share a short draft first:
 
 - **The thesis**, one line.
-- **The theme** (noir/thread) and why it fits this story's shape.
+- **The three choices**: theme (noir/thread), length (short/long), and narrative approach
+  (storytelling/teaser), each with why it fits this story — this is also where the
+  `AskUserQuestion` confirmation from step 1 surfaces if it hasn't already.
 - **The scene sequence**: role + one-line content for each (e.g. "cover: BBRI's yield vs.
   bonds hook · chart: profit falling 3 years · stat: 85% payout ratio · takeaway"), each with
   its proof number and benchmark.
-- **A rough duration budget** summing to 10-15s total (scenes + ~2.2s outro).
+- **A rough duration budget** summing to the chosen length's target (10-15s, or ~45-75s for
+  long-form) — scenes + ~2.2s outro.
 - **Your recommendation**, plainly stated, plus anything you weighed and set aside.
 
 Then wait for the user, same checkpoint rules as the carousel skill (approve as-is, redirect,
@@ -104,15 +135,23 @@ or fine-tune). **Skip this checkpoint only when the user already told you not to
 
 Open `references/storyboard-format.md` (the JSON contract), `references/scenes.md` (the five
 scene roles), `references/motion.md` (the timing vocabulary — you don't hand-animate, you pick
-what enters and the shared motion system handles it), and `references/themes.md` (which visual
-system you're building against). Start from one of `samples/bbri-vs-bonds.storyboard.json`
-(noir) or `samples/msci-relegation.storyboard.json` (thread) rather than a blank file.
+what enters and the shared motion system handles it), `references/themes.md` (which visual
+system you're building against), `references/length.md` (short vs. long beat budgets), and
+`references/narrative-approaches.md` (how storytelling vs. teaser shapes the closing scene).
+Start from one of `samples/bbri-vs-bonds.storyboard.json` (noir) or
+`samples/msci-relegation.storyboard.json` (thread) rather than a blank file — both are
+`"short"`/storytelling pieces; for a `"long"` or teaser piece, adapt the same envelope per
+`length.md`/`narrative-approaches.md` rather than starting blank.
 
+- Set `storyboard.length` explicitly (`"short"` or `"long"`) — don't rely on the default when
+  the user chose long-form, since omitting it defaults to `"short"` and the lint will flag a
+  60s storyboard as wildly over target.
 - Every scene's `headline`/`emphasis` follows the exact-substring rule (`storyboard-format.md`)
   — a mismatch THROWS at render time here (there's no flat-fallback the way the carousel's
   lint merely warns), so get it right before rendering.
-- Keep total duration in **10-15 seconds**, 3-6 scenes. `scripts/storyboard-lint.mjs` checks
-  this mechanically.
+- Keep total duration in the confirmed length's target band (10-15s/3-6 scenes for
+  `"short"`, ~45-75s/8-18 scenes for `"long"`). `scripts/storyboard-lint.mjs` checks this
+  mechanically against whichever `length` you set.
 - Run the copy through `references/writing/writing.md` §3 (plain words, the AI-tell filter) —
   on-screen video text needs to be SHORTER than carousel slide copy: a scene is on screen for
   2-4 seconds, so a headline a viewer can't read in that time is a miss regardless of how good
@@ -190,6 +229,8 @@ render the final MP4 straight into the `scs` story folder once approved.
 SKILL.md                     ← you are here
 references/
   themes.md                  which visual system (noir/thread) fits which story shape
+  length.md                  short (10-15s) vs long (~45-75s) targets and beat budgets
+  narrative-approaches.md    storytelling (resolves) vs teaser (open question) closing beat
   storyboard-format.md       the storyboard.json contract
   scenes.md                  the 5 scene roles (cover/stat/chart/breakdown/takeaway)
   motion.md                  the timing/easing vocabulary every scene draws from

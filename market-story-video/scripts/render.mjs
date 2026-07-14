@@ -36,14 +36,18 @@ function parseArgs(argv) {
   return { kind: "run", storyboardPath, out, stills };
 }
 
+const LENGTH_TARGETS = { short: { min: 9, max: 16 }, long: { min: 40, max: 80 } };
+
 function validateDuration(storyboard) {
+  const length = storyboard.length ?? "short";
+  const { min, max } = LENGTH_TARGETS[length] ?? LENGTH_TARGETS.short;
   const sceneSeconds = storyboard.scenes.reduce((a, s) => a + s.duration, 0);
   const outroSeconds = storyboard.outro === false ? 0 : 2.2;
   const total = sceneSeconds + outroSeconds;
-  if (total < 9 || total > 16) {
+  if (total < min || total > max) {
     console.error(
       `WARNING: total video length is ~${total.toFixed(1)}s (scenes ${sceneSeconds.toFixed(1)}s + outro ${outroSeconds}s), ` +
-        "outside the 10-15s target. Run scripts/storyboard-lint.mjs for the full check."
+        `outside the "${length}" target. Run scripts/storyboard-lint.mjs for the full check.`
     );
   }
 }

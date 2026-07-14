@@ -36,7 +36,7 @@ export type SceneRole = "cover" | "stat" | "chart" | "breakdown" | "takeaway";
 
 export interface Scene {
   role: SceneRole;
-  duration: number; // seconds; sum of all scenes + outro must land the story in 10-15s
+  duration: number; // seconds; sum of all scenes + outro must land the story's target length (storyboard.length)
   kicker?: string;
   headline?: string;
   emphasis?: string; // must be an exact substring of headline — see EmphasizedHeadline
@@ -57,6 +57,7 @@ export interface OutroSpec {
 
 export interface Storyboard {
   theme: "noir" | "thread";
+  length?: "short" | "long"; // "short" (10-15s, default) or "long" (~45-75s) — see storyboard-format.md
   tickers: string[]; // every ticker the piece is about
   sourceDate?: string; // bare date, e.g. "17 Jun 2026" — stamped once for the whole video
   outro?: OutroSpec | false; // false to suppress; default outro used if omitted

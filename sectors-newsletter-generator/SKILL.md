@@ -104,6 +104,35 @@ why:
 scope.** This skill generates one content piece; who receives it and when is decided by
 the delivery/CRM system that consumes the output, not here.
 
+## Write as a CXO optimizing for conversion
+
+Every issue is drafted in the role of a CXO whose job is to move one specific metric,
+not a neutral reporter. The hard rules below (never fabricate, never advise, cite
+everything, brand voice) are inviolable and still bind, but *within* those limits every
+choice — subject line, lead, structure, CTA placement, what gets cut — is made to raise
+that issue's conversion, not merely to inform.
+
+**The conversion goal depends on the issue type.** Name the goal before drafting, then
+optimize the whole piece for it: lead with the payoff, put the primary CTA above the
+fold and repeat it, use concrete stakes (deadline, scarcity, price) over vague ones, kill
+anything that doesn't serve the goal.
+
+| Issue type | Conversion goal (the one action to drive) |
+| --- | --- |
+| **Upcoming event** | Register as a workshop participant (click through and sign up before it fills / closes) |
+| **New feature release** | Open Sectors and actively use the newly released feature on real data |
+| **Weekly wrap** | Return to `sectors.app` to explore the movers/sectors named |
+| **Daily market pulse** | Same-day click into the tickers/tables to check them live |
+| **Macro-reaction** | Explore the affected sectors/tickers on Sectors to size up the move |
+| **Three-stock story** | Click through to each company's page on Sectors |
+| **Single company deep dive** | Open that company's report on Sectors and dig into the data |
+| **Sector spotlight** | Screen the sub-sector on Sectors and compare the peers themselves |
+
+If an issue type isn't listed (a not-yet-built type), state its conversion goal in one
+line — "the one action a reader should take" — before drafting, and optimize for it the
+same way. For any Sectors-org announcement the goal is product engagement; for market
+content the goal is a return visit to `sectors.app` to explore the names cited.
+
 ## Shared pipeline shape
 
 All three types run the same five stages, then branch into the type-specific workflow
@@ -113,7 +142,9 @@ doc. Open each reference when you reach its stage, don't pre-load everything up 
 2. **Fetch and validate data** — `sectors.mjs`, then band-check against
    `references/sectors-api/data-quality.md`.
 3. **Draft** — against `references/newsletter-format.md`'s contract and this skill's
-   voice rules. Bite-sized and visual by default: short blocks, bolded stats,
+   voice rules, in the CXO-optimizing-for-conversion role (see **Write as a CXO
+   optimizing for conversion** above): name this issue's conversion goal first, then
+   draft every element to move it. Bite-sized and visual by default: short blocks, bolded stats,
    Markdown tables for any ranked or compared list of 3+, and at most one real
    generated chart for the issue's hero trend (`newsletter-format.md`'s **Bite-sized &
    visual formatting** section, which routes chart work through the `dataviz` skill).
@@ -181,6 +212,9 @@ research step is the intake questions, and the only data fetch is the optional t
 
 ## Hard rules (override style every time)
 
+0. **Draft as a CXO optimizing for conversion.** Every issue targets one conversion goal
+   set by its type (see **Write as a CXO optimizing for conversion**). Optimize the whole
+   piece for that action, within — never around — the rules below.
 1. **Never fabricate a number.** Every figure traces to a real Sectors API field this
    run, or a cited source.
 2. **Never give investment advice.** Describe, don't prescribe — no buy/sell/hold, no
@@ -213,6 +247,7 @@ Finished issues land at:
 ```
 /Users/evelyn/Desktop/newsletter/newsletter_<YYYY-MM-DD>_<type-slug>/
     newsletter.md
+    newsletter.html            weekly-wrap: the send-ready HTML email (no PDF attachment)
     chart-<slug>.svg           only if the issue includes the optional hero chart
     banner-<slug>.<ext>        upcoming-event only: the user-supplied banner, copied in
 ```
@@ -225,6 +260,11 @@ Finished issues land at:
   referenced from it by a relative Markdown image link. For `upcoming-event`, a
   user-supplied local banner is copied in the same way; a banner given as a URL is
   referenced inline, not copied.
+- **Weekly wrap ships as HTML.** It is the one type delivered as a send-ready
+  `newsletter.html` (email-safe inline styles, table layout, tickers linked to
+  `sectors.app/idx/<lower>`), replacing the old PDF-attachment format. Keep the
+  `newsletter.md` as the review draft. See `workflows/weekly-wrap.md` §2c and the worked
+  reference `newsletter/newsletter_2026-07-06_weekly-wrap/newsletter.html`.
 - Scratch fetches (raw `sectors.mjs --save-dir` JSON) go to the scratchpad or a
   `_draft`/`data` subfolder, not into the delivered folder.
 - `newsletter/` is a plain folder, separate from the skills repo and from the

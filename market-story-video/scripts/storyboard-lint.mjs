@@ -29,6 +29,11 @@ function collectText(storyboard) {
   return texts;
 }
 
+const LENGTH_TARGETS = {
+  short: { errorMin: 9, errorMax: 16, warnMin: 10, warnMax: 15, scenesMin: 3, scenesMax: 6 },
+  long: { errorMin: 40, errorMax: 80, warnMin: 45, warnMax: 75, scenesMin: 8, scenesMax: 18 },
+};
+
 function lint(storyboard) {
   const errors = [];
   const warnings = [];
@@ -36,6 +41,11 @@ function lint(storyboard) {
   if (storyboard.theme !== "noir" && storyboard.theme !== "thread") {
     errors.push(`theme must be "noir" or "thread", got ${JSON.stringify(storyboard.theme)}`);
   }
+  const length = storyboard.length ?? "short";
+  if (length !== "short" && length !== "long") {
+    errors.push(`length must be "short" or "long", got ${JSON.stringify(storyboard.length)}`);
+  }
+  const target = LENGTH_TARGETS[length] ?? LENGTH_TARGETS.short;
   if (!Array.isArray(storyboard.scenes) || storyboard.scenes.length === 0) {
     errors.push("scenes must be a non-empty array");
     return { errors, warnings };
@@ -46,7 +56,7 @@ function lint(storyboard) {
     if (!VALID_ROLES.has(s.role)) errors.push(`scene[${i}].role "${s.role}" is not one of ${[...VALID_ROLES].join("/")}`);
     if (!(s.duration > 0)) errors.push(`scene[${i}].duration must be a positive number of seconds`);
     if (s.duration < 1.2 || s.duration > 6) {
-      warnings.push(`scene[${i}].duration is ${s.duration}s — the readable range for a 10-15s story is ~1.2-6s per scene`);
+      warnings.push(`scene[${i}].duration is ${s.duration}s — the readable range per scene is ~1.2-6s regardless of story length`);
     }
     if (s.emphasis) {
       if (!s.headline) errors.push(`scene[${i}] has emphasis but no headline to match it against`);
@@ -67,8 +77,10 @@ function lint(storyboard) {
     }
   });
 
-  if (storyboard.scenes.length < 3 || storyboard.scenes.length > 6) {
-    warnings.push(`${storyboard.scenes.length} scenes — 3-6 is the readable range for a 10-15s story`);
+  if (storyboard.scenes.length < target.scenesMin || storyboard.scenes.length > target.scenesMax) {
+    warnings.push(
+      `${storyboard.scenes.length} scenes — ${target.scenesMin}-${target.scenesMax} is the readable range for a "${length}" story`
+    );
   }
 
   if (storyboard.outro && storyboard.outro !== false && storyboard.outro.emphasis) {
@@ -80,10 +92,13 @@ function lint(storyboard) {
   const sceneSeconds = storyboard.scenes.reduce((a, s) => a + (s.duration || 0), 0);
   const outroSeconds = storyboard.outro === false ? 0 : 2.2;
   const total = sceneSeconds + outroSeconds;
-  if (total < 9 || total > 16) {
-    errors.push(`total video length ~${total.toFixed(1)}s is well outside the 10-15s target (scenes ${sceneSeconds.toFixed(1)}s + outro ${outroSeconds}s)`);
-  } else if (total < 10 || total > 15) {
-    warnings.push(`total video length ~${total.toFixed(1)}s is just outside the 10-15s target`);
+  if (total < target.errorMin || total > target.errorMax) {
+    errors.push(
+      `total video length ~${total.toFixed(1)}s is well outside the "${length}" target ${target.warnMin}-${target.warnMax}s ` +
+        `(scenes ${sceneSeconds.toFixed(1)}s + outro ${outroSeconds}s)`
+    );
+  } else if (total < target.warnMin || total > target.warnMax) {
+    warnings.push(`total video length ~${total.toFixed(1)}s is just outside the "${length}" target ${target.warnMin}-${target.warnMax}s`);
   }
 
   for (const [label, text] of collectText(storyboard)) {
