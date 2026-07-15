@@ -23,7 +23,21 @@ This newsletter goes to subscribers. It carries the same non-negotiables as the 
    carries its own date.
 6. **`sectors.app` is the citation, never "Sectors API" or bare "Sectors."** Internal
    engineering name stays internal; the reader-facing citation is the product they could
-   visit.
+   visit. This extends to **raw field paths in body copy**: never write
+   `future.company_growth_forecasts`, `historical_valuation[].pe_peer_avg`, or any other
+   dotted/bracketed field name mid-paragraph, even backtick-wrapped, even as a citation.
+   A subscriber reading prose isn't reading the API schema and a field name explains
+   nothing to them there. Cite `sectors.app` inline exactly the way every other
+   API-derived figure in the issue does, nothing more specific. (Caught on the ADRO deep
+   dive: a draft cited `future.company_growth_forecasts` inline, mid-paragraph, reads as
+   internal engineering detail to a subscriber, not a citation.)
+   **Field paths belong in the Appendix instead** (`newsletter-format.md`'s **Appendix:
+   data sources** section), where they serve a different reader in a different mode:
+   someone who's already finished the piece and wants to verify or reproduce a specific
+   number. There, map each metric actually used to its endpoint AND field, e.g.
+   `company/report/ADRO.JK/` (`future.company_growth_forecasts`: consensus EPS/revenue
+   growth), that's traceability serving credibility, not clutter, because it's opt-in,
+   clearly demarcated, and never the thing a subscriber has to read to follow the story.
 
 ## Reconciling "a good time to purchase" and "a great future forecast" with the no-advice rule
 

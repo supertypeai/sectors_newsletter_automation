@@ -125,14 +125,48 @@ no-dash/no-AI-tell rules, it constrains *shape*.
   this run, never estimated or redrawn from memory. Static only: this skill stays
   dependency-free by design (no Puppeteer, no Node packages, no R/Python animation
   toolchain installed as a hard requirement), so ship a still image, not a GIF, unless
-  the user has explicitly asked to add that toolchain for this run. `ggplot2` (R) is
-  fine to use for a cleaner static render when it's already available; a hand-rolled
-  inline SVG is an equally valid fallback when it isn't, either way the output is one
-  static image.
-  **Invoke the `dataviz` skill before writing any chart code or picking a color** (it
-  loads on its own trigger for "any chart," so it fires automatically here too),
-  it picks the chart form, hands you a validated single accent color for a light
-  background, and specifies mark weight, axis treatment, and endpoint labeling.
+  the user has explicitly asked to add that toolchain for this run.
+  **Use `scripts/charts.mjs`**, this skill's own light-surface fork of the carousel
+  skill's chart engine: `import` the function for the kind you need (`sparkline`/`line`
+  for a price series, `barChart` for year-over-year, `donut` for a mix, `multiline` for
+  self-vs-peer, and so on, the same 13-kind grammar documented in the carousel skill's
+  `references/charts.md`) and write its returned SVG string to `chart-<slug>.svg`. Its
+  colors are already fixed and validated (see the file's own header comment for the role
+  map and why GAIN/LOSS renders blue/red, not green/red on this palette), so don't
+  re-derive a palette per issue. A hand-rolled inline SVG or `ggplot2` (R) is a fallback
+  only for a shape `charts.mjs` doesn't cover (reach for its own `compose` escape hatch
+  first).
+  **Still consult the `dataviz` skill for chart-FORM choice** (it loads on its own
+  trigger for "any chart," so it fires automatically here too): its form heuristic
+  picks *which kind* fits the data before you call `charts.mjs`, and its mark-weight,
+  axis-treatment, and endpoint-labeling guidance already matches what `charts.mjs`
+  draws, since that's what the fork's geometry was validated against.
+
+  **`charts.mjs` never draws its own background** (every function assumes it's being
+  composited onto a surface that already exists, true for the carousel's slide canvas,
+  never true for this skill's standalone chart files), so every call MUST be wrapped in
+  an explicit opaque rect before it's saved, or the surrounding page/email's own
+  background shows through wherever a mark or label happens to sit outside the visible
+  content, reading as a transparency bug rather than the missing-background-fill it
+  actually is (hit for real on the ADRO deep dive: an endpoint label spilled past the
+  canvas edge with no rect there to sit on, and looked exactly like a transparency
+  problem until traced to the overflow, see the next paragraph). Always wrap like this
+  before writing the file:
+  ```js
+  const inner = svg.replace(/^<svg[^>]*>/, "").replace(/<\/svg>$/, "");
+  const full = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="${w}" height="${h}" fill="#fcfcfb"/>${inner}</svg>`;
+  ```
+  `#fcfcfb` is the same light chart surface `dataviz`'s palette validates against, keep
+  it in sync if that reference value ever changes.
+
+  **Reserve label margin for a series' endpoint.** A `compose` chart's `dot` mark prints
+  its label immediately after the dot with no auto-margin (see the comment at that mark
+  in `charts.mjs`): a point placed exactly at the domain's right edge pushes its label
+  past the canvas, outside the background rect above, same failure mode. Pad the x
+  domain past the last real data point (e.g. `domain: [0, (n-1) + 10]` for a ~56-point
+  series) so the endpoint lands with room to spare, and check the label's rightmost
+  pixel actually lands under `w` before shipping (font-size × char-count is close enough
+  to eyeball, or render and grep the `<text>` element's `x` plus its string length).
   Use a **non-zero-based y-axis** for a price series (padded to the data's own range,
   not from 0): a price chart's job is to show how much it actually moved, and a
   zero-based axis on a large-denomination price flattens real volatility into a
@@ -162,9 +196,30 @@ no-dash/no-AI-tell rules, it constrains *shape*.
 - Every ratio explained in one clause on first use: "ROE, profit earned on shareholder
   money, hit 21%."
 
-## Section skeleton per issue type
+## Section headings state the finding, not the slot
 
-### Weekly wrap
+The bolded names in the skeleton below (**The trigger**, **The read**, **The numbers**,
+**Valuation context**, **What to watch**, ...) name a section's *job*, not literal text
+to paste in as an H2. Write every actual heading as a short headline that states this
+issue's specific finding for that slot, the same way the H1 states the issue's hook
+instead of a masthead. A reader skimming just the headings should be able to
+reconstruct the issue's argument without reading the body.
+
+- Bad: `## The trigger` (tells you the role, not what happened).
+- Good: `## What happened this week` (still fills the trigger role, names it plainly)
+  or, when the finding itself fits in the heading, `## Buyback, then a profit beat`.
+- Bad: `## Valuation context` on a section explaining why a screener's headline yield
+  figure is misleading.
+- Good: `## Peer valuation, and what the yield figure actually means`.
+
+Macro-reaction's section 2 already models this ("Winners and losers" / "Who's exposed" /
+"The effects", picked by the issue's actual shape, never left as a generic label); apply
+the same instinct to every other slot in every issue type, not just that one section.
+Never state a causal or comparative relationship in a heading (or body) that the fetched
+data doesn't actually support, if two events are simply concurrent, say they're
+concurrent, don't imply one caused the other.
+
+## Section skeleton per issue type
 The full "Sectors Weekly Insights" digest. **Delivered as a send-ready HTML email
 (`newsletter.html`), not just Markdown** — the two-column mover cards, colored +/- cells,
 CTA button and event banner don't survive plain Markdown, and the revamp's whole point is
@@ -289,6 +344,37 @@ Product enablement, not market analysis. Source is the release page, not the mar
 3. **Optional real example** — if the feature produces data, one real band-checked
    `sectors.mjs` result showing what it surfaces (as capability demo, never a buy call).
 4. **Sources** — the release page (and docs recipe) + disclaimer footer.
+
+## Appendix: data sources (optional, after Sources, before the disclaimer)
+
+A technical block mapping each metric actually used in the issue to its endpoint AND
+field, one endpoint per bullet, the specific fields it backed in parentheses:
+
+```markdown
+**Appendix: Sectors API endpoints (fields used)**
+- `company/report/ADRO.JK/` — `valuation.historical_valuation[]` (P/E, P/B vs peer
+  average), `financials.historical_eps`, `financials.historical_financial_ratio[]`
+  (ROE), `dividend.yield_ttm`, `dividend.payout_ratio`, `dividend.historical_dividends`,
+  `future.company_growth_forecasts` (consensus EPS/revenue growth),
+  `future.analyst_rating_breakdown`
+- `daily/ADRO.JK/` — 90-day close price series (hero chart)
+- `companies/` screener — `total_yield[2025]`, LQ45 constituents ranked by 2025
+  dividend yield
+- `company/corporate-actions/ADRO.JK/` — `dividend[]` history, buyback/capital-reduction
+  detail
+```
+
+Rule 6's ban on raw field paths applies to **body copy**, not here: this section exists
+specifically so a reader who's finished the piece can trace any number back to its exact
+source, that's a credibility feature for someone in verification mode, not the same
+reader following the narrative. Group by endpoint (not one bullet per field) so a
+reader sees the shape of the pull, not a flat list; every field named must actually have
+backed a claim in this issue, an appendix isn't the place to pad with everything that
+happened to get fetched. It never substitutes for the inline `(sectors.app)` citation
+those same figures already carry in the body, and it never appears before the Sources
+list or ahead of the disclaimer. Optional per issue: add it when a reader might
+plausibly want to trace the pull (a deep dive, a spotlight built on a screener query),
+skip it on a tight daily-pulse issue where it'd outweigh the content.
 
 ## Standard disclaimer footer (fixed text, appended to every issue)
 

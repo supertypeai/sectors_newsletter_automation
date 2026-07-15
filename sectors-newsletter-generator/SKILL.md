@@ -300,6 +300,13 @@ scripts/
   sectors.mjs                     authenticated Sectors API GET (zero external
                                    dependencies, self-locates its own config; a synced
                                    copy shared with sectors-carousel)
+  charts.mjs                      inline-SVG chart generators (bar/line/donut/multiline/
+                                   radar/waterfall/table/scatter/heatmap/bump/sankey/
+                                   compose), forked from sectors-carousel's own
+                                   scripts/charts.mjs for a LIGHT chart surface — same
+                                   geometry, own light-safe color constants (see the
+                                   file's header comment for the validated role map and
+                                   why GAIN/LOSS is blue/red, not green/red)
 config.json                       own copy of the shared Sectors API key
                                    (sectorsApiKey); SECTORS_API_KEY env overrides
 ```
@@ -320,11 +327,17 @@ references. It has no dependency relationship with this skill in either directio
 
 No install needed. Unlike `sectors-carousel` there is no slide-rendering step — the
 only dependency is `node` (built-ins only, no npm packages) to run `sectors.mjs`, and
-the shared API key already ships in `config.json`. The optional hero
-chart writes a plain SVG string to a file directly (no Puppeteer, no build step), using
-color/form guidance from the `dataviz` skill, not the carousel's Instagram-branded chart
-engine (`sectors-carousel`'s `scripts/charts.mjs` is dark-theme brand-specific and stays
-out of scope here). Sanity check:
+the shared API key already ships in `config.json`. The optional hero chart is generated
+with this skill's own `scripts/charts.mjs` (import the chart-kind function you need —
+`sparkline`/`line` for a price series, `barChart` for year-over-year, `donut` for a mix,
+etc. — and write its returned SVG string to a file, no Puppeteer, no build step). Still
+consult the `dataviz` skill first for **which kind of chart fits the data** (its form
+heuristic and the "which Sectors field maps to which chart" table in the sibling
+carousel skill's `references/charts.md` both apply here unchanged); `charts.mjs` is the
+render step once that choice is made. This IS the carousel's chart engine, forked for a
+light surface rather than avoided: the two skills' geometry and chart-kind grammar now
+match, only the color constants differ (see `scripts/charts.mjs`'s header comment for
+the validated light-mode role map). Sanity check:
 
 ```bash
 node scripts/sectors.mjs "idx-total/?start=2026-07-01&end=2026-07-08"

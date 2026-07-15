@@ -88,6 +88,15 @@ marked, or an earnings/revenue bar series. Non-zero-based y-axis for price
 
 ## 5. Self-review before delivery
 
+- If the issue shipped a hero chart, is it wrapped in an explicit opaque background rect
+  (`charts.mjs` never draws one itself), and does every label, especially a series'
+  endpoint value, land inside the canvas rather than past its right edge
+  (`../newsletter-format.md`'s hero-chart paragraph on both)?
+- Did every section heading get rewritten to state this issue's actual finding, not
+  left as the skeleton's generic slot name (`../newsletter-format.md`'s **Section
+  headings state the finding, not the slot**)? If two events (a corporate action, an
+  earnings print, a screener ranking) are merely concurrent, does the heading and prose
+  say so plainly instead of implying one caused the other?
 - Is the lead a real recent trigger, not a standing historical fact?
 - Is every valuation/quality number benchmarked against its own history or peers?
 - Did any ratio fail a plausibility band and get left in anyway? Re-scan.
