@@ -5,6 +5,7 @@ import { thread, MOTION } from "../../../tokens";
 import { fontFamilies } from "../../../fonts";
 import { EmphasizedHeadline } from "../../../components/GradientText";
 import { BrandMarkIcon } from "../../../components/BrandMark";
+import { ThreadFrostPanel } from "../FrostPanel";
 
 export const ThreadOutro: React.FC<{ outro: OutroSpec }> = ({ outro }) => {
   const frame = useCurrentFrame();
@@ -22,20 +23,21 @@ export const ThreadOutro: React.FC<{ outro: OutroSpec }> = ({ outro }) => {
 
   return (
     <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 44, padding: "0 76px" }}>
-      <EmphasizedHeadline
-        text={outro.headline}
-        emphasis={outro.emphasis}
-        style={{
-          fontFamily: fontFamilies.serif,
-          fontWeight: 700,
-          fontSize: 48,
-          lineHeight: 1.2,
-          textAlign: "center",
-          color: thread.ink,
-          opacity: headlineOpacity,
-        }}
-        emphasisStyle={{ fontFamily: fontFamilies.serifItalic, fontStyle: "italic" }}
-      />
+      <ThreadFrostPanel opacity={headlineOpacity}>
+        <EmphasizedHeadline
+          text={outro.headline}
+          emphasis={outro.emphasis}
+          style={{
+            fontFamily: fontFamilies.serif,
+            fontWeight: 700,
+            fontSize: 48,
+            lineHeight: 1.2,
+            textAlign: "center",
+            color: thread.ink,
+          }}
+          emphasisStyle={{ fontFamily: fontFamilies.serifItalic, fontStyle: "italic" }}
+        />
+      </ThreadFrostPanel>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14, opacity: markOpacity, transform: `scale(${markScale})` }}>
         <BrandMarkIcon size={64} />
         <div style={{ fontFamily: fontFamilies.sans, fontWeight: 800, fontSize: 40, backgroundImage: "linear-gradient(to right,#E5337E,#DF9439)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>

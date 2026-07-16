@@ -9,21 +9,54 @@ The prose equivalent of the carousel skill's `deck-format.md`. Every issue is a 
 ---
 subject: <the email subject line>
 preview: <the inbox preview/preheader text>
-issue_type: weekly-wrap | macro-reaction | three-stock-story | single-company-deep-dive | sector-spotlight | daily-market-pulse | upcoming-event | new-feature-release
+issue_type: weekly-wrap | macro-reaction | three-stock-story | single-company-deep-dive | sector-spotlight | daily-market-pulse | upcoming-event | new-feature-release | watchlist-performance-digest
 date: <YYYY-MM-DD, the issue/send date>
 data_as_of: <YYYY-MM-DD, the API's as-of date>
+sample_recipient: <watchlist-performance-digest only: a scrubbed placeholder
+  identifier for the worked example, never a real email or full name, e.g.
+  "sample-row-1">
 ---
 ```
 
 - **`subject`**: ≤ ~9 words. States the verdict or hook, not a category. Passes the same
   test as a carousel cover headline — "trades at 12x, near a 5-year low" beats "This
-  Week in Banks." No hype, no advice framing (never "3 stocks to buy now").
+  Week in Banks." No hype, no advice framing (never "3 stocks to buy now"). For
+  `watchlist-performance-digest`, the subject itself carries a `{{merge_tag}}` (it's a
+  template, not one fixed line), see **Merge-tag convention** below.
 - **`preview`**: ~40-90 characters. Re-angles the subject with a second detail; never
   restates it verbatim (same rule as the carousel caption's first line).
 - **`issue_type`**: one of the built workflow slugs, matches the folder/file naming in
   the delivery convention (see SKILL.md).
 - **`date`** and **`data_as_of`**: the API "today" lags ~1 day (UTC), so these can differ
   from the actual send date. Always show both.
+- **`sample_recipient`**: `watchlist-performance-digest` only, identifies which
+  dbquery-supplied audience row the worked example was rendered from, without
+  embedding the real identifier (dbquery's `references/supabase-access.md` PII rule
+  applies here too, same discipline, this skill has no DB credential of its own but
+  still handles the real rows the dbquery skill hands back).
+
+## Merge-tag convention (watchlist-performance-digest only)
+
+Every other issue type in this skill is a single broadcast piece, no merge tags. This
+one type is a reusable per-recipient template, borrowing dbquery's convention
+wholesale rather than inventing a second one:
+
+- Every per-recipient field is a `{{snake_case_field}}` tag, matching a column the
+  dbquery skill's `watchlist-tracked-interest` query actually returns (`{{first_name}}`,
+  `{{tickers}}`, `{{sectors}}`) or a value computed at draft time from the live market
+  fetch for that recipient's tracked items (ranked table rows, the headline mover).
+  Don't invent a tag that doesn't trace to one of those two sources.
+- The **worked example** immediately below the template (or in a clearly separated
+  "Rendered example" section) shows the same body with every tag resolved against one
+  real sample row, proving the template reads right once filled in. Scrub any real
+  email/name in that rendering unless the user explicitly wants it kept for their own
+  review.
+- The market-blended figures (each tracked item's 7-day move, its peer comparison
+  where available) are computed at draft time from the live fetch, not stored as
+  static merge tags, since they depend on both the dbquery row and the live market
+  data at render time. Document that distinction inline in the template so a
+  downstream renderer knows which fields it must recompute per recipient at actual
+  send time versus which are static from the dbquery row.
 
 ## Opening line (first line of the body)
 
@@ -324,17 +357,31 @@ Tightest type, tables first, built to read in under a minute.
 ### Upcoming event
 Promo for a Sectors in-house workshop. Content is **user-supplied** (date/venue, agenda,
 speaker, registration link, banner), not market data. Ask for all four detail sets first
-(workflow doc), never invent them.
+(workflow doc), never invent them. **Ships as both `newsletter.md` and `newsletter.html`**
+(the send-ready email), see `workflows/upcoming-event.md` §4.
 1. **Hook headline** — what the participant walks away able to do + the most compelling
    logistical fact (named speaker, hard date, "hands-on, live data").
 2. **Banner** — the user's marketing image right after the headline, one-line caption.
 3. **Essentials block/small table** — date/time (with timezone), venue/format, who it's
-   for. Catchable in one glance.
-4. **Agenda** (short list) + **speaker(s)** (name + role).
-5. **Optional data teaser** — one real band-checked `sectors.mjs` result showing what
+   for. Catchable in one glance. CTA repeated right after this block.
+4. **What you walk away with** — a short bold-lead bullet list (4-5 items, no more), each
+   bullet opening with the benefit stated as an outcome, not the agenda feature, one
+   mechanism sentence after it. Write this section like a CxO deciding whether to expense
+   the ticket: time saved, an informational edge, no-technical-background achievability,
+   instructor credibility. **No emoji as bullet markers, and no table** for this section,
+   the essentials block and any data-teaser table already spend this issue's table
+   budget, a third one reads as spreadsheet fatigue in a short promo email. Full
+   guidance and the worked example in `workflows/upcoming-event.md`.
+5. **Optional short numbered "how we get there" list** — 3-5 items, only if the agenda
+   naturally chunks into stages, kept separate from and below the benefit list above so
+   it shows sequence without diluting the benefit-first framing.
+6. **Optional data teaser** — one real band-checked `sectors.mjs` result showing what
    participants will build (cited `sectors.app`), skip if the agenda speaks for itself.
-6. **CTA** — the registration link, plainly stated, repeated once near the close.
-7. Disclaimer footer (Sources only if a data teaser was used). No market-advice framing.
+7. **Speaker(s)** — name + role, a short credibility note works better than a full bio
+   dump.
+8. **CTA** — the registration link, plainly stated, repeated once near the close (three
+   total touches across the issue: hook, essentials, sign-off).
+9. Disclaimer footer (Sources only if a data teaser was used). No market-advice framing.
 
 ### New feature release
 Product enablement, not market analysis. Source is the release page, not the market API.
@@ -344,6 +391,55 @@ Product enablement, not market analysis. Source is the release page, not the mar
 3. **Optional real example** — if the feature produces data, one real band-checked
    `sectors.mjs` result showing what it surfaces (as capability demo, never a buy call).
 4. **Sources** — the release page (and docs recipe) + disclaimer footer.
+
+### Watchlist/sector performance digest
+Personalized, per-recipient template, not a broadcast piece. Same structure for every
+recipient, only the values (and which tickers/sectors appear) change per
+`{{merge_tag}}`.
+1. **Greeting + the headline mover** — `{{first_name}}`, then the single biggest
+   7-day mover among that recipient's tracked tickers/sectors (by absolute move,
+   regardless of where it lands in the table below), stated as fact with a benchmark
+   (vs. the IDX composite for an IDX name, vs. its own recent history for an SGX name
+   where the composite isn't a fair comparison), same no-bare-percentage rule as every
+   other type here.
+2. **The ranked table** — up to 5 of the recipient's tracked tickers/sectors. Columns:
+   name, **Exchange** (`IDX` or `SGX`, its own column, always shown), 7-day move, one
+   peer-comparison figure. **Row order: group by exchange first (IDX rows before SGX,
+   alphabetical by country, Indonesia before Singapore), then by 7-day move descending
+   within each group** — this is display order, independent of which row is the
+   headline mover in step 1, the headline is chosen by absolute significance, the
+   table is ordered by exchange then signed move.
+   - **Peer comparison column**: P/E vs. peer average for an IDX ticker with peer
+     data (`company/report?sections=peers`). For a row where it isn't available yet
+     (every SGX ticker, `sections=peers` 400s there), write **"coming soon"**, never
+     leave the cell blank and never silently drop the column.
+   - A sector-level row shows the sector's own aggregate move (`subsector/report`'s
+     `mcap_change.1w`) plus a one-line callout of its top mover in that
+     peer-comparison cell (`companies/top-changes` filtered to the sub-sector).
+   - **Ticker link**: IDX tickers link `https://sectors.app/idx/<lowercase, no .JK>`
+     (existing convention). **SGX tickers link `https://sectors.app/sgx/<lowercase
+     bare code>`** (confirmed 2026-07-16, e.g. `https://sectors.app/sgx/d05`).
+   - **Sector link**: `https://sectors.app/indonesia/<sub-sector slug>` (confirmed
+     2026-07-16, e.g. `https://sectors.app/indonesia/banks`,
+     `https://sectors.app/indonesia/consumer-services`), the same kebab slug
+     `subsector/report/{slug}/` uses.
+3. **Takeaway paragraph, factors and news, never a call** — after the table, a short
+   paragraph naming real, dated, factual drivers behind what the table just showed:
+   potential factors affecting a tracked ticker/sector's move, related news, or a
+   genuinely upcoming event (an earnings date, a disclosed corporate action). Source
+   from the Sectors API first (`news/?symbols=` / `news/?sub_sector=`,
+   `company/corporate-actions/{symbol}/`), fall back to a cited web search only for
+   what the API can't cover (an SGX name's news, since `news/` is IDX-only), same
+   citation discipline as `sourcing.md` (inline `(sectors.app)` for API facts, a
+   dated named-outlet citation plus a **Sources** entry for anything web-sourced).
+   **Not every row needs a factor.** Only include one for a row where a real source
+   actually turned something up, never manufacture a narrative to fill every line,
+   same non-advice discipline as sector-spotlight and single-company-deep-dive
+   throughout, describe what happened and what's scheduled, never what to do about it.
+4. **CTA** — back to `sectors.app` to check the full watchlist/workflow, one link.
+5. **Sources** (list any web-sourced facts used in step 3, name + date + link, same
+   format as every other issue type; Sectors-API-sourced facts only need the standard
+   inline `(sectors.app)` citation, no separate Sources entry) + disclaimer footer.
 
 ## Appendix: data sources (optional, after Sources, before the disclaimer)
 
@@ -389,7 +485,10 @@ recommendation to buy or sell any security. Figures are from sectors.app as of
 
 Newsletter prose, not slide fragments: 400-900 words typical across the whole issue.
 Vary sentence and paragraph length; simplify word choice, not cadence (inherit
-`writing/writing.md` section 3).
+`writing/writing.md` section 3). **`watchlist-performance-digest` is shorter**,
+150-300 words outside the table, it's a personalized digest read in a couple minutes
+on a phone, not a full briefing, closer to dbquery's nudge-length norm than this
+skill's usual newsletter length.
 
 ## Worked micro-example (header + one filled section)
 

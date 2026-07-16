@@ -5,6 +5,7 @@ import { thread, MOTION } from "../../../tokens";
 import { fontFamilies } from "../../../fonts";
 import { EmphasizedHeadline } from "../../../components/GradientText";
 import { ThreadSceneLayout } from "../SceneLayout";
+import { ThreadFrostPanel } from "../FrostPanel";
 
 export const ThreadTakeaway: React.FC<{ scene: Scene }> = ({ scene }) => {
   const frame = useCurrentFrame();
@@ -15,20 +16,20 @@ export const ThreadTakeaway: React.FC<{ scene: Scene }> = ({ scene }) => {
 
   return (
     <ThreadSceneLayout kicker={scene.kicker} justify="center">
-      <EmphasizedHeadline
-        text={scene.headline ?? ""}
-        emphasis={scene.emphasis}
-        style={{
-          fontFamily: fontFamilies.serif,
-          fontWeight: 700,
-          fontSize: 60,
-          lineHeight: 1.2,
-          color: thread.ink,
-          opacity,
-          maxWidth: 880,
-        }}
-        emphasisStyle={{ fontFamily: fontFamilies.serifItalic, fontStyle: "italic" }}
-      />
+      <ThreadFrostPanel opacity={opacity}>
+        <EmphasizedHeadline
+          text={scene.headline ?? ""}
+          emphasis={scene.emphasis}
+          style={{
+            fontFamily: fontFamilies.serif,
+            fontWeight: 700,
+            fontSize: 60,
+            lineHeight: 1.2,
+            color: thread.ink,
+          }}
+          emphasisStyle={{ fontFamily: fontFamilies.serifItalic, fontStyle: "italic" }}
+        />
+      </ThreadFrostPanel>
     </ThreadSceneLayout>
   );
 };

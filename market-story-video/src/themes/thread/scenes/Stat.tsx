@@ -6,6 +6,7 @@ import { fontFamilies } from "../../../fonts";
 import { EmphasizedHeadline } from "../../../components/GradientText";
 import { ThreadBadgeStack } from "../Badge";
 import { ThreadSceneLayout } from "../SceneLayout";
+import { ThreadFrostPanel } from "../FrostPanel";
 
 export const ThreadStat: React.FC<{ scene: Scene }> = ({ scene }) => {
   const frame = useCurrentFrame();
@@ -21,40 +22,42 @@ export const ThreadStat: React.FC<{ scene: Scene }> = ({ scene }) => {
   return (
     <ThreadSceneLayout kicker={scene.kicker} justify="center">
       {scene.headline && (
-        <EmphasizedHeadline
-          text={scene.headline}
-          emphasis={scene.emphasis}
-          style={{
-            fontFamily: fontFamilies.serif,
-            fontWeight: 700,
-            fontSize: 54,
-            lineHeight: 1.2,
-            color: thread.ink,
-            opacity,
-            maxWidth: 880,
-          }}
-          emphasisStyle={{ fontFamily: fontFamilies.serifItalic, fontStyle: "italic" }}
-        />
+        <ThreadFrostPanel opacity={opacity}>
+          <EmphasizedHeadline
+            text={scene.headline}
+            emphasis={scene.emphasis}
+            style={{
+              fontFamily: fontFamilies.serif,
+              fontWeight: 700,
+              fontSize: 54,
+              lineHeight: 1.2,
+              color: thread.ink,
+            }}
+            emphasisStyle={{ fontFamily: fontFamilies.serifItalic, fontStyle: "italic" }}
+          />
+        </ThreadFrostPanel>
       )}
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, opacity, transform: `scale(${scale})` }}>
-        <div
-          style={{
-            fontFamily: fontFamilies.mono,
-            fontWeight: 700,
-            fontSize: 148,
-            lineHeight: 1,
-            backgroundImage: gradient,
-            WebkitBackgroundClip: "text",
-            backgroundClip: "text",
-            color: "transparent",
-          }}
-        >
-          {scene.stat?.value}
+      <ThreadFrostPanel opacity={opacity} transform={`scale(${scale})`}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+          <div
+            style={{
+              fontFamily: fontFamilies.mono,
+              fontWeight: 700,
+              fontSize: 148,
+              lineHeight: 1,
+              backgroundImage: gradient,
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              color: "transparent",
+            }}
+          >
+            {scene.stat?.value}
+          </div>
+          <div style={{ fontFamily: fontFamilies.sans, fontSize: 26, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: thread.muted }}>
+            {scene.stat?.label}
+          </div>
         </div>
-        <div style={{ fontFamily: fontFamilies.sans, fontSize: 26, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: thread.muted }}>
-          {scene.stat?.label}
-        </div>
-      </div>
+      </ThreadFrostPanel>
       {scene.badges && scene.badges.length > 0 && (
         <ThreadBadgeStack badges={scene.badges} delay={badgeDelay} />
       )}

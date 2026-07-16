@@ -1,0 +1,27 @@
+-- STAGING AREA for sectors-newsletter-dbquery query drafts.
+--
+-- This file is NOT a run source. Nothing gets executed straight out of here. It's
+-- where a new or edited query gets drafted, sanity-tested read-only for a match
+-- count, and shown to the user one query at a time for explicit approval. Only after
+-- approval does the query get copied into scripts/approved-queries/<slug>.sql, the
+-- ONLY folder this skill is allowed to run a query from. See
+-- references/supabase-access.md for the full contract.
+--
+-- Current approved queries live in scripts/approved-queries/:
+--   onboarding-nudge.sql
+--   onboarding-unclaimed-reward.sql
+--   credit-plan-lifecycle-credits-expiring.sql
+--   credit-plan-lifecycle-quota-cycle-renewal.sql
+--   notification-setup-nudge.sql
+--   watchlist-tracked-interest.sql (supports the sibling generator skill's
+--     personalized content, not a dbquery-drafted lifecycle email)
+--
+-- Schema notes (public schema, confirmed via information_schema.columns):
+-- - api_user has no first_name column, only full_name. Every approved query derives
+--   {{first_name}} as split_part(full_name, ' ', 1) rather than inventing a column.
+-- - credits_total has no literal column; monthly_quota is the closest real proxy
+--   (the recurring allotment), not a running total.
+--
+-- To draft a new candidate query, write it below this line, get it approved, then
+-- move it out to scripts/approved-queries/<slug>.sql and clear this file back to
+-- empty.

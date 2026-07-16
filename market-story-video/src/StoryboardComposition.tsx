@@ -37,20 +37,60 @@ export const StoryboardComposition: React.FC<{ storyboard: Storyboard }> = ({ st
     return start;
   });
 
-  const markers: ThreadMarker[] = storyboard.scenes.map((scene, i) => ({
-    atFrame: starts[i],
-    kind: scene.marker?.kind ?? (scene.tickers && scene.tickers.length > 0 ? "logo" : "dot"),
-    color: scene.marker?.color
-      ? { pink: "#E5337E", gold: "#DF9439", green: "#1D8A4E", dark: "#211B15" }[scene.marker.color]
-      : MARKER_COLOR_CYCLE[i % MARKER_COLOR_CYCLE.length],
-    ticker: scene.tickers?.[0],
-  }));
+  // The logo track shows each of the story's tickers once, in the fixed order given by the
+  // envelope's `tickers` array — not once per scene mention. A ticker already shown earlier
+  // in the current lap is skipped rather than re-pinned, so the thread doesn't fill up with
+  // repeat dots for a hub entity that recurs across many scenes. Once every ticker in the
+  // envelope order has appeared, the lap resets so a later repeat starts a fresh lap instead
+  // of being dropped — "loop it if necessary" for a story with more beats than tickers.
+  let seenThisLap = new Set<string>();
+  const colorFor = (color: NonNullable<typeof storyboard.scenes[number]["marker"]>["color"]) =>
+    color ? { pink: "#E5337E", gold: "#DF9439", green: "#1D8A4E", dark: "#211B15" }[color] : undefined;
+  const markers: ThreadMarker[] = storyboard.scenes.flatMap((scene, i) => {
+    if (scene.marker || !scene.tickers || scene.tickers.length === 0) {
+      return [
+        {
+          atFrame: starts[i],
+          kind: scene.marker?.kind ?? "dot",
+          color: colorFor(scene.marker?.color) ?? MARKER_COLOR_CYCLE[i % MARKER_COLOR_CYCLE.length],
+        },
+      ];
+    }
+    const newThisScene = scene.tickers.filter((ticker) => {
+      if (seenThisLap.has(ticker)) return false;
+      seenThisLap.add(ticker);
+      if (seenThisLap.size >= storyboard.tickers.length) seenThisLap = new Set();
+      return true;
+    });
+    return newThisScene.map((ticker, j) => ({
+      atFrame: starts[i] + Math.round(((j + 1) * sceneFrames[i]) / (newThisScene.length + 1)),
+      kind: "logo" as const,
+      ticker,
+    }));
+  });
+
+  // Markers are positioned along the thread purely by time-fraction (atFrame / total), and
+  // a scene that names several tickers close together in time lands them close together in
+  // SPACE too (the path's y is linear in time) — close enough that two 56px logo circles can
+  // visibly overlap. Enforce a minimum frame gap between consecutive markers (in chronological
+  // order) so no two logos ever sit closer than one logo-diameter-plus-margin apart.
+  const MIN_MARKER_GAP_PX = 80;
+  const minGapFrames = Math.ceil((MIN_MARKER_GAP_PX / 1920) * total);
+  let lastMarkerFrame = -Infinity;
+  const spacedMarkers: ThreadMarker[] = markers
+    .slice()
+    .sort((a, b) => a.atFrame - b.atFrame)
+    .map((m) => {
+      const atFrame = Math.min(Math.max(m.atFrame, lastMarkerFrame + minGapFrames), total - 1);
+      lastMarkerFrame = atFrame;
+      return { ...m, atFrame };
+    });
 
   return (
     <AbsoluteFill>
       <theme.Background />
       {storyboard.theme === "thread" && (
-        <ThreadLine width={1080} height={1920} totalFrames={total} markers={markers} />
+        <ThreadLine width={1080} height={1920} totalFrames={total} markers={spacedMarkers} />
       )}
       {theme.Chrome && <theme.Chrome sourceDate={storyboard.sourceDate} />}
       {storyboard.scenes.map((scene, i) => {

@@ -35,6 +35,13 @@ export const thread = {
   gridLine: "rgba(33,27,21,0.08)",
   threadLine: "rgba(33,27,21,0.35)",
   pillDark: "#211B15",
+  // Cream-colored halo behind headline/stat text so the thread line and its markers, which
+  // pass directly through the centered text column (see ThreadLine's amplitude), never
+  // visually blend into a letter or digit sitting on top of them. A `filter: drop-shadow`
+  // (not `text-shadow`) — drop-shadow follows the element's actual rendered alpha, so a
+  // gradient-clipped, color-transparent emphasis word still shows its gradient; text-shadow
+  // instead fills the whole transparent glyph with the shadow color, erasing the gradient.
+  textHalo: "drop-shadow(0 0 6px #F3EEE5) drop-shadow(0 0 10px #F3EEE5)",
 } as const;
 
 export const gradient = "linear-gradient(to right, #E5337E 0%, #DF9439 100%)";

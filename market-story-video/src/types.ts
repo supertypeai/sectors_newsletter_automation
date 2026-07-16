@@ -41,7 +41,8 @@ export interface Scene {
   headline?: string;
   emphasis?: string; // must be an exact substring of headline — see EmphasizedHeadline
   body?: string;
-  tickers?: string[]; // tickers this scene names — drives the logo(s) shown
+  tickers?: string[]; // tickers this scene names — drives the logo(s) shown AND (thread theme) the thread's logo-track markers for this scene
+  coverLogos?: string[]; // cover role only: the full logo row to display, decoupled from `tickers` so a cover showing every ticker in the piece doesn't also front-load every marker onto the thread track
   stat?: StatSpec;
   chart?: ChartSpec;
   breakdown?: BreakdownSpec;

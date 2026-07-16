@@ -7,6 +7,7 @@ import { EmphasizedHeadline } from "../../../components/GradientText";
 import { LineChart } from "../../../components/charts/LineChart";
 import { BarChart } from "../../../components/charts/BarChart";
 import { ThreadSceneLayout } from "../SceneLayout";
+import { ThreadFrostPanel } from "../FrostPanel";
 
 const CHART_W = 900;
 const CHART_H = 520;
@@ -29,20 +30,20 @@ export const ThreadChart: React.FC<{ scene: Scene }> = ({ scene }) => {
   return (
     <ThreadSceneLayout kicker={scene.kicker} justify="space-between">
       {scene.headline && (
-        <EmphasizedHeadline
-          text={scene.headline}
-          emphasis={scene.emphasis}
-          style={{
-            fontFamily: fontFamilies.serif,
-            fontWeight: 700,
-            fontSize: 52,
-            lineHeight: 1.18,
-            color: thread.ink,
-            opacity: headlineOpacity,
-            maxWidth: 880,
-          }}
-          emphasisStyle={{ fontFamily: fontFamilies.serifItalic, fontStyle: "italic" }}
-        />
+        <ThreadFrostPanel opacity={headlineOpacity}>
+          <EmphasizedHeadline
+            text={scene.headline}
+            emphasis={scene.emphasis}
+            style={{
+              fontFamily: fontFamilies.serif,
+              fontWeight: 700,
+              fontSize: 52,
+              lineHeight: 1.18,
+              color: thread.ink,
+            }}
+            emphasisStyle={{ fontFamily: fontFamilies.serifItalic, fontStyle: "italic" }}
+          />
+        </ThreadFrostPanel>
       )}
       {scene.chart?.kind === "line" && (
         <LineChart

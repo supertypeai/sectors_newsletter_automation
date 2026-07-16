@@ -3,24 +3,31 @@ name: sectors-newsletter-generator
 description: >-
   Generate an on-brand, data-backed Markdown newsletter about the Indonesian stock
   market (IDX) from live Sectors data and cited research. Use whenever the user wants
-  to write, draft, or produce a Sectors subscriber newsletter issue. Handles eight
-  built issue types the user picks from on each run, across four families: MARKET
+  to write, draft, or produce a Sectors subscriber newsletter issue. Handles nine
+  built issue types the user picks from on each run, across five families: MARKET
   PERFORMANCE ("weekly wrap" / "Saturday market wrap"; "daily market pulse" end-of-day
   movers and volume); MARKET INSIGHTS ("macro-reaction" / "macro newsletter" tying the
   last ~2 days of macro news to affected sectors and tickers); COMPANY INSIGHTS ("three
   stocks story" history/people/fun-facts/attributed-outlook; "single company deep dive"
   off an earnings or corporate-action trigger; "sector spotlight" peer-comparing one
-  sub-sector's names on valuation); and SECTORS-ORG announcements ("new feature release"
+  sub-sector's names on valuation); SECTORS-ORG announcements ("new feature release"
   enablement copy sourced from the Sectors release notes; "upcoming event" promo for a
-  Sectors in-house workshop, built from user-supplied event details, not market data).
+  Sectors in-house workshop, built from user-supplied event details, not market data);
+  and PERSONALIZED ("watchlist/sector performance digest" — a fixed template, ranked
+  performance + peer comparison table for each user's own tracked tickers/sectors,
+  same presentation for every recipient, only the values change). The personalized
+  type is the one exception to "no user-account data": it gets its audience and
+  tracked-tickers/sectors from the sibling `sectors-newsletter-dbquery` skill's
+  approved `watchlist-tracked-interest` query, never an ad-hoc query written here.
   Trigger on phrases like "write the newsletter", "do this week's Saturday wrap", "daily
   pulse", "macro piece on the rate cut", "deep dive on BBRI earnings", "sector spotlight
-  on the banks", "three-stocks story", "write up the new feature release", or "announce
-  the upcoming workshop". Do NOT use it for Instagram carousels or slides (use sectors-carousel),
-  for video, or for non-IDX markets, and do NOT use it for lifecycle/CRM/transactional
-  email (onboarding nudges, credit/plan reminders, upgrade/win-back, personal portfolio
-  digests) or for deciding recipients/frequency, those need live user-account data this
-  skill does not have. This skill's deliverable is Markdown text and tables, bite-sized
+  on the banks", "three-stocks story", "write up the new feature release", "announce
+  the upcoming workshop", or "watchlist performance digest". Do NOT use it for Instagram
+  carousels or slides (use sectors-carousel), for video, or for non-IDX/non-SGX markets,
+  and do NOT use it for lifecycle/CRM/transactional email (onboarding nudges, credit/plan
+  reminders, upgrade/win-back) or for deciding recipients/frequency, those need live
+  user-account data and stay with the sibling `sectors-newsletter-dbquery` skill
+  instead. This skill's deliverable is Markdown text and tables, bite-sized
   and scannable, plus at most one optional generated chart image for the issue's single
   hero trend, it is not a slides or video renderer.
 ---
@@ -36,9 +43,30 @@ skill govern everything here:
 - **Factual by construction.** Every claim is a real Sectors API field or a cited
   source, nothing fabricated, nothing prescriptive. See `references/compliance.md`.
 
+## Personalization check (run before picking an issue type)
+
+Ask one question first: **does this content need real per-user data (which tickers or
+sectors a specific user tracks, their account/billing state) that the Sectors API
+cannot supply?**
+
+- **No** (the standard case — market-wide content, same for every reader): proceed to
+  "Pick the issue type" below as normal, this skill's own API/web-research pipeline is
+  sufficient, don't call any other skill.
+- **Yes, and it's account/billing state** (renewal dates, credits, onboarding status,
+  who to send a nudge to): out of scope here entirely, hand off to the sibling
+  `sectors-newsletter-dbquery` skill, see **Out of scope** below.
+- **Yes, and it's which tickers/sectors a user tracks** (this is the `watchlist-performance-digest`
+  personalized type): invoke the `sectors-newsletter-dbquery` skill (via the Skill tool)
+  to run its approved `watchlist-tracked-interest` query and return the raw audience
+  rows. **Never write or improvise SQL in this skill, and never ask for Supabase access
+  directly here** — this skill has no database credential of its own by design; the
+  dbquery skill is the only path to that data, and it only ever runs a query that's
+  already sitting approved in its `scripts/approved-queries/` folder. See
+  `references/workflows/watchlist-performance-digest.md` step 1.
+
 ## Pick the issue type (always first)
 
-This is **one issue per run**, never several at once. Eight issue types are built,
+This is **one issue per run**, never several at once. Nine issue types are built,
 grouped by content family (mirroring the newsletter content plan's type catalog). Each
 maps to a workflow doc in `references/workflows/` and an issue-type slug:
 
@@ -68,11 +96,20 @@ maps to a workflow doc in `references/workflows/` and an issue-type slug:
    **user-supplied**: ask for date/time/venue, agenda/speaker/target audience,
    registration link, and marketing banner before drafting. Not market-data driven.
 
+**Personalized**
+9. **Watchlist/sector performance digest** (`watchlist-performance-digest`) — a fixed
+   template, same structure for every recipient, ranked performance + peer comparison
+   table for up to 5 of that user's own tracked tickers/sectors (from the sibling
+   dbquery skill's `watchlist-tracked-interest` query), only the values differ per
+   recipient. The one type in this catalog that isn't a single broadcast piece, see
+   the **Personalization check** above and
+   `references/workflows/watchlist-performance-digest.md`.
+
 **Skip the menu when the ask already resolves it**: if the user names the type and/or
 subject ("do the Saturday wrap," "deep dive on BBRI earnings," "spotlight the banks"), go
 straight into that pipeline. If they delegate the choice ("you pick this week's issue"),
 choose and state a one-line "why this, why now" as you proceed. Only a bare "write the
-newsletter" with no type named gets the menu, offer the eight above grouped by family.
+newsletter" with no type named gets the menu, offer the nine above grouped by family.
 
 ### Not yet built (in scope, will be added iteratively)
 
@@ -91,18 +128,24 @@ template (don't fake it with an ad-hoc pipeline):
 
 ### Out of scope (do not attempt here)
 
-These need live **user-account, billing, or product-usage data** this skill cannot fetch
-(`quest_completed`, `credits_used`, watchlist/workflow history, renewal dates). They are
-lifecycle/CRM/transactional email, a different system, not market content. Decline and say
-why:
+These need live **user-account or billing state** this skill cannot fetch
+(`quest_completed`, `credits_used`, onboarding progress, renewal dates). They are
+lifecycle/CRM/transactional email, a different system entirely, triggered by account
+state rather than market content, and drafted end-to-end by the sibling
+`sectors-newsletter-dbquery` skill, not this one:
 
-- Reminder: onboarding nudge, setup nudge, credit-expiry, plan-renewal
-- Account & Value: value recap, upgrade prompt, win-back reoffer
-- Market Performance: personal portfolio digest (needs the user's own watchlist history)
+- Reminder: onboarding nudge, onboarding unclaimed reward, credit-expiry,
+  quota-cycle renewal
+- Account & Value: notification setup nudge, upgrade prompt, win-back reoffer
+
+The one account-adjacent thing that IS in scope here is **which tickers/sectors a user
+tracks**, that's audience/personalization data for the `watchlist-performance-digest`
+type above, not a lifecycle trigger, see the **Personalization check** section.
 
 **Recipient grouping, segmentation, frequency caps, and send scheduling are also out of
-scope.** This skill generates one content piece; who receives it and when is decided by
-the delivery/CRM system that consumes the output, not here.
+scope**, including for the personalized type. This skill generates content (one
+broadcast piece, or one reusable per-recipient template); who receives it and when is
+decided by the delivery/CRM system that consumes the output, not here.
 
 ## Write as a CXO optimizing for conversion
 
@@ -127,6 +170,7 @@ anything that doesn't serve the goal.
 | **Three-stock story** | Click through to each company's page on Sectors |
 | **Single company deep dive** | Open that company's report on Sectors and dig into the data |
 | **Sector spotlight** | Screen the sub-sector on Sectors and compare the peers themselves |
+| **Watchlist/sector performance digest** | Open Sectors to check their own tracked tickers/sectors in full, now that the digest showed a real move on one |
 
 If an issue type isn't listed (a not-yet-built type), state its conversion goal in one
 line — "the one action a reader should take" — before drafting, and optimize for it the
@@ -135,12 +179,23 @@ content the goal is a return visit to `sectors.app` to explore the names cited.
 
 ## Shared pipeline shape
 
-All three types run the same five stages, then branch into the type-specific workflow
-doc. Open each reference when you reach its stage, don't pre-load everything up front.
+The eight broadcast issue types run the same five stages, then branch into the
+type-specific workflow doc. Open each reference when you reach its stage, don't
+pre-load everything up front. **`watchlist-performance-digest` diverges at stage 1**
+(audience comes from the dbquery skill, not research) and stage 5 (delivers a
+per-recipient template, not a single broadcast file), see its own workflow doc.
 
 1. **Research the angle** — web search and/or API discovery, before any drafting.
 2. **Fetch and validate data** — `sectors.mjs`, then band-check against
-   `references/sectors-api/data-quality.md`.
+   `references/sectors-api/data-quality.md`. Before fetching, check
+   `/Users/evelyn/Desktop/newsletter/samples/<type-slug>/queries.md` for that issue
+   type's resolved endpoint list, param shape, and date/window rule (e.g. weekly-wrap's
+   Mon-Fri anchor, macro-reaction's last-2-days news window) — reuse the same criteria
+   this run, only the dates/tickers change. If no sample exists yet for a type, the file
+   still holds the documented recipe pattern; populate the sample after this run. This
+   folder lives next to the delivered issues, not inside the skill, specifically so it's
+   easy to open and edit directly when the user wants to adjust a type's format or
+   presentation, without touching skill internals.
 3. **Draft** — against `references/newsletter-format.md`'s contract and this skill's
    voice rules, in the CXO-optimizing-for-conversion role (see **Write as a CXO
    optimizing for conversion** above): name this issue's conversion goal first, then
@@ -149,7 +204,10 @@ doc. Open each reference when you reach its stage, don't pre-load everything up 
    generated chart for the issue's hero trend (`newsletter-format.md`'s **Bite-sized &
    visual formatting** section, which routes chart work through the `dataviz` skill).
 4. **Self-review** — the checklist at the end of the chosen workflow doc, plus
-   `references/compliance.md`'s one-line test.
+   `references/compliance.md`'s one-line test. Also diff the draft's section order and
+   heading logic against `/Users/evelyn/Desktop/newsletter/samples/<type-slug>/newsletter.md`
+   (when one exists) so flow and section-title logic stay consistent issue to issue for
+   the same type, not just compliant with the prose skeleton in isolation.
 5. **Deliver** — see Delivery below.
 
 ### Weekly wrap
@@ -210,6 +268,23 @@ link, and marketing banner. Never invent any of them. Optionally include one rea
 exception to the "research the angle / fetch and validate data" opening stages, the
 research step is the intake questions, and the only data fetch is the optional teaser.
 
+### Watchlist/sector performance digest
+Open `references/workflows/watchlist-performance-digest.md`. This is the pipeline's
+other divergent type, personalized rather than broadcast. In brief: invoke the
+`sectors-newsletter-dbquery` skill to run its approved `watchlist-tracked-interest`
+query and get each eligible user's tracked tickers/sectors; for a sample user, fetch
+7-day performance for every tracked item (IDX tickers via `company/report?sections=overview,peers`
+for performance + ready-made peer comparison, SGX tickers via `sgx/company/report`
+for performance only, "coming soon" where peer comparison isn't available; a tracked
+sector via a sub-sector screen for its aggregate move + top mover), plus real dated
+factors/news per item where a genuine source exists (Sectors API `news/`/
+`corporate-actions` for IDX, a cited web search for SGX); pick the headline by
+absolute 7-day move, cap the table at 5 rows grouped by exchange (IDX before SGX)
+then sorted by signed move within each group; draft one fixed template with the
+ranked table and a factual takeaway paragraph, prove it against that one real user as
+the worked example, `{{merge_tag}}` every per-recipient field the same way the
+dbquery skill's templates do.
+
 ## Hard rules (override style every time)
 
 0. **Draft as a CXO optimizing for conversion.** Every issue targets one conversion goal
@@ -247,28 +322,48 @@ Finished issues land at:
 ```
 /Users/evelyn/Desktop/newsletter/newsletter_<YYYY-MM-DD>_<type-slug>/
     newsletter.md
-    newsletter.html            weekly-wrap: the send-ready HTML email (no PDF attachment)
+    newsletter.html            weekly-wrap & upcoming-event: the send-ready HTML email
     chart-<slug>.svg           only if the issue includes the optional hero chart
     banner-<slug>.<ext>        upcoming-event only: the user-supplied banner, copied in
+    sample-rows.csv            watchlist-performance-digest only: the real audience rows
+                                the dbquery skill's query returned this run (local only,
+                                contains PII, never copy elsewhere or commit)
 ```
 
-- `<type-slug>` is one of the eight built slugs: `weekly-wrap`, `daily-market-pulse`,
+- `<type-slug>` is one of the nine built slugs: `weekly-wrap`, `daily-market-pulse`,
   `macro-reaction`, `three-stock-story`, `single-company-deep-dive`, `sector-spotlight`,
-  `new-feature-release`, `upcoming-event`.
+  `new-feature-release`, `upcoming-event`, `watchlist-performance-digest`.
 - `<YYYY-MM-DD>` is the issue/send date.
 - Any generated chart file lands in this same folder, next to `newsletter.md`, and is
   referenced from it by a relative Markdown image link. For `upcoming-event`, a
   user-supplied local banner is copied in the same way; a banner given as a URL is
   referenced inline, not copied.
-- **Weekly wrap ships as HTML.** It is the one type delivered as a send-ready
+- **`watchlist-performance-digest` delivers a template, not a single piece.**
+  `newsletter.md` for this type is the same kind of artifact as a dbquery issue:
+  `{{merge_tag}}` placeholders plus one worked example rendered against a real sample
+  row, not standalone finished copy. `sample-rows.csv` carries real user PII (email,
+  tracked tickers/sectors), same discipline as the dbquery skill's own
+  `references/supabase-access.md`: flag it to the user, it stays local, never leaves
+  this machine.
+- **Weekly wrap and upcoming event ship as HTML.** Both are delivered as a send-ready
   `newsletter.html` (email-safe inline styles, table layout, tickers linked to
   `sectors.app/idx/<lower>`), replacing the old PDF-attachment format. Keep the
   `newsletter.md` as the review draft. See `workflows/weekly-wrap.md` §2c and the worked
-  reference `newsletter/newsletter_2026-07-06_weekly-wrap/newsletter.html`.
+  reference `newsletter/newsletter_2026-07-06_weekly-wrap/newsletter.html` for the digest
+  type; `workflows/upcoming-event.md` §4 and
+  `newsletter/newsletter_2026-07-13_upcoming-event/newsletter.html` for the promo type.
 - Scratch fetches (raw `sectors.mjs --save-dir` JSON) go to the scratchpad or a
   `_draft`/`data` subfolder, not into the delivered folder.
 - `newsletter/` is a plain folder, separate from the skills repo and from the
   `sectors-carousel` skill's `scs/<ticker>_<slug>/` git repo, no git init needed here.
+- **`samples/` lives in this same `newsletter/` folder, not inside the skill.**
+  `/Users/evelyn/Desktop/newsletter/samples/<type-slug>/` holds one `newsletter.md`
+  (+`.html`/chart where applicable) and a `queries.md` per issue type, deliberately kept
+  next to the delivered issues rather than under the skill's own `references/` so the
+  user can open and edit a type's format/presentation reference directly, without
+  digging into skill internals. See **Shared pipeline shape** steps 2 and 4 for when
+  this skill reads it, and refresh a type's sample here after any run whose output is
+  more current or more refined than what's stored.
 
 ## What's in this skill
 
@@ -280,7 +375,7 @@ references/
                                    section skeletons, disclaimer footer
   compliance.md                   hard rules + the advice-reconciliation guidance
   sourcing.md                     web research + citation rules
-  workflows/                      one doc per built issue type (eight)
+  workflows/                      one doc per built issue type (nine)
     weekly-wrap.md                API recipe + section outline, Saturday issue
     daily-market-pulse.md         one-day movers/volume/brokers recipe, table-first
     macro-reaction.md             macro sourcing + affected-ticker + valuation-context
@@ -291,6 +386,10 @@ references/
     sector-spotlight.md           one sub-sector peer-comparison on valuation
     new-feature-release.md        release-note-sourced product enablement copy
     upcoming-event.md             in-house workshop promo, user-supplied event details
+    watchlist-performance-digest.md  personalized, per-recipient template; calls the
+                                   dbquery skill for audience, ranks tracked
+                                   tickers/sectors by 7-day move, top 5, peer
+                                   comparison for IDX only
   sectors-api/                    endpoints, data-quality, README (the data layer, v2 —
                                    a synced copy shared with sectors-carousel)
   writing/
