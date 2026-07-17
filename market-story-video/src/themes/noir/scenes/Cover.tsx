@@ -40,10 +40,17 @@ export const NoirCover: React.FC<{ scene: Scene }> = ({ scene }) => {
           transform: `translateY(${headlineY}px)`,
         }}
       />
-      {scene.tickers && scene.tickers.length > 0 && (
-        <div style={{ display: "flex", gap: 16, opacity: statOpacity }}>
-          {scene.tickers.map((t) => (
-            <Logo key={t} ticker={t} size={72} />
+      {scene.people && scene.people.length > 0 && (
+        <div style={{ display: "flex", gap: 28, opacity: statOpacity }}>
+          {scene.people.map((p) => (
+            <div key={p.initials} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, width: 104 }}>
+              <div style={{ fontFamily: fontFamilies.sans, fontSize: 15, fontWeight: 700, color: noir.text, textAlign: "center" }}>{p.name}</div>
+              {p.role && (
+                <div style={{ fontFamily: fontFamilies.sans, fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", color: noir.dim, textAlign: "center" }}>
+                  {p.role}
+                </div>
+              )}
+            </div>
           ))}
         </div>
       )}
@@ -70,6 +77,13 @@ export const NoirCover: React.FC<{ scene: Scene }> = ({ scene }) => {
               </div>
             </>
           )}
+        </div>
+      )}
+      {scene.tickers && scene.tickers.length > 0 && (
+        <div style={{ display: "flex", gap: 16, opacity: statOpacity }}>
+          {scene.tickers.map((t) => (
+            <Logo key={t} ticker={t} size={96} />
+          ))}
         </div>
       )}
     </NoirSceneLayout>

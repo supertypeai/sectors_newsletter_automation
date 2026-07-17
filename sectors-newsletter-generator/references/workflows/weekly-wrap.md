@@ -137,9 +137,15 @@ self-contained and data-backed with **no PDF attachment**. Author `newsletter.ht
 email-safe inline styles and table-based layout (see the worked reference at
 `newsletter/newsletter_2026-07-06_weekly-wrap/newsletter.html`):
 
-- Every ticker mention links to `https://sectors.app/idx/<lower>`, in tables and prose.
-- Gains green, losses red; keep a single accent (Sectors magenta `#d6336c`) for links,
-  headers, and the CTA; cream card ground `#fdf7ee`.
+- Every ticker mention links to `https://sectors.app/idx/<lower>`, in tables and prose,
+  same shared ticker-blue (`#3288BD`) as every other issue type, not a type-specific
+  color (this doc previously said magenta for links, that was wrong, see the global
+  color convention in `../newsletter-format.md`'s **Ticker-mention convention**).
+- Gains green (`#1D8A4E`), losses red (`#D6295A`); Sectors magenta (`#d6336c`) is
+  reserved for the CTA button only, not links or headers; section headers render in a
+  dark neutral (`#1c1c1c`); cream card ground `#fdf7ee`.
+- Every broker code (if a broker/flow table appears) links to
+  `https://sectors.app/idx/broker/<lower>`, same ticker-blue styling.
 - The event banner can be a self-contained CSS block; swap in the real hosted banner
   image only when a URL is supplied (email can't embed a local file).
 - Keep a `newsletter.md` draft alongside for review, ship the `.html` for send. A rendered
@@ -180,4 +186,11 @@ prove it (mirrors the carousel skill's "write the payoff slide first").
   not `overview.daily_close_change` (the latest day)? Every ticker linked to its report?
 - Headlines: 5 IDX-relevant items, off-topic non-IDX stories dropped, each with a source?
 - Is it delivered as `newsletter.html` (send-ready, no PDF attachment), with every ticker
-  linked to `sectors.app/idx/<lower>`?
+  linked to `sectors.app/idx/<lower>`, in ticker-blue (`#3288BD`), including inline
+  prose mentions, not just table cells?
+- Gains/losses green/red (`#1D8A4E`/`#D6295A`) consistently across every table and the
+  hero chart, magenta reserved for the CTA button only?
+- If a broker/flow table appears, is every broker code linked to
+  `sectors.app/idx/broker/<lower>`?
+- Is the Appendix (endpoint/field trace) present, after Sources and before the
+  disclaimer (`../newsletter-format.md`'s Appendix section, mandatory for every issue)?

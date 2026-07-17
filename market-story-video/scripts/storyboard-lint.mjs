@@ -72,8 +72,15 @@ function lint(storyboard) {
         errors.push(`scene[${i}].breakdown.ownership: nodes.length must be links.length + 1`);
       }
     }
-    if (s.breakdown && s.breakdown.kind !== "list" && s.breakdown.kind !== "ownership") {
-      errors.push(`scene[${i}].breakdown.kind must be "list" or "ownership", got "${s.breakdown.kind}"`);
+    if (s.breakdown?.kind === "network") {
+      const ids = new Set(s.breakdown.nodes.map((n) => n.id));
+      for (const edge of s.breakdown.edges) {
+        if (!ids.has(edge.from)) errors.push(`scene[${i}].breakdown.network: edge.from "${edge.from}" is not a node id`);
+        if (!ids.has(edge.to)) errors.push(`scene[${i}].breakdown.network: edge.to "${edge.to}" is not a node id`);
+      }
+    }
+    if (s.breakdown && s.breakdown.kind !== "list" && s.breakdown.kind !== "ownership" && s.breakdown.kind !== "network") {
+      errors.push(`scene[${i}].breakdown.kind must be "list", "ownership", or "network", got "${s.breakdown.kind}"`);
     }
   });
 

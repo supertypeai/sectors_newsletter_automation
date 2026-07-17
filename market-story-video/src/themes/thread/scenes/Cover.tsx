@@ -45,19 +45,22 @@ export const ThreadCover: React.FC<{ scene: Scene }> = ({ scene }) => {
           />
         </ThreadFrostPanel>
       )}
-      {(() => {
-        const logos = scene.coverLogos ?? scene.tickers;
-        return (
-          logos &&
-          logos.length > 0 && (
-            <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 14, opacity: statOpacity, maxWidth: 900 }}>
-              {logos.map((t) => (
-                <Logo key={t} ticker={t} size={logos.length > 4 ? 52 : 64} />
-              ))}
-            </div>
-          )
-        );
-      })()}
+      {scene.people && scene.people.length > 0 && (
+        <ThreadFrostPanel opacity={statOpacity}>
+          <div style={{ display: "flex", gap: 28 }}>
+            {scene.people.map((p) => (
+              <div key={p.initials} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, width: 104 }}>
+                <div style={{ fontFamily: fontFamilies.sans, fontSize: 15, fontWeight: 700, color: thread.ink, textAlign: "center" }}>{p.name}</div>
+                {p.role && (
+                  <div style={{ fontFamily: fontFamilies.sans, fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", color: thread.muted, textAlign: "center" }}>
+                    {p.role}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </ThreadFrostPanel>
+      )}
       {scene.stat && (
         <ThreadFrostPanel opacity={statOpacity}>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
@@ -78,6 +81,19 @@ export const ThreadCover: React.FC<{ scene: Scene }> = ({ scene }) => {
           </div>
         </ThreadFrostPanel>
       )}
+      {(() => {
+        const logos = scene.coverLogos ?? scene.tickers;
+        return (
+          logos &&
+          logos.length > 0 && (
+            <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 14, opacity: statOpacity, maxWidth: 900 }}>
+              {logos.map((t) => (
+                <Logo key={t} ticker={t} size={logos.length > 4 ? 52 : 96} />
+              ))}
+            </div>
+          )
+        );
+      })()}
     </ThreadSceneLayout>
   );
 };

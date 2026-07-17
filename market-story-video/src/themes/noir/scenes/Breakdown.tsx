@@ -5,6 +5,7 @@ import { noir, MOTION } from "../../../tokens";
 import { fontFamilies } from "../../../fonts";
 import { EmphasizedHeadline } from "../../../components/GradientText";
 import { OwnershipTree } from "../../../components/charts/OwnershipTree";
+import { OwnershipNetwork } from "../../../components/charts/OwnershipNetwork";
 import { NoirSceneLayout } from "../SceneLayout";
 
 export const NoirBreakdown: React.FC<{ scene: Scene }> = ({ scene }) => {
@@ -65,6 +66,25 @@ export const NoirBreakdown: React.FC<{ scene: Scene }> = ({ scene }) => {
           nameColor={noir.text}
           subColor={noir.muted}
           lineColor={noir.border}
+          delay={bodyDelay}
+          fontFamily={fontFamilies.sans}
+          monoFontFamily={fontFamilies.mono}
+        />
+      )}
+      {scene.breakdown?.kind === "network" && (
+        <OwnershipNetwork
+          nodes={scene.breakdown.nodes}
+          edges={scene.breakdown.edges}
+          width={920}
+          height={980}
+          accentColor={noir.brandPink}
+          reverseColor={noir.brandGold}
+          nameColor={noir.text}
+          codeColor={noir.muted}
+          lineColor={noir.border}
+          labelBgColor={noir.bg}
+          closingCaption={scene.breakdown.closingCaption}
+          captionColor={noir.brandGold}
           delay={bodyDelay}
           fontFamily={fontFamilies.sans}
           monoFontFamily={fontFamilies.mono}

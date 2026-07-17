@@ -13,14 +13,22 @@
 // and >=3:1 contrast (the rest are pastels that read near-invisible on white): a rose
 // (#c14d94), a red (#D53E4F), a blue (#3288BD), and a purple (#5E4FA2, in use; #6D5FA6 is
 // a same-family spare for a 4th peer slot if one's ever needed), plus #8B004C which passes
-// contrast alone but fails the shared lightness band next to the others. A real gap this
-// leaves: no hue in the given list is both green AND >=3:1 on
-// white, so GAIN/LOSS uses blue/red (validated, ΔE 46.5) instead of the usual green/red
-// finance convention, a genuine green (#5BAA5A) sits at 2.79:1 and fails the CVD floor
-// outright when adjacent to this list's red, not just a soft warn. Every chart already
-// prints its own signed value net to the mark (this file's long-standing rule, see the
-// bottom "every chart is a promise" note in the sibling skill's charts.md), so the
-// polarity is never color-alone regardless.
+// contrast alone but fails the shared lightness band next to the others. That 22-hex list
+// has no green clearing 3:1 on white (a genuine green, #5BAA5A, sits at 2.79:1 and fails
+// the CVD floor next to this list's red), which is why GAIN/LOSS used blue/red here for a
+// while instead of the usual green/red finance convention.
+//
+// GAIN/LOSS now use a green/red pair sourced from OUTSIDE that 22-hex list instead: the
+// light-mode `gain`/`loss` tokens already shipped in the sibling `market-story-video`
+// skill's own brand tokens (`src/tokens.ts`, light theme: gain #1D8A4E, loss #D6295A),
+// picked over the newsletter's own list on explicit request to match the plain finance
+// green/red convention. Checked against this file's #fcfcfb chart surface: #1D8A4E is
+// ~4.2:1, #D6295A is ~4.7:1, both clear the >=3:1 mark comfortably (loss also lands close
+// to the brand mark's own crimson, #E11D48). This is a deliberate override of the 22-hex
+// list for this one semantic pair only, not a precedent for picking other hues outside it.
+// Every chart still prints its own signed value net to the mark regardless (this file's
+// long-standing rule, see the bottom "every chart is a promise" note in the sibling
+// skill's charts.md), so the polarity is never color-alone even for a colorblind reader.
 //
 // GOLD (#8B004C, a darker maroon in PINK's own magenta family) is PINK's own endpoint/
 // highlight accent, e.g. a sparkline's endpoint dot, never a second competing series. Fed
@@ -52,9 +60,14 @@ const uid = (p) => `${p}${_uid++}`;
 // nothing warm in the approved list clears 3:1 on white (see header note).
 const PINK = "#C14D94";
 const GOLD = "#8B004C";
-// GAIN/LOSS: bar/flow polarity. Blue/red, not green/red (see header note above).
-const GAIN = "#3288BD";
-const LOSS = "#D53E4F";
+// GAIN/LOSS: bar/flow polarity, brand green/red sourced from market-story-video's light
+// tokens (see header note above), not the newsletter's own 22-hex categorical list.
+const GAIN = "#1D8A4E";
+const LOSS = "#D6295A";
+// TICKER: every ticker mention (a bar's own category label, a prose $TICKER, a table
+// cell) renders in this blue throughout a newsletter issue, kept from the same 22-hex
+// list so it stays distinguishable from GAIN/LOSS's green/red semantics right next to it.
+const TICKER = "#3288BD";
 // Neutral ink for muted text + reference/benchmark lines (not from the 22-hex list, see
 // header note above).
 const MUTED = "#52514E";
@@ -282,7 +295,16 @@ export function coverDuel(series, { w = 1080, h = 440, pad = 72 } = {}) {
 // maxNegAbs the bars themselves scale against (below), not read as a display-only overlay on
 // top of a scale that ignores it; a benchmark above every bar would otherwise draw off the
 // plot (or get silently clipped) instead of stretching the axis to include it.
-export function barChart(bars, { w = 936, h = 460, benchmark } = {}) {
+// financial (opt-in): this bar set is a signed gain/loss reading (a %-move list), not a
+// plain magnitude series (an earnings-by-year bar, a P/E comparison) — positive bars fill
+// solid GAIN green instead of the brand PINK/GOLD gradient, keeping the gradient reserved
+// for "this is our own subject's magnitude," not "this went up." Negative bars were always
+// LOSS red regardless, this only changes what a *positive* bar means visually.
+// labelAll (opt-in): forces every bar's value label to render, bypassing the n<=6 /
+// extremes-only thinning below — for a short, fully-enumerated movers list (a top-10
+// gainers+losers table's own chart) where every bar IS the load-bearing point, not a long
+// series where only the extremes matter.
+export function barChart(bars, { w = 936, h = 460, benchmark, financial = false, labelAll = false } = {}) {
   const id = uid("bar");
   const left = 10, right = w - 10, top = 40, plotBottom = 348, labelY = 424;
   const n = bars.length || 1;
@@ -302,8 +324,8 @@ export function barChart(bars, { w = 936, h = 460, benchmark } = {}) {
   const negH = plotBottom - baseY;
   const slot = (right - left) / n;
   const bw = slot * 0.56;
-  const showAll = n <= 6;
-  const everyOther = n > 7;
+  const showAll = labelAll || n <= 6;
+  const everyOther = !labelAll && n > 7;
   // Beyond 6 bars we stop labeling every point, but first/last alone can silently drop the
   // most story-relevant bar — a mid-series dip or peak (a streak's one bad year, a spike)
   // is exactly the point a reader needs the number for, and prose asserting it elsewhere
@@ -325,7 +347,7 @@ export function barChart(bars, { w = 936, h = 460, benchmark } = {}) {
     const neg = b.value < 0;
     const bh = neg ? (maxNegAbs ? (-b.value / maxNegAbs) * negH : 0) : (maxPos ? (b.value / maxPos) * posH : 0);
     const y = neg ? baseY : baseY - bh;
-    const fill = neg ? LOSS : `url(#${id}s)`;
+    const fill = neg ? LOSS : financial ? GAIN : `url(#${id}s)`;
     out += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(2, bh).toFixed(1)}" rx="8" fill="${fill}"/>`;
     if (showAll || i === 0 || i === n - 1 || i === maxIdx || i === minIdx) {
       const ly = neg ? baseY + bh + 34 : y - 14;
@@ -342,6 +364,46 @@ export function barChart(bars, { w = 936, h = 460, benchmark } = {}) {
     out += `<line x1="0" y1="${by.toFixed(1)}" x2="${w}" y2="${by.toFixed(1)}" stroke="#52514E" stroke-width="2" stroke-dasharray="8 6" opacity="0.85"/>
     <text x="${right}" y="${ly.toFixed(1)}" fill="#52514E" font-family="${MONO}" font-size="22" font-weight="700" text-anchor="end">${esc(label)}</text>`;
   }
+  return out + `</svg>`;
+}
+
+// Ranked movers strip: a diverging horizontal bar per ticker, logo + ticker on the left,
+// a green/red bar reading off a shared zero-line, full value label at the bar's outer end.
+// Built for a "top gainers + top losers" movers list where every row needs to be legible at
+// once (barChart's own n<=6 label-thinning drops most of a 10-row list, and it has no room
+// for a logo at all) — this is the shape charts.mjs didn't cover, not a barChart variant.
+// items: [{ symbol, value, display?, logoBase64? }], value is the signed %-move (or any
+// signed metric) driving both bar length and polarity. logoBase64 is a raw base64 PNG
+// (no `data:` prefix, e.g. straight from a ticker-logo registry); rows without one just
+// skip the image and keep the row's spacing, so a missing logo never misaligns the list.
+export function moversChart(items, { w = 936, rowH = 46, labelZone = 190, pad = 16 } = {}) {
+  const n = items.length || 1;
+  const h = pad * 2 + n * rowH;
+  const plotL = labelZone, plotR = w - pad;
+  const cx = (plotL + plotR) / 2;
+  const halfW = cx - plotL;
+  const maxAbs = Math.max(1e-9, ...items.map((it) => Math.abs(it.value)));
+  const fmt = (it) => (it.display != null ? it.display : `${it.value >= 0 ? "+" : ""}${trimNum(it.value)}%`);
+  let out = `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+    <line x1="${cx.toFixed(1)}" y1="${pad}" x2="${cx.toFixed(1)}" y2="${(h - pad).toFixed(1)}" stroke="rgba(11,11,11,0.14)" stroke-width="2"/>`;
+  items.forEach((it, i) => {
+    const rowY = pad + i * rowH;
+    const midY = rowY + rowH / 2;
+    if (i > 0) out += `<line x1="${plotL - 8}" y1="${rowY.toFixed(1)}" x2="${plotR.toFixed(1)}" y2="${rowY.toFixed(1)}" stroke="rgba(11,11,11,0.08)" stroke-width="1.5"/>`;
+    const logoSize = Math.min(30, rowH - 12);
+    if (it.logoBase64) {
+      out += `<image href="data:image/png;base64,${it.logoBase64}" x="${pad}" y="${(midY - logoSize / 2).toFixed(1)}" width="${logoSize}" height="${logoSize}" preserveAspectRatio="xMidYMid meet"/>`;
+    }
+    const tickerX = pad + logoSize + 10;
+    out += `<text x="${tickerX}" y="${(midY + 7).toFixed(1)}" fill="${TICKER}" font-family="${MONO}" font-size="24" font-weight="800" text-anchor="start">${esc(it.symbol)}</text>`;
+    const neg = it.value < 0;
+    const barLen = (Math.abs(it.value) / maxAbs) * halfW * 0.86;
+    const barX = neg ? cx - barLen : cx;
+    const fill = neg ? LOSS : GAIN;
+    out += `<rect x="${barX.toFixed(1)}" y="${(rowY + 8).toFixed(1)}" width="${Math.max(2, barLen).toFixed(1)}" height="${(rowH - 16).toFixed(1)}" rx="6" fill="${fill}"/>`;
+    const labelX = neg ? barX - 10 : barX + barLen + 10;
+    out += `<text x="${labelX.toFixed(1)}" y="${(midY + 7).toFixed(1)}" fill="${fill}" font-family="${MONO}" font-size="23" font-weight="800" text-anchor="${neg ? "end" : "start"}">${esc(fmt(it))}</text>`;
+  });
   return out + `</svg>`;
 }
 

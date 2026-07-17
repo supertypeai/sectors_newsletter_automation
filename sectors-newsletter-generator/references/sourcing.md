@@ -35,7 +35,7 @@ with `start`/`end`) as a second, IDX-tagged source once you have a candidate sto
 big-cap-skewed (see `sectors-api/data-quality.md`), so use it to corroborate and find affected
 tickers, not as your only macro-news source.
 
-## Gated sectors.app / docs.sectors.app fetch (feature-release & how-to issues)
+## Gated sectors.app / docs.sectors.app fetch (how-to issues)
 
 `sectors.app` and `docs.sectors.app` sit behind Cloudflare. A **default fetch user-agent
 gets a 403/429**, which reads like an auth wall but is a bot block, not a credential
@@ -46,9 +46,12 @@ curl -s -A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36" 
   "https://sectors.app/release"
 ```
 
-- **Release notes**: `https://sectors.app/release` (feature-release / enhancement /
-  deprecation issues). The main domain rate-limits (429) more aggressively than the docs
-  host, retry once on a 429 before treating it as down.
+- **Release notes are no longer fetchable this way.** `https://sectors.app/release`
+  serves a Vercel Security Checkpoint JS challenge (confirmed 2026-07-17, on two
+  separate runs), not the old Cloudflare 403/429 a UA swap could clear. The
+  `new-release-feature` issue type asks the user for the release note as a PDF or
+  Markdown file instead, see `workflows/new-release-feature.md` step 1, don't retry
+  this fetch for that type.
 - **How-to recipes**: `https://docs.sectors.app/recipes` and its children (e.g.
   `.../recipes/generative-ai-python`) for how-to and use-case-walkthrough issues.
 - **Docs index**: `https://docs.sectors.app/llms.txt` enumerates every docs page, fetch it

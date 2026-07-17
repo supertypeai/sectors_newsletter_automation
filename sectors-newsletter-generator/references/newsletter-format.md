@@ -9,7 +9,7 @@ The prose equivalent of the carousel skill's `deck-format.md`. Every issue is a 
 ---
 subject: <the email subject line>
 preview: <the inbox preview/preheader text>
-issue_type: weekly-wrap | macro-reaction | three-stock-story | single-company-deep-dive | sector-spotlight | daily-market-pulse | upcoming-event | new-feature-release | watchlist-performance-digest
+issue_type: weekly-wrap | macro-reaction | three-stock-story | single-company-deep-dive | sector-spotlight | monthly-market-pulse | upcoming-event | new-release-feature | watchlist-performance-digest
 date: <YYYY-MM-DD, the issue/send date>
 data_as_of: <YYYY-MM-DD, the API's as-of date>
 sample_recipient: <watchlist-performance-digest only: a scrubbed placeholder
@@ -76,11 +76,56 @@ API" or bare "Sectors" (`compliance.md` rule 6).
   `[**$BBCA**](https://sectors.app/idx/bbca)`, lowercase ticker, no `.JK` suffix. This
   applies everywhere the ticker is bolded (first mention and any table cell), not just
   once per section, a reader should be able to click through from wherever they land.
+  **Inline prose mentions count too, not just table cells** — a bare `$TICKER` typed
+  into a paragraph without the bold+link treatment is the single easiest miss, check
+  every paragraph, not just tables and chart labels.
 - Pair with the company's full name at least once per section:
   `Bank Central Asia ([**$BBCA**](https://sectors.app/idx/bbca))`.
 - **No elegant variation.** Don't rotate BBCA → "the lender" → "the banking giant" to
   avoid repetition — reuse the ticker or the company name plainly. This is the same
   AI-tell filter the carousel skill's `writing.md` applies to slide copy.
+- **SGX tickers**: same bold/`$`/link treatment, `https://sectors.app/sgx/<lowercase
+  bare code>` (no `.SI` suffix), e.g. `https://sectors.app/sgx/d05`. Confirmed
+  2026-07-16.
+- **Sub-sector/sector mentions** (a sector named as its own subject, not attached to
+  one ticker): link `https://sectors.app/indonesia/<slug>`, the same kebab slug
+  `subsector/report/{slug}/` uses, e.g. `https://sectors.app/indonesia/banks`.
+  Confirmed 2026-07-16.
+- **Broker codes**, wherever a broker/flow table or mention appears: link
+  `https://sectors.app/idx/broker/<lowercase code>`, e.g.
+  `https://sectors.app/idx/broker/ak`. Confirmed 2026-07-16.
+
+## Color convention (every issue type, HTML delivery — no per-type exceptions)
+
+One fixed palette, applied identically across every table, every chart, and every
+inline prose mention, in every issue this skill delivers. A type-specific color choice
+(a different link color, a different accent for "this type's" tickers) is a bug, not a
+style variant, this section is the single source of truth, don't re-derive per type:
+
+- **Ticker blue, `#3288BD`.** Every ticker link (IDX or SGX), every sub-sector/sector
+  link, every broker-code link, and every other outbound citation link (a Sources
+  entry, the standard `sectors.app` footer citation) uses this same blue. One color
+  for "this is a link," full stop.
+- **Gain green, `#1D8A4E`.** Every positive %-move reading, in a table cell or a
+  chart's own bar/line/label, uses this green. This is `scripts/charts.mjs`'s own
+  `GAIN` constant.
+- **Loss red, `#D6295A`.** Every negative %-move reading, table or chart, uses this
+  red. `scripts/charts.mjs`'s own `LOSS` constant.
+- **Brand magenta, `#d6336c`, is reserved for the CTA button only** (and the button
+  only), never for a link, a ticker, a section header, or anything else. A section
+  header renders in a dark neutral (`#1c1c1c`), not an accent color.
+- **A chart showing a signed gain/loss reading must actually render green/red, not
+  just cite the right hex in prose.** `scripts/charts.mjs`'s `moversChart` and
+  `waterfall` are green/red by construction, no extra flag needed. Plain `barChart` is
+  NOT green/red by default for a positive bar (it renders the brand PINK/GOLD
+  gradient unless told otherwise) — pass **`financial: true`** whenever `barChart` is
+  showing a signed %-move series, or the chart will silently break this convention
+  even though the surrounding table is correct. Negative bars always render `LOSS`
+  red regardless of the flag.
+- This palette is defined once, in `scripts/charts.mjs`'s header comment (`GAIN`,
+  `LOSS`, `TICKER` constants) — if a future session needs to change a hex value,
+  change it there and this doc follows, don't hand-pick a different value in one
+  issue's HTML.
 
 ## Prose style (newsletter-specific, overrides the carousel's short-declarative slide voice)
 
@@ -152,7 +197,19 @@ no-dash/no-AI-tell rules, it constrains *shape*.
   tickers) uses the same move: a table for the shared metrics (price, P/E vs. peer
   average, ROE, dividend yield) with one row per ticker, then a short paragraph under it
   for whatever doesn't fit a column (analyst coverage detail, a one-off fact).
-- **One hero chart per issue, optional but encouraged.** Pick the single name or series
+- **A table dropped inside a tinted/shaded section (any background other than the card's
+  own `#fdf7ee`) needs its own background set explicitly**, on the `<table>` and on every
+  data `<tr>` (confirmed 2026-07-17, caught from a screenshot: `new-release-feature`'s
+  shaded `#f2ede4` Feature Highlight box rendered its ticker table's data rows as a bare
+  white patch because neither the nested `<table>` nor its `<tr>`s carried a
+  `background`). A `<td>`/`<tr>` with no background isn't reliably transparent in every
+  email/browser renderer, don't assume the ancestor's tint shows through. Same applies to
+  row-divider colors: a border color picked against the white card (`#eee`) goes
+  near-invisible on a tinted section, use the section's own divider tone instead
+  (`#e4cdb4` here).
+- **One hero chart per issue, required.** Every issue ships at least one generated
+  chart, no exceptions by type, matching the standard set by the worked samples in
+  `newsletter/samples/<type-slug>/`. Pick the single name or series
   that the section's own argument turns on, not just whichever ticker happens to have
   data. Render it as a real line or bar chart image built from the exact series fetched
   this run, never estimated or redrawn from memory. Static only: this skill stays
@@ -164,11 +221,12 @@ no-dash/no-AI-tell rules, it constrains *shape*.
   for a price series, `barChart` for year-over-year, `donut` for a mix, `multiline` for
   self-vs-peer, and so on, the same 13-kind grammar documented in the carousel skill's
   `references/charts.md`) and write its returned SVG string to `chart-<slug>.svg`. Its
-  colors are already fixed and validated (see the file's own header comment for the role
-  map and why GAIN/LOSS renders blue/red, not green/red on this palette), so don't
-  re-derive a palette per issue. A hand-rolled inline SVG or `ggplot2` (R) is a fallback
-  only for a shape `charts.mjs` doesn't cover (reach for its own `compose` escape hatch
-  first).
+  colors are already fixed and validated to the shared palette above (green
+  `#1D8A4E` gain, red `#D6295A` loss, blue `#3288BD` ticker, see the file's own header
+  comment for the full role map), so don't re-derive a palette per issue, and see this
+  doc's own **Color convention** section above for the `financial: true` requirement
+  on `barChart`. A hand-rolled inline SVG or `ggplot2` (R) is a fallback only for a
+  shape `charts.mjs` doesn't cover (reach for its own `compose` escape hatch first).
   **Still consult the `dataviz` skill for chart-FORM choice** (it loads on its own
   trigger for "any chart," so it fires automatically here too): its form heuristic
   picks *which kind* fits the data before you call `charts.mjs`, and its mark-weight,
@@ -223,8 +281,12 @@ no-dash/no-AI-tell rules, it constrains *shape*.
 
 ## Number formatting
 
-- Rupiah as `IDR` — `IDR 10,150` for a price, `IDR 689.5T` for a compacted large
-  figure.
+- Rupiah is always `IDR`, never `Rp`, in prose, tables, chart labels, and headers alike.
+- **≥1 trillion**: compact, two decimals, `IDR 31.40T`.
+- **≥1 billion, <1 trillion**: compact, two decimals, `IDR 689.50B`.
+- **≥1 million, <1 billion** (the tier with no clean T/B suffix): thousand-separated
+  millions, two decimals, unit spelled out: `IDR 5.85 million`, `IDR 128.10 million`.
+- **<1 million**: plain thousand-separated, `IDR 10,150`.
 - Percentages as `%`, multiples as `x` (`12x earnings`, not `12×` or `12 times`).
 - Every ratio explained in one clause on first use: "ROE, profit earned on shareholder
   money, hit 21%."
@@ -253,12 +315,18 @@ data doesn't actually support, if two events are simply concurrent, say they're
 concurrent, don't imply one caused the other.
 
 ## Section skeleton per issue type
-The full "Sectors Weekly Insights" digest. **Delivered as a send-ready HTML email
-(`newsletter.html`), not just Markdown** — the two-column mover cards, colored +/- cells,
-CTA button and event banner don't survive plain Markdown, and the revamp's whole point is
-a self-contained, data-backed email with **no PDF attachment**. Keep a `newsletter.md`
-draft for review; ship the `.html`. Full recipe (API source per section, HTML delivery
-notes) in `workflows/weekly-wrap.md` §2b–2c.
+
+**Every type below ships as a send-ready HTML email (`newsletter.html`), not just
+Markdown**, colored +/- cells, tables, CTA buttons and the hero chart don't survive
+plain Markdown the same way, and the point is a self-contained, data-backed email with
+no PDF attachment. Keep `newsletter.md` as the review draft; ship the `.html` alongside
+it, for all nine types, not only weekly-wrap and upcoming-event. See
+`newsletter/samples/<type-slug>/newsletter.html` for each type's own worked HTML
+reference.
+
+The full "Sectors Weekly Insights" digest below is weekly-wrap's own skeleton, its
+two-column mover cards and event banner are specific to that type's layout. Full recipe
+(API source per section, HTML delivery notes) in `workflows/weekly-wrap.md` §2b–2c.
 
 1. **IDX Total Market Cap** — the headline stat (`idx-total` level) with a 3-up snapshot:
    7d (label it "rolling") / 30d / YTD.
@@ -345,14 +413,53 @@ notes) in `workflows/weekly-wrap.md` §2b–2c.
    never "the one to buy").
 5. **Sources** list + disclaimer footer.
 
-### Daily market pulse
-Tightest type, tables first, built to read in under a minute.
-1. **Index in one line** — up/down and whether broad or led by a handful.
-2. **Top gainers** and **top losers** — two small tables (never a signed column).
-3. **Most traded** — a short table (ticker, volume, price).
-4. **Flow/broker line** — one line only if there's a genuine signal; skip rather than pad.
-5. Disclaimer footer (Sources only if a "why" line was web-sourced). No hero chart unless
-   one name genuinely warrants it.
+### Monthly market pulse
+Tightest type, tables first. Every section is a trailing-30-day aggregate, never a
+single day's snapshot; see `workflows/monthly-market-pulse.md` for exactly how each
+metric gets aggregated (most-traded and broker flow have no native range param, so both
+are summed client-side from repeated daily calls, the same way every run).
+1. **Headline + trend paragraph, no separate "index in one line" heading.** The H1
+   states this run's own actual finding (drafted fresh each run from that run's
+   `idx-total` trend, a template headline is never reused verbatim run to run), and the
+   standfirst paragraph immediately under it carries the index's own 30-day move,
+   start/end values and any notable trough/peak in the window. This replaces what used
+   to be a separate "Index in one line" section, the same data now opens the issue
+   instead of repeating it under its own heading.
+2. **Top Movers** — one heading, two small tables underneath (top gainers, top losers
+   over the 30-day window, never a signed column), plus the issue's hero chart: a
+   diverging bar per ticker (green gain / red loss, off a shared zero line) with every
+   row's logo, ticker and full value label shown, not thinned to a handful. See
+   `scripts/charts.mjs`'s `moversChart` (built for exactly this shape; `barChart`'s
+   own label-thinning past 6 bars and lack of per-row logos don't fit a full movers
+   list). Chart caption states only what the chart shows (the tickers, the ranking,
+   the window), no interpretive commentary, that belongs in the surrounding prose.
+3. **Most traded** — ranked by total volume summed across the whole window, not one
+   day's top-N; a short table (ticker, company, 30d volume, price), **followed by a
+   short paragraph** naming one ticker from the list and its real, dated, cited reason
+   for trading heavily all month (an analyst call, a foreign-flow story, a sector policy
+   note). Not every window has a clean answer; say so rather than manufacturing one.
+4. **Broker Flow** — tabular, not a prose line: a top-net-buyers table and a
+   top-net-sellers table, columns broker code, broker name, 30d net, ranked by
+   aggregate net value across the window, **followed by a short paragraph** observing
+   the actual shape of the flow and any real, dated news that plausibly relates, cited
+   and stated as concurrent, never asserted as the proven cause. **Broker code links**
+   (confirmed 2026-07-16): `https://sectors.app/idx/broker/<lowercase code>`, e.g.
+   `https://sectors.app/idx/broker/ak`, same bold ticker-blue (`#3288BD`) treatment as
+   a ticker link, every code cell in both tables gets one.
+5. **Appendix: Sectors API endpoints (fields used)**, after Sources and before the
+   disclaimer. Always included for this type (see the generic Appendix section below
+   for the format; this type doesn't treat it as optional the way a tight daily issue
+   would, five distinct endpoints and real client-side aggregation sit behind every
+   run, exactly what a reader might want to trace).
+6. Disclaimer footer (Sources whenever either paragraph above cites something web-sourced).
+
+Color and ticker convention for this type's HTML delivery: every ticker mention
+renders in the shared ticker blue (`scripts/charts.mjs`'s `TICKER`, `#3288BD`), and
+every gain/loss reading renders in the shared brand green/red (`GAIN` `#1D8A4E` /
+`LOSS` `#D6295A`), consistently across every table, the chart, AND any inline prose
+mention (a bare `$TICKER` in a paragraph, not just table cells and bar labels, is the
+easy miss, same bold-linked-blue treatment applies there too, see the **Ticker-mention
+convention** section above).
 
 ### Upcoming event
 Promo for a Sectors in-house workshop. Content is **user-supplied** (date/venue, agenda,
@@ -383,14 +490,37 @@ speaker, registration link, banner), not market data. Ask for all four detail se
    total touches across the issue: hook, essentials, sign-off).
 9. Disclaimer footer (Sources only if a data teaser was used). No market-advice framing.
 
-### New feature release
-Product enablement, not market analysis. Source is the release page, not the market API.
-1. **What you can now do** — one line, the capability, not a hype opener.
-2. **How to use it** — where it lives, the steps, the plan tier if gated; link the docs
-   recipe if one exists.
-3. **Optional real example** — if the feature produces data, one real band-checked
-   `sectors.mjs` result showing what it surfaces (as capability demo, never a buy call).
-4. **Sources** — the release page (and docs recipe) + disclaimer footer.
+### New release feature
+Product enablement, not market analysis. Source is a user-supplied release note (PDF
+or Markdown), not a live fetch and not the market API, see
+`references/workflows/new-release-feature.md` step 1. Exactly two body sections, ask
+for the release note and the feature to highlight before drafting either. **The subject
+line, preview text, and headline are about the release only** — never mention the
+highlighted feature there, it isn't the issue's hook, it's an add-on beneath it.
+1. **Release summary — the issue itself.** H1 headed with a **"Latest Release"** label
+   (eyebrow tag in HTML, inline colon-joined in Markdown, e.g. "Latest Release: The
+   Straits (3.7.0)"), the same pattern section 2's "Feature Highlight" label uses. A
+   brief, sentence-or-two-per-highlight recap of what shipped, pulled only from the
+   release note's own Highlights section
+   (Sectors release notes tend to run three of these). Omit an Announcement section
+   (community events, upcoming workshops) or an Improvements/deprecations section
+   entirely if the note has them, those are housekeeping, not release headlines. Not
+   an exhaustive changelog, the shape of the release, not every sub-bullet. Closes with
+   a **Read more** button linking to the release note's own URL.
+2. **Feature highlight — a secondary marketing/education section.** Headed with a
+   **"Feature Highlight"** label (an eyebrow tag over a specific title), reads as a
+   bonus aside beneath the release summary, not a second headline competing with it.
+   One feature, in depth (may not be the release's own headline item, whichever the
+   user asked to highlight): what it does, how to use it (steps, where it lives, plan
+   tier if gated), and, if it produces data, one real example (a table or figure
+   already published in the release note counts, cite it `sectors.app`). **A generated
+   chart is not the default here**, a table is usually enough, add one only if it
+   carries a takeaway the table doesn't already show. Closes with the CTA: **"Try the
+   feature now"** linking to the
+   feature's own URL if the user supplied one, otherwise **"Try it yourself now!"**
+   linking to `sectors.app`.
+3. **Sources** — the release note (title, version if it has one, publish date, link) +
+   disclaimer footer.
 
 ### Watchlist/sector performance digest
 Personalized, per-recipient template, not a broadcast piece. Same structure for every
@@ -441,10 +571,12 @@ recipient, only the values (and which tickers/sectors appear) change per
    format as every other issue type; Sectors-API-sourced facts only need the standard
    inline `(sectors.app)` citation, no separate Sources entry) + disclaimer footer.
 
-## Appendix: data sources (optional, after Sources, before the disclaimer)
+## Appendix: data sources (required for every issue, after Sources, before the disclaimer)
 
 A technical block mapping each metric actually used in the issue to its endpoint AND
-field, one endpoint per bullet, the specific fields it backed in parentheses:
+field, one endpoint per bullet, the specific fields it backed in parentheses. This is
+mandatory for every issue type this skill delivers, not a nice-to-have for a deep
+dive, even a short type gets one, it just has fewer bullets:
 
 ```markdown
 **Appendix: Sectors API endpoints (fields used)**
@@ -468,9 +600,9 @@ reader sees the shape of the pull, not a flat list; every field named must actua
 backed a claim in this issue, an appendix isn't the place to pad with everything that
 happened to get fetched. It never substitutes for the inline `(sectors.app)` citation
 those same figures already carry in the body, and it never appears before the Sources
-list or ahead of the disclaimer. Optional per issue: add it when a reader might
-plausibly want to trace the pull (a deep dive, a spotlight built on a screener query),
-skip it on a tight daily-pulse issue where it'd outweigh the content.
+list or ahead of the disclaimer. **Required on every issue, every type** (confirmed
+2026-07-16): a short type with one or two endpoint calls still gets a short appendix,
+proportional to how much was actually fetched, never skipped for length.
 
 ## Standard disclaimer footer (fixed text, appended to every issue)
 

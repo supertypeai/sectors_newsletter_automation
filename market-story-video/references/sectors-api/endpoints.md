@@ -366,10 +366,40 @@ on a Sectors-branded asset — do not merge it into `assets/logos.json` and do n
 via a `logoUrl` override. This was tried and reverted (2026-07-08): a `D05` entry was briefly
 added to `logos.json`, discovered watermarked on render, and removed.
 
-**Until a clean source is found, let SGX tickers fall back to the built-in gradient
+**Re-verified 2026-07-17, two corrections to the note above.** First, the background is
+**already properly transparent, not opaque white** — a raw pixel dump (`ffmpeg -f rawvideo
+-pix_fmt rgba`) shows alpha=0 at the canvas edges on every ticker checked (U11, U14, H02, U06,
+U13, U10). The "opaque white" impression in the original note almost certainly came from
+viewing the PNG in a tool that composites transparent pixels onto a white canvas by default,
+not from the file itself. **Do not run a white-colorkey pass on this source** — since the
+background is RGB (0,0,0) at alpha=0 (transparent black, not transparent white), a
+`colorkey=0xFFFFFF` filter won't match those pixels, and depending on filter order it can
+flatten their alpha to fully opaque, turning the transparent background into a solid BLACK box
+(worse than the original problem). Use the fetched PNG directly, no background processing
+needed.
+
+Second, the watermark claim holds, just needed the right test: it's invisible while the
+background reads as white/transparent (nothing to contrast against), but overlay the raw PNG
+directly onto a dark canvas (`color=0x0C0A09` + `overlay`) and the "SGinvestors" text is
+clearly visible, repeated diagonally across the mark itself, not just near the wordmark.
+Confirmed on U11 and H02 this pass. This is a property of the actual ink pixels (their alpha
+IS 255, by design, that's the logo), not a background/transparency artifact, so it survives
+into any composited use.
+
+**Given the above, this source now ships in this skill anyway**: `assets/sgx-logos.json` holds
+the six tickers used in the Wee Family Group video (U11, U14, H02, U06, U13, U10), fetched
+directly with no colorkey step, per the user's explicit call that the watermark is acceptable
+for that piece. `src/components/Logo.tsx` checks this registry before falling back to the
+gradient monogram. Don't assume this decision generalizes: it was made by the user for one
+specific video, not a blanket "watermark is fine now" for every future SGX piece — ask before
+reusing this registry's contents in a different published piece.
+
+**Until told otherwise for a given piece, let SGX tickers fall back to the built-in gradient
 monogram** (`visual-language.md`'s documented degradation for "no logo asset"; `logoBox` in
 `scripts/blocks.mjs` already does this automatically for any ticker missing from
-`logos.json`, zero extra work needed). Don't add an SGX key to `logos.json` from this host.
+`logos.json`, zero extra work needed). Still don't add an SGX key to the shared IDX
+`logos.json` — keep any watermarked SGX asset in its own separate registry file so it's never
+silently reused as if it were a clean logo.
 If a future session finds a clean official SGX logo source (DBS's own newsroom/press-kit
 assets, Wikimedia Commons' bank/company logo pages, etc.), the merge mechanism itself is
 still sound: `assets/logos.json` is a flat `{TICKER: base64png}` map with no IDX/SGX

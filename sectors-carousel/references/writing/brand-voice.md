@@ -30,7 +30,7 @@ Retail investors and finance-curious people on Instagram who follow IDX (Indones
 
 ## Vocabulary
 
-- **Use:** the company's real name and ticker, plain verbs (rose, fell, earns, pays, owns, trades at), concrete units (IDR, %, ×, T for trillion). Indonesian rupiah is `IDR` (e.g. `IDR 10,150`); large numbers compact as `IDR 689.5T`.
+- **Use:** the company's real name and ticker, plain verbs (rose, fell, earns, pays, owns, trades at), concrete units (IDR, %, ×, T for trillion). Indonesian rupiah is `IDR`, never `Rp` (e.g. `IDR 10,150`). Compact ≥1T/≥1B figures at two decimals (`IDR 31.40T`, `IDR 689.50B`); a figure ≥1 million and <1 billion, with no clean T/B suffix, renders as thousand-separated millions, two decimals: `IDR 5.85 million`.
 - **Lose:** the AI/LinkedIn tells (delve, leverage, robust, pivotal, testament, landscape, in today's market), the finfluencer tells (secret, nobody's talking about, this is your sign), and dash-connectors as pauses (use periods/commas).
 
 ## Voice in one line, good vs off-brand

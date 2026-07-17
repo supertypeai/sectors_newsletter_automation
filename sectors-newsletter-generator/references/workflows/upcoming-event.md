@@ -110,3 +110,8 @@ for this type is `newsletter/newsletter_2026-07-13_upcoming-event/newsletter.htm
 - Voice clean (no hype, no dashes, no emoji)?
 - Does `newsletter.html` exist alongside `newsletter.md` and match it section for
   section?
+- If a data teaser includes a ticker, does it read bold, linked, and ticker-blue
+  (`#3288BD`) (`../newsletter-format.md`'s Color convention, applies to every issue)?
+- Is the Appendix (endpoint/field trace) present, after Sources and before the
+  disclaimer? Just the teaser's one endpoint if that's all that was fetched, still
+  required.

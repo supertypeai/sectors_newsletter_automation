@@ -5,6 +5,7 @@ import { thread, MOTION } from "../../../tokens";
 import { fontFamilies } from "../../../fonts";
 import { EmphasizedHeadline } from "../../../components/GradientText";
 import { OwnershipTree } from "../../../components/charts/OwnershipTree";
+import { OwnershipNetwork } from "../../../components/charts/OwnershipNetwork";
 import { ThreadBadgeStack } from "../Badge";
 import { ThreadSceneLayout } from "../SceneLayout";
 import { ThreadFrostPanel } from "../FrostPanel";
@@ -45,6 +46,27 @@ export const ThreadBreakdown: React.FC<{ scene: Scene }> = ({ scene }) => {
             nameColor={thread.ink}
             subColor={thread.muted}
             lineColor={thread.threadLine}
+            delay={bodyDelay}
+            fontFamily={fontFamilies.sans}
+            monoFontFamily={fontFamilies.mono}
+          />
+        </ThreadFrostPanel>
+      )}
+      {scene.breakdown?.kind === "network" && (
+        <ThreadFrostPanel>
+          <OwnershipNetwork
+            nodes={scene.breakdown.nodes}
+            edges={scene.breakdown.edges}
+            width={920}
+            height={980}
+            accentColor={thread.brandPink}
+            reverseColor={thread.brandGold}
+            nameColor={thread.ink}
+            codeColor={thread.muted}
+            lineColor={thread.threadLine}
+            labelBgColor={thread.bg}
+            closingCaption={scene.breakdown.closingCaption}
+            captionColor={thread.brandGold}
             delay={bodyDelay}
             fontFamily={fontFamilies.sans}
             monoFontFamily={fontFamilies.mono}

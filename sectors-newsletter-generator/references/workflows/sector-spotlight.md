@@ -80,3 +80,8 @@ on the metric that matters, stated as valuation context, not a recommendation.
   to buy" (`../compliance.md`).
 - Is the metric being ranked on stated plainly (P/E, ROE, yield), so the reader knows what
   "cheap" means here?
+- Does every `$TICKER` mention (table, chart label, AND inline prose) read bold,
+  linked, and ticker-blue (`#3288BD`)? Gains/losses green/red (`#1D8A4E`/`#D6295A`)?
+  (`../newsletter-format.md`'s Color convention, applies to every issue.)
+- Is the Appendix (endpoint/field trace) present, after Sources and before the
+  disclaimer?

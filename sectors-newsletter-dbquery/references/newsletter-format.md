@@ -79,7 +79,12 @@ Read as continuous email prose, not swiped fragments:
 
 ## Number formatting
 
-- Rupiah as `IDR` (`IDR 10,150`), percentages as `%`, multiples as `x`.
+- Rupiah is always `IDR`, never `Rp`. Compact large figures at two decimals: `IDR
+  31.40T` (trillion), `IDR 689.50B` (billion). A figure ≥1 million and <1 billion, the
+  tier with no clean T/B suffix, renders as thousand-separated millions, two decimals,
+  unit spelled out: `IDR 5.85 million`, `IDR 128.10 million`. Below 1 million, plain
+  thousand-separated: `IDR 10,150`.
+- Percentages as `%`, multiples as `x`.
 - Credits, counts, and dates render as a person would read them, not as raw database
   values: `4 credits`, not `4.0`; `July 22`, not `2026-07-22T00:00:00Z`.
 

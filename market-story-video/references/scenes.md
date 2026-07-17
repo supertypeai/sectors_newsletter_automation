@@ -30,6 +30,13 @@ The opening beat carries the hook: headline + `emphasis` (the one gradient word,
 numeric proof with an optional `compare`). Don't put a chart here — the cover's job is to make
 someone keep watching for 10 more seconds, not to prove anything yet.
 
+For a story about named people rather than (or alongside) tickers, `people` renders a row of
+stylized initial monograms with a name/optional role caption underneath — the same
+gradient-monogram visual language `Logo` already falls back to when a ticker has no logo
+asset. There is no real-photo support in this design system (see `Cover.tsx`); `people` is the
+sanctioned substitute, not a workaround to route an actual photo asset through some other
+field.
+
 ```jsonc
 { "role": "cover", "duration": 3.0, "kicker": "IDX · DIVIDENDS",
   "headline": "A high yield, the hard way.", "emphasis": "hard way",
@@ -76,6 +83,32 @@ so don't skip the logo on a node that has a ticker.
   "breakdown": { "kind": "ownership",
     "nodes": [ { "name": "Indofood Sukses Makmur" }, { "ticker": "ICBP", "name": "Indofood CBP", "sub": "the Indomie maker" } ],
     "links": [ { "pct": "80%" } ] } }
+```
+
+`network` is for a story with MORE than one ownership relationship among the same handful of
+entities (a cross-holding loop, several subsidiaries under one parent) — `ownership`'s strict
+single-column chain can't show that without splitting into several pairwise scenes, which reads
+as disconnected flashes rather than one structure. `network` holds every node on screen and
+reveals each edge in its own beat, so relationships accumulate instead of replacing each other.
+Nodes carry authored `x`/`y` (0-1 fractional position in the diagram box) since this is a
+hand-placed diagram, not an auto-layout graph — plan the layout on paper first. An edge with
+`reversePct` renders both directions on one connecting line (the two entities own stakes in
+each other). Because this holds several relationships at once, its duration legitimately runs
+well past the ~1.2-6s single-beat range the lint warns about; that warning is expected and fine
+to override here, not a sign something's wrong.
+
+```jsonc
+{ "role": "breakdown", "duration": 14.0, "kicker": "THE LOOP",
+  "breakdown": { "kind": "network",
+    "nodes": [
+      { "id": "a", "ticker": "AAA", "name": "Company A", "x": 0.5, "y": 0.1 },
+      { "id": "b", "ticker": "BBB", "name": "Company B", "x": 0.2, "y": 0.5 },
+      { "id": "c", "ticker": "CCC", "name": "Company C", "x": 0.8, "y": 0.5 }
+    ],
+    "edges": [
+      { "from": "a", "to": "b", "pct": "AAA OWNS 10%", "reversePct": "BBB OWNS 5%" },
+      { "from": "a", "to": "c", "pct": "AAA OWNS 30%" }
+    ] } }
 ```
 
 ## `takeaway`

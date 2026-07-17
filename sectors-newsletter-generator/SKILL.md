@@ -5,30 +5,32 @@ description: >-
   market (IDX) from live Sectors data and cited research. Use whenever the user wants
   to write, draft, or produce a Sectors subscriber newsletter issue. Handles nine
   built issue types the user picks from on each run, across five families: MARKET
-  PERFORMANCE ("weekly wrap" / "Saturday market wrap"; "daily market pulse" end-of-day
-  movers and volume); MARKET INSIGHTS ("macro-reaction" / "macro newsletter" tying the
+  PERFORMANCE ("weekly wrap" / "Saturday market wrap"; "monthly market pulse" a
+  trailing-30-day movers/volume/broker-flow read); MARKET INSIGHTS ("macro-reaction" / "macro newsletter" tying the
   last ~2 days of macro news to affected sectors and tickers); COMPANY INSIGHTS ("three
   stocks story" history/people/fun-facts/attributed-outlook; "single company deep dive"
   off an earnings or corporate-action trigger; "sector spotlight" peer-comparing one
-  sub-sector's names on valuation); SECTORS-ORG announcements ("new feature release"
-  enablement copy sourced from the Sectors release notes; "upcoming event" promo for a
-  Sectors in-house workshop, built from user-supplied event details, not market data);
+  sub-sector's names on valuation); SECTORS-ORG announcements ("new release feature" a
+  two-part release-summary-plus-feature-highlight piece built from a user-supplied
+  release note (PDF or Markdown) and user-supplied feature detail, not a live fetch;
+  "upcoming event" promo for a Sectors in-house workshop, built from user-supplied
+  event details, not market data);
   and PERSONALIZED ("watchlist/sector performance digest" — a fixed template, ranked
   performance + peer comparison table for each user's own tracked tickers/sectors,
   same presentation for every recipient, only the values change). The personalized
   type is the one exception to "no user-account data": it gets its audience and
   tracked-tickers/sectors from the sibling `sectors-newsletter-dbquery` skill's
   approved `watchlist-tracked-interest` query, never an ad-hoc query written here.
-  Trigger on phrases like "write the newsletter", "do this week's Saturday wrap", "daily
+  Trigger on phrases like "write the newsletter", "do this week's Saturday wrap", "monthly
   pulse", "macro piece on the rate cut", "deep dive on BBRI earnings", "sector spotlight
-  on the banks", "three-stocks story", "write up the new feature release", "announce
+  on the banks", "three-stocks story", "write up the new release feature", "announce
   the upcoming workshop", or "watchlist performance digest". Do NOT use it for Instagram
   carousels or slides (use sectors-carousel), for video, or for non-IDX/non-SGX markets,
   and do NOT use it for lifecycle/CRM/transactional email (onboarding nudges, credit/plan
   reminders, upgrade/win-back) or for deciding recipients/frequency, those need live
   user-account data and stay with the sibling `sectors-newsletter-dbquery` skill
   instead. This skill's deliverable is Markdown text and tables, bite-sized
-  and scannable, plus at most one optional generated chart image for the issue's single
+  and scannable, plus at least one required generated chart image for the issue's single
   hero trend, it is not a slides or video renderer.
 ---
 
@@ -73,8 +75,9 @@ maps to a workflow doc in `references/workflows/` and an issue-type slug:
 **Market Performance**
 1. **Weekly wrap** (`weekly-wrap`) — the week's conclusion: index moves, sector/ticker
    standouts, flows. Saturday send.
-2. **Daily market pulse** (`daily-market-pulse`) — end-of-day movers, volume leaders,
-   brokers. Tight, table-first, read in under a minute.
+2. **Monthly market pulse** (`monthly-market-pulse`) — the trailing 30 days' movers,
+   most-traded, and broker flow, each aggregated across the whole window, not a single
+   day's snapshot. Tight, table-first, chart-and-table led.
 
 **Market Insights**
 3. **Macro-reaction** (`macro-reaction`) — tie the last ~2 days of macro news to affected
@@ -89,8 +92,14 @@ maps to a workflow doc in `references/workflows/` and an issue-type slug:
    valuation ("which one is actually cheap," as context, not a call).
 
 **Sectors-org announcements** (about Sectors itself, not the market)
-7. **New feature release** (`new-feature-release`) — enablement copy off a real Sectors
-   release note (`sectors.app/release`), optionally showing the capability on real data.
+7. **New release feature** (`new-release-feature`) — two sections: the issue itself is
+   a brief summary of the latest release off a user-supplied release note (PDF or
+   Markdown, `sectors.app/release` is no longer live-fetchable, see the workflow doc;
+   subject/preview/headline name only the release, never the feature), plus a
+   secondary marketing/education section spotlighting one feature the user picks
+   (which may differ from the release's own headline item), with a "Try the feature
+   now" CTA (or "Try it yourself now!" if the feature has no
+   direct URL).
 8. **Upcoming event** (`upcoming-event`) — promo for a Sectors in-house workshop (online
    or offline, teaching participants to build on live Sectors API data). Content is
    **user-supplied**: ask for date/time/venue, agenda/speaker/target audience,
@@ -163,9 +172,9 @@ anything that doesn't serve the goal.
 | Issue type | Conversion goal (the one action to drive) |
 | --- | --- |
 | **Upcoming event** | Register as a workshop participant (click through and sign up before it fills / closes) |
-| **New feature release** | Open Sectors and actively use the newly released feature on real data |
+| **New release feature** | Click "Try the feature now" and actively use the highlighted feature on real data |
 | **Weekly wrap** | Return to `sectors.app` to explore the movers/sectors named |
-| **Daily market pulse** | Same-day click into the tickers/tables to check them live |
+| **Monthly market pulse** | Click into the tickers/tables to check the month's movers live |
 | **Macro-reaction** | Explore the affected sectors/tickers on Sectors to size up the move |
 | **Three-stock story** | Click through to each company's page on Sectors |
 | **Single company deep dive** | Open that company's report on Sectors and dig into the data |
@@ -184,6 +193,9 @@ type-specific workflow doc. Open each reference when you reach its stage, don't
 pre-load everything up front. **`watchlist-performance-digest` diverges at stage 1**
 (audience comes from the dbquery skill, not research) and stage 5 (delivers a
 per-recipient template, not a single broadcast file), see its own workflow doc.
+**`new-release-feature` and `upcoming-event` also diverge at stage 1**: no web/API
+research, stage 1 is asking the user for the release note / event details instead,
+see their own workflow docs.
 
 1. **Research the angle** — web search and/or API discovery, before any drafting.
 2. **Fetch and validate data** — `sectors.mjs`, then band-check against
@@ -247,26 +259,34 @@ current hook, pull `subsector/report` for the group median as the benchmark, scr
 `report` 2-4 members, and lead with a comparison table reading each name against the group
 median and its own history, valuation context only, never "the one to buy."
 
-### Daily market pulse
-Open `references/workflows/daily-market-pulse.md`. In brief: one batched call for the
-day's `top-changes` (`periods=1d`), `most-traded`, `brokers/top`, and `idx-total`; write a
-one-line index read and two/three small tables; keep it short by design.
+### Monthly market pulse
+Open `references/workflows/monthly-market-pulse.md`. In brief: `top-changes`
+(`periods=30d`) for the month's gainers/losers, `most-traded` over the 30-day window
+aggregated client-side into one ranking (the endpoint itself only returns per-date
+top-N), `brokers/top` called once per trading day in the window and aggregated the same
+way (no native range param), and `idx-total` start/end for the month's index read; write
+the headline off that month's own idx-total trend, a combined Top Movers table+chart,
+Most traded, and Broker Flow, table-first throughout.
 
-### New feature release
-Open `references/workflows/new-feature-release.md`, and read `references/sourcing.md`'s
-**gated sectors.app / docs.sectors.app fetch** note first. In brief: fetch
-`sectors.app/release` live with a browser user-agent, pick the newest net-new feature,
-write enablement copy (optionally showing the capability on one real band-checked data
-example), cite the release page.
+### New release feature
+Open `references/workflows/new-release-feature.md`. This type is **not** a live fetch,
+`sectors.app/release` sits behind a JS challenge page no fetch method here clears
+(confirmed 2026-07-17). In brief: ask the user for the release note (PDF or Markdown)
+and the feature to highlight (what it does, how to use it, and its URL if one exists),
+write section 1 as a brief release summary with a Read more button to the release
+note's own URL, section 2 as an in-depth feature highlight closing with "Try the
+feature now" (or "Try it yourself now!" if no feature URL was given), cite the release
+note in Sources.
 
 ### Upcoming event
 Open `references/workflows/upcoming-event.md`. This type is **not** market-data driven,
 it's a promo for a Sectors in-house workshop, and the content comes from the user. Before
 drafting, ask for all four: date/time/venue, agenda/speaker/target audience, registration
 link, and marketing banner. Never invent any of them. Optionally include one real
-`sectors.mjs` data teaser of what participants will build. This is the pipeline's one
-exception to the "research the angle / fetch and validate data" opening stages, the
-research step is the intake questions, and the only data fetch is the optional teaser.
+`sectors.mjs` data teaser of what participants will build. This is one of two pipeline
+exceptions to the "research the angle / fetch and validate data" opening stages (the
+other is `new-release-feature`, above), the research step here is the intake
+questions, and the only data fetch is the optional teaser.
 
 ### Watchlist/sector performance digest
 Open `references/workflows/watchlist-performance-digest.md`. This is the pipeline's
@@ -310,6 +330,20 @@ dbquery skill's templates do.
    negative-parallelism ("it's not X, it's Y") or manufactured paradox, no emoji or
    decorative glyphs. Full treatment in `newsletter-format.md`'s **Prose style**
    section — read it before drafting any issue.
+7. **One fixed color palette, every issue, no per-type exceptions** (confirmed
+   2026-07-16). Ticker blue `#3288BD` for every ticker/sector/broker-code link,
+   table cell, chart label, AND inline prose mention, not just tables. Gain green
+   `#1D8A4E` / loss red `#D6295A` for every signed %-move, table or chart —
+   `barChart` needs `financial: true` to actually render green for a positive bar,
+   it doesn't default to it. Brand magenta `#d6336c` is the CTA button's color and
+   nothing else's. Full treatment in `newsletter-format.md`'s **Color convention**
+   section.
+8. **Appendix required on every issue** (confirmed 2026-07-16), not optional, not
+   type-dependent: the endpoint/field trace block, after Sources, before the
+   disclaimer, sized to how much was actually fetched. See
+   `newsletter-format.md`'s **Appendix** section.
+9. **Every broker code links** to `sectors.app/idx/broker/<lower>`, same ticker-blue
+   styling, on any type that has a broker/flow table (confirmed 2026-07-16).
 
 Full treatment, including the "good time to purchase" / "great future forecast"
 reconciliation, lives in `references/compliance.md` — read it before drafting the
@@ -322,17 +356,17 @@ Finished issues land at:
 ```
 /Users/evelyn/Desktop/newsletter/newsletter_<YYYY-MM-DD>_<type-slug>/
     newsletter.md
-    newsletter.html            weekly-wrap & upcoming-event: the send-ready HTML email
-    chart-<slug>.svg           only if the issue includes the optional hero chart
+    newsletter.html            every type: the send-ready HTML email
+    chart-<slug>.svg           every issue's required hero chart
     banner-<slug>.<ext>        upcoming-event only: the user-supplied banner, copied in
     sample-rows.csv            watchlist-performance-digest only: the real audience rows
                                 the dbquery skill's query returned this run (local only,
                                 contains PII, never copy elsewhere or commit)
 ```
 
-- `<type-slug>` is one of the nine built slugs: `weekly-wrap`, `daily-market-pulse`,
+- `<type-slug>` is one of the nine built slugs: `weekly-wrap`, `monthly-market-pulse`,
   `macro-reaction`, `three-stock-story`, `single-company-deep-dive`, `sector-spotlight`,
-  `new-feature-release`, `upcoming-event`, `watchlist-performance-digest`.
+  `new-release-feature`, `upcoming-event`, `watchlist-performance-digest`.
 - `<YYYY-MM-DD>` is the issue/send date.
 - Any generated chart file lands in this same folder, next to `newsletter.md`, and is
   referenced from it by a relative Markdown image link. For `upcoming-event`, a
@@ -345,13 +379,19 @@ Finished issues land at:
   tracked tickers/sectors), same discipline as the dbquery skill's own
   `references/supabase-access.md`: flag it to the user, it stays local, never leaves
   this machine.
-- **Weekly wrap and upcoming event ship as HTML.** Both are delivered as a send-ready
-  `newsletter.html` (email-safe inline styles, table layout, tickers linked to
-  `sectors.app/idx/<lower>`), replacing the old PDF-attachment format. Keep the
-  `newsletter.md` as the review draft. See `workflows/weekly-wrap.md` §2c and the worked
-  reference `newsletter/newsletter_2026-07-06_weekly-wrap/newsletter.html` for the digest
-  type; `workflows/upcoming-event.md` §4 and
-  `newsletter/newsletter_2026-07-13_upcoming-event/newsletter.html` for the promo type.
+- **Every issue type ships as HTML, and every issue gets a hero chart.** All nine types
+  are delivered as a send-ready `newsletter.html` (email-safe inline styles, table
+  layout, tickers linked to `sectors.app/idx/<lower>`), replacing the old
+  PDF-attachment format, plus at least one generated `chart-<slug>.svg` per issue.
+  This was originally weekly-wrap- and upcoming-event-only; the samples in
+  `newsletter/samples/` now cover all nine types with both, and any newly delivered
+  issue matches that standard regardless of type. Keep `newsletter.md` as the review
+  draft, ship the `.html` alongside it. See `workflows/weekly-wrap.md` §2c and the
+  worked reference `newsletter/newsletter_2026-07-06_weekly-wrap/newsletter.html` for
+  the digest type; `workflows/upcoming-event.md` §4 and
+  `newsletter/newsletter_2026-07-13_upcoming-event/newsletter.html` for the promo type;
+  and `newsletter/samples/<type-slug>/newsletter.html` for every other type's own
+  worked reference.
 - Scratch fetches (raw `sectors.mjs --save-dir` JSON) go to the scratchpad or a
   `_draft`/`data` subfolder, not into the delivered folder.
 - `newsletter/` is a plain folder, separate from the skills repo and from the
@@ -377,14 +417,15 @@ references/
   sourcing.md                     web research + citation rules
   workflows/                      one doc per built issue type (nine)
     weekly-wrap.md                API recipe + section outline, Saturday issue
-    daily-market-pulse.md         one-day movers/volume/brokers recipe, table-first
+    monthly-market-pulse.md       30-day movers/volume/broker-flow recipe, table-first
     macro-reaction.md             macro sourcing + affected-ticker + valuation-context
                                    recipe, non-advice framing
     three-stock-story.md          stock-pick discovery + history/people research +
                                    attributed-forecast recipe
     single-company-deep-dive.md   trigger-anchored one-stock read, earnings/action/owner
     sector-spotlight.md           one sub-sector peer-comparison on valuation
-    new-feature-release.md        release-note-sourced product enablement copy
+    new-release-feature.md        user-supplied release note summary + one feature
+                                   highlight, no live fetch
     upcoming-event.md             in-house workshop promo, user-supplied event details
     watchlist-performance-digest.md  personalized, per-recipient template; calls the
                                    dbquery skill for audience, ranks tracked
@@ -401,11 +442,12 @@ scripts/
                                    copy shared with sectors-carousel)
   charts.mjs                      inline-SVG chart generators (bar/line/donut/multiline/
                                    radar/waterfall/table/scatter/heatmap/bump/sankey/
-                                   compose), forked from sectors-carousel's own
+                                   movers/compose), forked from sectors-carousel's own
                                    scripts/charts.mjs for a LIGHT chart surface — same
                                    geometry, own light-safe color constants (see the
-                                   file's header comment for the validated role map and
-                                   why GAIN/LOSS is blue/red, not green/red)
+                                   file's header comment for the validated role map;
+                                   GAIN/LOSS is brand green/red `#1D8A4E`/`#D6295A`,
+                                   ticker mentions are blue `#3288BD`, see Hard rule 7)
 config.json                       own copy of the shared Sectors API key
                                    (sectorsApiKey); SECTORS_API_KEY env overrides
 ```
@@ -426,10 +468,12 @@ references. It has no dependency relationship with this skill in either directio
 
 No install needed. Unlike `sectors-carousel` there is no slide-rendering step — the
 only dependency is `node` (built-ins only, no npm packages) to run `sectors.mjs`, and
-the shared API key already ships in `config.json`. The optional hero chart is generated
+the shared API key already ships in `config.json`. The required hero chart is generated
 with this skill's own `scripts/charts.mjs` (import the chart-kind function you need —
-`sparkline`/`line` for a price series, `barChart` for year-over-year, `donut` for a mix,
-etc. — and write its returned SVG string to a file, no Puppeteer, no build step). Still
+`sparkline`/`line` for a price series, `barChart` for year-over-year (pass `financial:
+true` for a signed gain/loss series), `donut` for a mix, `moversChart` for a ranked
+gainers/losers list with per-row logos, etc. — and write its returned SVG string to a
+file, no Puppeteer, no build step). Still
 consult the `dataviz` skill first for **which kind of chart fits the data** (its form
 heuristic and the "which Sectors field maps to which chart" table in the sibling
 carousel skill's `references/charts.md` both apply here unchanged); `charts.mjs` is the

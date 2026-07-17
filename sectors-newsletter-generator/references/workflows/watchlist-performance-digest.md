@@ -150,7 +150,11 @@ from step 3, only where a real source exists, non-advice throughout), one CTA ba
 and clearly mark which table/takeaway values are computed at draft/render time from
 the live fetch rather than stored as tags (`../newsletter-format.md`'s **Merge-tag
 convention** section covers the exact split). Prove the whole template by rendering
-it once against the sample user from step 1.
+it once against the sample user from step 1. Close with the standard **Appendix:
+Sectors API endpoints (fields used)** block (`../newsletter-format.md`'s Appendix
+section, required for every issue type, this one included), one bullet per endpoint
+actually called this run (the approved dbquery query itself belongs here too, cited
+as the audience source, not just the market-data calls).
 
 ## 6. Self-review before delivery
 
@@ -178,4 +182,6 @@ it once against the sample user from step 1.
   static tag?
 - Worked example rendered against one real sample user, PII scrubbed per dbquery's
   `references/supabase-access.md`, before this file is shared outside the session?
+- Is the Appendix (endpoint/field trace, including the dbquery audience query) present,
+  after Sources and before the disclaimer?
 - Disclaimer footer present, unmodified (`../newsletter-format.md`)?

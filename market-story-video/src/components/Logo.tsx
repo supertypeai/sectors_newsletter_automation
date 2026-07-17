@@ -1,10 +1,16 @@
 import React from "react";
 import { Img } from "remotion";
 import logos from "../../assets/logos.json";
+import sgxLogos from "../../assets/sgx-logos.json";
 import { gradient } from "../tokens";
 import { fontFamilies } from "../fonts";
 
 const registry = logos as Record<string, string>;
+// SGX logos are watermarked (see sectors-api/endpoints.md's SGX logo note) — kept in a
+// separate registry rather than merged into the shared IDX logos.json, per that doc's
+// explicit "don't add an SGX key to logos.json" instruction. Used here on the user's explicit
+// call that the watermark is acceptable for this piece.
+const sgxRegistry = sgxLogos as Record<string, string>;
 
 // Ticker strings normalize the same way as the carousel skill: "bbca.jk", "BBCA.JK", "BBCA"
 // all resolve to the same logo.
@@ -18,7 +24,7 @@ export const Logo: React.FC<{
   radius?: number;
 }> = ({ ticker, size, radius = size * 0.26 }) => {
   const key = normalize(ticker);
-  const b64 = registry[key];
+  const b64 = registry[key] ?? sgxRegistry[key];
   if (b64) {
     return (
       <div
@@ -38,7 +44,11 @@ export const Logo: React.FC<{
       </div>
     );
   }
-  // fallback: gradient monogram, same convention as carousel's .logo--mono
+  // fallback: gradient monogram, same convention as carousel's .logo--mono.
+  // Shows the full ticker (not just 2 chars) — SGX codes like U11/U14/U10/U13 share a
+  // "U1" prefix and would render identically under a hard 2-char slice.
+  const label = key.slice(0, 4);
+  const fontScale = label.length <= 2 ? 0.32 : label.length === 3 ? 0.26 : 0.21;
   return (
     <div
       style={{
@@ -50,13 +60,13 @@ export const Logo: React.FC<{
         color: "#fff",
         fontFamily: fontFamilies.mono,
         fontWeight: 700,
-        fontSize: size * 0.32,
+        fontSize: size * fontScale,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
       }}
     >
-      {key.slice(0, 2)}
+      {label}
     </div>
   );
 };
