@@ -5,8 +5,8 @@ description: >-
   market (IDX) from live Sectors data and cited research. Use whenever the user wants
   to write, draft, or produce a Sectors subscriber newsletter issue. Handles ten
   built issue types the user picks from on each run, across five families: MARKET
-  PERFORMANCE ("weekly insights v2" / "weekly insights" / "Saturday market wrap", the
-  current eight-block Saturday digest and the default for a weekly send; "weekly wrap"
+  PERFORMANCE ("weekly insights v2" / "weekly insights" / "Monday market wrap", the
+  current eight-block Monday digest and the default for a weekly send; "weekly wrap"
   the superseded eleven-section v1, kept until the user retires it; "monthly market
   pulse" a trailing-30-day movers/volume/broker-flow read); MARKET INSIGHTS ("macro-reaction" / "macro newsletter" tying the
   last ~2 days of macro news to affected sectors and tickers); COMPANY INSIGHTS ("three
@@ -78,7 +78,8 @@ maps to a workflow doc in `references/workflows/` and an issue-type slug:
 1. **Weekly Insights v2** (`weekly-insights-v2`) — **the default weekly send.** Eight
    blocks, info-packed, no long-form reading: greeting, Key Data Bites, Top Movers, one
    "What the Data Unearthed" findings block built on the social cards, Insider Filings,
-   Headlines, a corporate-action week calendar, CTA. Saturday send.
+   Headlines, a corporate-action week calendar, CTA. Monday send (confirmed 2026-07-20,
+   moved from the original Saturday cadence, see Hard rule 11).
 2. **Weekly wrap** (`weekly-wrap`) — **superseded by v2**, kept live until the user
    retires it. The eleven-section long-form version: index moves, sector/ticker
    standouts, flows. Only pick this if the user names v1 explicitly.
@@ -363,14 +364,24 @@ dbquery skill's templates do.
    `newsletter-format.md`'s **Appendix** section.
 9. **Every broker code links** to `sectors.app/idx/broker/<lower>`, same ticker-blue
    styling, on any type that has a broker/flow table (confirmed 2026-07-16).
-10. **Upcoming event closing block on every issue except `upcoming-event` itself**
-    (confirmed 2026-07-20): a small promo for the next Sectors workshop, live-fetched
-    from a shared Google Sheet (`references/upcoming-events-source.md`), not
-    user-supplied, placed after the issue's own CTA and before Sources. Posterimage,
-    title, description, details list, and a "Register here" button to `eventUrl`, five
-    fields straight off the sheet's nearest still-upcoming row, nothing invented. See
-    `newsletter-format.md`'s **Upcoming event closing block** section for the exact
+10. **"Upcoming Events" closing block on every issue except `upcoming-event` itself**
+    (confirmed 2026-07-20, revised same day to cover every still-upcoming row, not just
+    the nearest): a small promo for Sectors workshops, live-fetched from a shared Google
+    Sheet (`references/upcoming-events-source.md`), not user-supplied, placed after the
+    issue's own CTA and before Sources. One card per still-upcoming row, soonest first,
+    each with poster image, title, description, details list, and a "Register here"
+    button to `eventUrl`, five fields per event straight off the sheet, nothing
+    invented. Heading is the fixed text "Upcoming Events," not a variable lead-in. See
+    `newsletter-format.md`'s **Upcoming events closing block** section for the exact
     contract.
+11. **Weekly Insights v2 sends Monday, not Saturday** (confirmed 2026-07-20): the
+    header line's issue/send date is the Monday immediately after the reporting week's
+    Friday close, e.g. week of 6-10 Jul → issue date 13 Jul, week of 13-17 Jul → issue
+    date 20 Jul. `date:` in the frontmatter, the delivery folder's `<YYYY-MM-DD>`, and
+    every `utm_campaign` suffix all use this same Monday date, not the Friday
+    `data_as_of` date and not the old same-week Saturday. See
+    `workflows/weekly-insights-v2.md` and the **Header block** section of
+    `newsletter-format.md`.
 
 Full treatment, including the "good time to purchase" / "great future forecast"
 reconciliation, lives in `references/compliance.md` — read it before drafting the
@@ -452,7 +463,7 @@ references/
                                    closing-block promo every issue but upcoming-event
                                    carries (Hard rule 10)
   workflows/                      one doc per built issue type (ten)
-    weekly-insights-v2.md         the current Saturday digest: eight blocks, social-card
+    weekly-insights-v2.md         the current Monday digest: eight blocks, social-card
                                    findings block, corporate-action week calendar
     weekly-wrap.md                v1, superseded by the above, kept until retired
     monthly-market-pulse.md       30-day movers/volume/broker-flow recipe, table-first

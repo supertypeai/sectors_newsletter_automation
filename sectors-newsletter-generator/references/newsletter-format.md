@@ -379,7 +379,7 @@ it, for all ten types, not only weekly-wrap and upcoming-event. See
 reference.
 
 **Weekly Insights v2 supersedes Weekly wrap.** Both skeletons are listed while the
-migration finishes; pick v2 for a Saturday send unless the user names v1. The full
+migration finishes; pick v2 for a Monday send unless the user names v1. The full
 "Sectors Weekly Insights" digest below is weekly-wrap's own skeleton, its
 two-column mover cards and event banner are specific to that type's layout. Full recipe
 (API source per section, HTML delivery notes) in `workflows/weekly-wrap.md` §2b–2c.
@@ -405,15 +405,15 @@ two-column mover cards and event banner are specific to that type's layout. Full
 9. **Headlines** — 5 recent IDX-relevant `news` items (title + short body + source link);
    drop off-topic non-IDX stories. Note there is **no 0-100 news score** in the API; rank
    by recency + relevance.
-10. **Upcoming event** — the current Sectors workshop promo block, if one is running
-    (details sourced as in `workflows/upcoming-event.md`, never invented).
+10. **Upcoming Events** — the standard closing block, see **Upcoming events closing
+    block** below, not this type's own thing.
 11. **The takeaway** — the non-obvious so-what, not a restatement of section 2 — then a
     CTA back to `sectors.app`, **Sources** list (if any web-sourced "why" was used), and
     the disclaimer footer.
 
 ### Weekly Insights v2
 
-The successor to Weekly wrap, and the one to reach for on a Saturday send unless the user
+The successor to Weekly wrap, and the one to reach for on a Monday send unless the user
 asks for v1 by name. **Eight blocks, info-packed, no long-form reading anywhere.** Full
 recipe in `workflows/weekly-insights-v2.md`.
 
@@ -662,56 +662,64 @@ recipient, only the values (and which tickers/sectors appear) change per
    format as every other issue type; Sectors-API-sourced facts only need the standard
    inline `(sectors.app)` citation, no separate Sources entry) + disclaimer footer.
 
-## Upcoming event closing block (required on every issue except `upcoming-event` itself, confirmed 2026-07-20)
+## Upcoming events closing block (required on every issue except `upcoming-event` itself, confirmed 2026-07-20)
 
-Every broadcast issue this skill delivers ends with a small promo block for the next
-Sectors workshop, live-fetched from a shared Google Sheet, not user-supplied. This is
-distinct from the dedicated `upcoming-event` issue type (a full broadcast built around
-one event, user-supplied details): this is a standing closing section every *other*
-type carries, sourced automatically. Skip it only on `upcoming-event` itself, that type
-already is the event promo, a second one would be redundant.
+Every broadcast issue this skill delivers ends with a small promo block for Sectors
+workshops, live-fetched from a shared Google Sheet, not user-supplied. This is distinct
+from the dedicated `upcoming-event` issue type (a full broadcast built around one event,
+user-supplied details): this is a standing closing section every *other* type carries,
+sourced automatically. Skip it only on `upcoming-event` itself, that type already is the
+event promo, a second one would be redundant.
 
 **Placement**: after the issue's own primary CTA, before **Sources**. Order for every
-applicable type becomes: main content blocks → primary CTA → **Upcoming event closing
+applicable type becomes: main content blocks → primary CTA → **Upcoming events closing
 block** → Sources → Appendix → disclaimer footer. It is the last thing a reader sees
 before the technical/legal footer, "at the end of the newsletter" as the standing rule.
 
-**Data source and selection logic**: see `upcoming-events-source.md` in full, summary
-here. Fetch the sheet fresh every run (`curl` the CSV export URL in that doc, don't
-reuse a cached row from a prior issue), pick the one event still in the future relative
-to this issue's send/data-as-of date that's soonest, drop the block entirely if every
-row in the sheet has already passed rather than featuring a stale event.
+**Data source and selection logic** (revised 2026-07-20, supersedes the original
+nearest-only rule): see `upcoming-events-source.md` in full, summary here. Fetch the
+sheet fresh every run (`curl` the CSV export URL in that doc, don't reuse a cached row
+from a prior issue). **Include every row still in the future relative to this issue's
+send/data-as-of date, not just the nearest one** — one card per event, ordered soonest
+first. Drop only rows that have already passed. If every row has passed, drop the whole
+block rather than featuring a stale event.
 
-**Content, both Markdown and HTML** (five fields, all from the sheet row, none
-invented): the event's `posterUrl` as a banner image, `title` as a bold heading,
+**Content, both Markdown and HTML** (five fields per event, all from that sheet row,
+none invented): the event's `posterUrl` as a banner image, `title` as a bold heading,
 `description` as one paragraph, `details` (the sheet's JSON array) rendered as a
 labelled list in the array's own order and wording, and a **Register here** button
 whose `href` is `eventUrl`, styled exactly like every other CTA button in this skill
 (see the **Color convention** section's locked CTA button values, `background:#9E0142;
-color:#ffffff`).
+color:#ffffff`). Repeat this five-field unit once per still-upcoming event under one
+shared "Upcoming Events" heading, don't repeat the heading per event.
 
 ```markdown
-## Don't miss this
+## Upcoming Events
 
-![{title}]({posterUrl})
+![{event[0].title}]({event[0].posterUrl})
 
-**{title}**
+**{event[0].title}**
 
-{description}
+{event[0].description}
 
-- **{details[0].key}:** {details[0].value}
-- **{details[1].key}:** {details[1].value}
+- **{event[0].details[0].key}:** {event[0].details[0].value}
   ...(one line per entry, in sheet order)
 
-[Register here]({eventUrl})
+[Register here]({event[0].eventUrl})
+
+![{event[1].title}]({event[1].posterUrl})
+
+**{event[1].title}**
+  ...(repeat the same five-field unit for every remaining still-upcoming row)
 ```
 
-HTML delivery uses the same five fields inside the shared card layout (a full-width
-`<img>` for the banner, a bold `<div>` for the title, a `<p>` for the description, a
-`<ul>`/definition-style block for `details`, and the CTA button using the locked
-`background:#9E0142;color:#ffffff` pairing). Heading copy ("Don't miss this") can vary
-issue to issue if a livelier lead-in fits the piece, the five data fields and the button
-styling may never vary.
+HTML delivery uses the same five fields per event inside the shared card layout (a
+full-width `<img>` for the banner, a bold `<div>` for the title, a `<p>` for the
+description, a labelled block for `details`, and the CTA button using the locked
+`background:#9E0142;color:#ffffff` pairing), one card per event stacked under the single
+"Upcoming Events" heading, each card its own rounded `#fbe9d8` box. Heading copy
+("Upcoming Events") stays fixed, don't vary it issue to issue, the five data fields per
+event and the button styling may never vary either.
 
 ## Appendix: data sources (required for every issue, after Sources, before the disclaimer)
 

@@ -1,9 +1,9 @@
-## Upcoming event closing block: data source
+## Upcoming events closing block: data source
 
 Every issue except `upcoming-event` itself ends with a small closing promo block
-for the next Sectors workshop, sourced live from one shared Google Sheet. This is
+for Sectors workshops, sourced live from one shared Google Sheet. This is
 not user-supplied per run, it is fetched fresh every time. See
-`newsletter-format.md`'s **Upcoming event closing block** section for where it
+`newsletter-format.md`'s **Upcoming events closing block** section for where it
 goes and how it's formatted; this doc is only the data-fetch recipe.
 
 ### Fetch
@@ -34,16 +34,16 @@ Sheet URL for reference (edit view, not the fetch URL):
 has Venue/Language, dates are always present as `key: "Date"`), print whatever
 keys that event actually has, don't force a fixed key set.
 
-### Selecting which event to feature (confirmed 2026-07-20)
+### Selecting which events to feature (revised 2026-07-20, supersedes the original nearest-only rule)
 
-One event per issue, **the nearest one still in the future relative to this
-issue's send/data-as-of date**, not always row 1. Parse each row's `Date` value
-out of `details`, compare to the issue date, drop anything already past, take the
-soonest of what's left. If a row's date range is ambiguous ("27th and 28th July,
-2026"), use the first date in the range for comparison. If every row in the sheet
-is already in the past relative to the issue date, drop the closing block entirely
-for that run rather than featuring a stale event, and say so in the self-review
-pass.
+**Every row still in the future relative to this issue's send/data-as-of date**, not
+just the nearest one, one card per event, ordered soonest first. Parse each row's
+`Date` value out of `details`, compare to the issue date, drop anything already past,
+keep everything that's left, sorted ascending. If a row's date range is ambiguous
+("27th and 28th July, 2026"), use the first date in the range for comparison. If every
+row in the sheet is already in the past relative to the issue date, drop the closing
+block entirely for that run rather than featuring a stale event, and say so in the
+self-review pass.
 
 ### Snapshot (2026-07-20, illustrative only, always refetch)
 
