@@ -89,7 +89,7 @@ a short line, not a summary restatement.
 - Did `share_percentage`'s type inconsistency get cast before any comparison?
 - Does each pick have a real, current "why this, why now," not just an interesting past?
 - Does every `$TICKER` mention (table, chart label, AND inline prose) read bold,
-  linked, and ticker-blue (`#3288BD`)? Gains/losses green/red (`#1D8A4E`/`#D6295A`)?
+  linked, and ticker-blue (`#9E0142`)? Gains/losses green/red (`#568475`/`#D53E50`)?
   (`../newsletter-format.md`'s Color convention, applies to every issue.)
 - Is the Appendix (endpoint/field trace) present, after Sources and before the
   disclaimer?

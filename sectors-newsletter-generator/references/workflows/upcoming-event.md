@@ -91,7 +91,7 @@ that answer, not the feature.
 Markdown draft, same as `weekly-wrap` (`../newsletter-format.md`'s delivery note, and
 `SKILL.md`'s delivery section). Keep `newsletter.md` as the review draft; build
 `newsletter.html` from it using the shared house chrome (email-safe inline styles, table
-layout, `#fdf7ee` card on `#f2ede4` background, `#d6336c` accent), the same pattern
+layout, `#fdf7ee` card on `#f2ede4` background, `#9E0142` accent), the same pattern
 `single-company-deep-dive.md`'s worked HTML uses. The banner image sits inline right
 after the headline block, same placement as the Markdown version. The worked reference
 for this type is `newsletter/newsletter_2026-07-13_upcoming-event/newsletter.html`.
@@ -111,7 +111,7 @@ for this type is `newsletter/newsletter_2026-07-13_upcoming-event/newsletter.htm
 - Does `newsletter.html` exist alongside `newsletter.md` and match it section for
   section?
 - If a data teaser includes a ticker, does it read bold, linked, and ticker-blue
-  (`#3288BD`) (`../newsletter-format.md`'s Color convention, applies to every issue)?
+  (`#9E0142`) (`../newsletter-format.md`'s Color convention, applies to every issue)?
 - Is the Appendix (endpoint/field trace) present, after Sources and before the
   disclaimer? Just the teaser's one endpoint if that's all that was fetched, still
   required.

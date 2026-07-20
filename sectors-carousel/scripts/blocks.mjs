@@ -1178,6 +1178,27 @@ function coverTickers(slide) {
   return [];
 }
 
+// Optional cover backdrop art: a subject photograph (a product, an object the story is
+// literally about) sitting behind the hook, not a chart. It rides in the same `.layer`
+// stack as the nebula and dot grid so it can never collide with the hook or the footer,
+// and it is deliberately capped: low opacity plus a soft edge mask, because the cover's
+// job is still the headline. A cutout PNG with a transparent surround reads best; a
+// photo with its own background will show as a rectangle.
+//   coverArt: { src, width?, right?, top?, bottom?, opacity?, fade? }
+// `src` is a data URI or path the page can load. Percentages are of the stage.
+function coverArtLayer(art, ctx) {
+  if (!art || !art.src) return "";
+  const width = art.width || "62%";
+  const opacity = art.opacity == null ? 0.3 : art.opacity;
+  const fade = art.fade === false ? "" : "-webkit-mask-image:radial-gradient(closest-side at 50% 50%,#000 55%,transparent 100%);mask-image:radial-gradient(closest-side at 50% 50%,#000 55%,transparent 100%);";
+  const vertical = art.bottom != null ? `bottom:${art.bottom};` : `top:${art.top == null ? "18%" : art.top};`;
+  const horizontal = art.left != null ? `left:${art.left};` : `right:${art.right == null ? "-6%" : art.right};`;
+  // `.layer` is inset:0; reset it so top/right/width actually position the art
+  return `<div class="layer coverart" style="inset:auto;height:auto;${vertical}${horizontal}width:${width};opacity:${opacity};${fade}"><img src="${esc(
+    art.src
+  )}" alt="" style="width:100%;display:block;"></div>`;
+}
+
 function renderCover(slide, deck, ctx) {
   const tickers = coverTickers(slide);
   // Backdrop series go through the same value gate as content charts: a NaN point in the
@@ -1464,7 +1485,11 @@ export function renderSlide(slide, deck, ctx = {}) {
   const frame = (cls, layers, inner) =>
     `<div class="stage ${cls}" style="width:${dims.w}px;height:${dims.h}px;">${layers}${inner}</div>`;
   if (role === "cover")
-    return frame("cover", `<div class="layer nebula"></div><div class="layer dots"></div>`, renderCover(slide, deck, ctx));
+    return frame(
+      "cover",
+      `<div class="layer nebula"></div><div class="layer dots"></div>${coverArtLayer(slide.coverArt, ctx)}`,
+      renderCover(slide, deck, ctx)
+    );
   if (role === "outro")
     return frame(
       "outro",

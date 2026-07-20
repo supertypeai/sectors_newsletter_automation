@@ -104,7 +104,7 @@ marked, or an earnings/revenue bar series. Non-zero-based y-axis for price
   call? No "undervalued," no "good entry," no price target as our view (`../compliance.md`).
 - Was `share_percentage`'s string/float type gotcha handled before any comparison?
 - Does every `$TICKER` mention (table, chart label, AND inline prose) read bold,
-  linked, and ticker-blue (`#3288BD`)? Gains/losses green/red (`#1D8A4E`/`#D6295A`),
+  linked, and ticker-blue (`#9E0142`)? Gains/losses green/red (`#568475`/`#D53E50`),
   and if the hero chart shows a signed move via `barChart`, was `financial: true`
   passed (it doesn't default to green)? (`../newsletter-format.md`'s Color
   convention, applies to every issue.)

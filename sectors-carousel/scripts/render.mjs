@@ -146,7 +146,38 @@ for (const t of tickers) {
   if (logoMap[t]) logos[t] = "data:image/png;base64," + logoMap[t];
 }
 
-const ctx = { logos, brand, warnings: [] };
+const ctxWarnings = [];
+
+// ---- resolve cover art -> base64 ----
+// A deck names its cover art by ticker or by path; the bytes get inlined here, at render
+// time, so deck.json stays a readable document instead of carrying a megabyte of base64.
+// Auto-resolution: a cover with no explicit `coverArt` picks up assets/coverart/<TICKER>.png
+// if one exists, so preparing the art (scripts/coverart.mjs --ticker T) is the only step.
+const coverArtDir = join(root, "assets", "coverart");
+const coverArtFile = (t) => join(coverArtDir, `${String(t).toUpperCase().replace(/\.[A-Z]+$/, "")}.png`);
+const inlineArt = (p) => "data:image/png;base64," + readFileSync(p).toString("base64");
+
+for (const slide of slides) {
+  if ((slide.role || "content") !== "cover") continue;
+  const art = slide.coverArt;
+  if (art && art.src) {
+    if (/^data:/.test(art.src)) continue; // already inline
+    const p = art.src.startsWith("/") ? art.src : join(root, art.src);
+    if (existsSync(p)) slide.coverArt = { ...art, src: inlineArt(p) };
+    else {
+      ctxWarnings.push(`cover art "${art.src}" not found — cover renders without it`);
+      slide.coverArt = null;
+    }
+    continue;
+  }
+  const first = (slide.tickers && slide.tickers[0]) || (slide.chip && slide.chip.ticker);
+  const t = typeof first === "string" ? first : first && first.ticker;
+  if (!t) continue;
+  const p = coverArtFile(t);
+  if (existsSync(p)) slide.coverArt = { ...(art || {}), src: inlineArt(p) };
+}
+
+const ctx = { logos, brand, warnings: ctxWarnings };
 
 // ---- render ----
 mkdirSync(outDir, { recursive: true });

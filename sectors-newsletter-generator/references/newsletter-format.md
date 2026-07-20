@@ -9,7 +9,7 @@ The prose equivalent of the carousel skill's `deck-format.md`. Every issue is a 
 ---
 subject: <the email subject line>
 preview: <the inbox preview/preheader text>
-issue_type: weekly-wrap | macro-reaction | three-stock-story | single-company-deep-dive | sector-spotlight | monthly-market-pulse | upcoming-event | new-release-feature | watchlist-performance-digest
+issue_type: weekly-insights-v2 | weekly-wrap | macro-reaction | three-stock-story | single-company-deep-dive | sector-spotlight | monthly-market-pulse | upcoming-event | new-release-feature | watchlist-performance-digest
 date: <YYYY-MM-DD, the issue/send date>
 data_as_of: <YYYY-MM-DD, the API's as-of date>
 sample_recipient: <watchlist-performance-digest only: a scrubbed placeholder
@@ -95,6 +95,42 @@ API" or bare "Sectors" (`compliance.md` rule 6).
   `https://sectors.app/idx/broker/<lowercase code>`, e.g.
   `https://sectors.app/idx/broker/ak`. Confirmed 2026-07-16.
 
+## UTM convention (every issue type, every `sectors.app` link)
+
+Every link to a domain **we own** carries UTM parameters so the CRM can attribute return
+visits to the issue and the block that drove them. Five params, always in this order,
+always lowercase:
+
+```
+?utm_source=newsletter
+&utm_medium=email
+&utm_campaign=<type-slug>_<YYYY-MM-DD>
+&utm_content=<block-slug>
+&utm_term=<ticker>            # ticker/broker links only, omit otherwise
+```
+
+In HTML the separator is `&amp;`, not a bare `&` — an unescaped ampersand in an `href` is
+invalid markup and some clients mangle the tail of the URL. In the `.md` draft it's a plain
+`&`.
+
+- **`utm_source=newsletter`, `utm_medium=email`** are fixed for everything this skill
+  produces. Don't vary them per type.
+- **`utm_campaign`** is the issue: the type slug, an underscore, then the issue date, e.g.
+  `weekly-insights-v2_2026-07-18`. Underscore between slug and date because the slug already
+  contains hyphens; keeping one separator for both makes the boundary unparseable.
+- **`utm_content`** is the **block**, not the individual link: `key-data-bites`,
+  `top-movers`, `data-unearthed`, `insider-filings`, `headlines`, `whats-ahead`, `cta`,
+  `footer`. Block-level is the granularity you actually act on ("nobody clicks the calendar")
+  and a unique slug per link would add ~40 distinct values per issue for no decision value.
+- **`utm_term`** carries the bare ticker or broker code on links to
+  `sectors.app/idx/<ticker>` and `sectors.app/idx/broker/<code>`, so per-name interest is
+  still recoverable without inflating `utm_content`. Omit it on every other link.
+
+**Never tag a third-party link.** Citations to Bisnis, Kontan, Kompas and any other outlet
+stay clean: our UTMs do nothing in their analytics, and appending tracking to someone else's
+URL is both useless and rude. Same for Instagram and Threads — they're our accounts but not
+our analytics, and the params are stripped or ignored. Tag `sectors.app` and nothing else.
+
 ## Color convention (every issue type, HTML delivery — no per-type exceptions)
 
 One fixed palette, applied identically across every table, every chart, and every
@@ -102,18 +138,36 @@ inline prose mention, in every issue this skill delivers. A type-specific color 
 (a different link color, a different accent for "this type's" tickers) is a bug, not a
 style variant, this section is the single source of truth, don't re-derive per type:
 
-- **Ticker blue, `#3288BD`.** Every ticker link (IDX or SGX), every sub-sector/sector
-  link, every broker-code link, and every other outbound citation link (a Sources
-  entry, the standard `sectors.app` footer citation) uses this same blue. One color
-  for "this is a link," full stop.
-- **Gain green, `#1D8A4E`.** Every positive %-move reading, in a table cell or a
-  chart's own bar/line/label, uses this green. This is `scripts/charts.mjs`'s own
-  `GAIN` constant.
-- **Loss red, `#D6295A`.** Every negative %-move reading, table or chart, uses this
-  red. `scripts/charts.mjs`'s own `LOSS` constant.
-- **Brand magenta, `#d6336c`, is reserved for the CTA button only** (and the button
-  only), never for a link, a ticker, a section header, or anything else. A section
-  header renders in a dark neutral (`#1c1c1c`), not an accent color.
+- **Accent `#9E0142`: every clickable thing, no exceptions.** If it is an `<a>`, it is this
+  colour. Ticker links (IDX or SGX), sub-sector/sector links, broker-code links, outbound
+  citation links, the footer's `sectors.app` and `@sectorsapp` links, *and* the CTA button's
+  background all use this one hex. **Including tickers inside the Top Gainers and Top Losers
+  cards**, which previously rendered dark `#1c1c1c` and no longer do; a reader must never have
+  to guess whether something is clickable. Verify with a sweep, not by eye: every `<a>` in the
+  file should carry `color:#9E0142`, and no anchor should be left to inherit. This replaced an earlier split where links were blue `#3288BD` and the
+  button was magenta `#d6336c`; **there is no longer a link/CTA colour distinction**, so any
+  rule you find elsewhere reserving this hex "for the button only" is stale, ignore it. The
+  button is distinguished by being a filled block with white text, not by hue.
+- **CTA button, locked exact values (confirmed 2026-07-20 after two rounds of
+  correction, don't re-derive)**: `background:#9E0142;color:#ffffff;font-weight:800;`
+  (or `700`, per the file's existing button weight) on an `<a>` styled
+  `display:inline-block;padding:...;border-radius:8px;text-decoration:none;`. White
+  text is required, not a style choice: black text on this background measures
+  ~2.5:1 contrast, well under the 4.5:1 AA floor, while white text measures 8.28:1.
+  Never `color:#9E0142` on the button itself (invisible against its own background,
+  the original bug), never black text on it either (fails contrast even though it
+  reads as bolder). This exact pairing is the only correct one, apply it verbatim
+  on every CTA button, every issue type.
+- **Gain `#568475`.** Every positive %-move reading, in a table cell or a chart's own
+  bar/line/label. This is `scripts/charts.mjs`'s `GAIN` constant.
+- **Loss `#D53E50`.** Every negative %-move reading, table or chart. `scripts/charts.mjs`'s
+  `LOSS` constant.
+- Section headers render in a dark neutral (`#1c1c1c`), never an accent colour.
+- **Contrast, measured on the `#fdf7ee` card ground**: `#9E0142` is 7.77:1 and white-on-
+  `#9E0142` is 8.28:1, both comfortably AA for body text. `#568475` (3.98:1) and `#D53E50`
+  (4.25:1) sit just under the 4.5:1 AA threshold for normal text, so only use them **bold**,
+  on a numeric reading, the way every current template does. Do not set a paragraph of running
+  copy in either. Both clear the 3:1 non-text mark for chart marks everywhere.
 - **A chart showing a signed gain/loss reading must actually render green/red, not
   just cite the right hex in prose.** `scripts/charts.mjs`'s `moversChart` and
   `waterfall` are green/red by construction, no extra flag needed. Plain `barChart` is
@@ -222,7 +276,7 @@ no-dash/no-AI-tell rules, it constrains *shape*.
   self-vs-peer, and so on, the same 13-kind grammar documented in the carousel skill's
   `references/charts.md`) and write its returned SVG string to `chart-<slug>.svg`. Its
   colors are already fixed and validated to the shared palette above (green
-  `#1D8A4E` gain, red `#D6295A` loss, blue `#3288BD` ticker, see the file's own header
+  `#568475` gain, red `#D53E50` loss, blue `#9E0142` ticker, see the file's own header
   comment for the full role map), so don't re-derive a palette per issue, and see this
   doc's own **Color convention** section above for the `financial: true` requirement
   on `barChart`. A hand-rolled inline SVG or `ggplot2` (R) is a fallback only for a
@@ -320,11 +374,13 @@ concurrent, don't imply one caused the other.
 Markdown**, colored +/- cells, tables, CTA buttons and the hero chart don't survive
 plain Markdown the same way, and the point is a self-contained, data-backed email with
 no PDF attachment. Keep `newsletter.md` as the review draft; ship the `.html` alongside
-it, for all nine types, not only weekly-wrap and upcoming-event. See
+it, for all ten types, not only weekly-wrap and upcoming-event. See
 `newsletter/samples/<type-slug>/newsletter.html` for each type's own worked HTML
 reference.
 
-The full "Sectors Weekly Insights" digest below is weekly-wrap's own skeleton, its
+**Weekly Insights v2 supersedes Weekly wrap.** Both skeletons are listed while the
+migration finishes; pick v2 for a Saturday send unless the user names v1. The full
+"Sectors Weekly Insights" digest below is weekly-wrap's own skeleton, its
 two-column mover cards and event banner are specific to that type's layout. Full recipe
 (API source per section, HTML delivery notes) in `workflows/weekly-wrap.md` §2b–2c.
 
@@ -354,6 +410,41 @@ two-column mover cards and event banner are specific to that type's layout. Full
 11. **The takeaway** — the non-obvious so-what, not a restatement of section 2 — then a
     CTA back to `sectors.app`, **Sources** list (if any web-sourced "why" was used), and
     the disclaimer footer.
+
+### Weekly Insights v2
+
+The successor to Weekly wrap, and the one to reach for on a Saturday send unless the user
+asks for v1 by name. **Eight blocks, info-packed, no long-form reading anywhere.** Full
+recipe in `workflows/weekly-insights-v2.md`.
+
+1. **Masthead + greeting** — issue number, send date, window, data-as-of. Then a bare
+   `Good morning!`. No opening hook paragraph, no table of contents.
+2. **Key Data Bites** — 8 one-line facts in a tinted box, each **derived from data**, every
+   ticker linked. This is where v1's market-level prose sections survive, one line each.
+   Nothing here may repeat a Headlines item (see block 6).
+3. **Top Weekly Movers** — top gainers and top losers as two side-by-side cards, same as v1.
+   Tables only; the ranked-bar chart is not used in this type.
+4. **What the Data Unearthed** — the issue's only analysis. Two or three findings, each a
+   **join of two sources** (movers × corporate actions, price × foreign flow, volume ×
+   filings), each with a heading stating the finding, a social card image, and 3-5 short
+   bullets. Never paragraphs. Two images under one heading go side by side; a single image
+   runs half width. Closes with a follow-us line (Instagram, Threads).
+5. **Insider Filings** — the 5 most recent disclosures as one table: date, holder, ticker,
+   buy/sell, shares, stake before → after. Structured fields only, filtered by `timestamp`
+   to on-or-before the window's Friday. One short line calling out the standout filing.
+6. **Other Major Headlines** — 5 IDX-relevant `news` items, **from news sources**, each with
+   an outbound citation. **No category prefix** on the bullets. Closes with a read-more link
+   to `sectors.app/indonesia/news`.
+7. **What's Ahead** — a **Mon-Fri week-grid calendar** of corporate actions (stock splits,
+   dividend ex-dates, AGMs, rights issues) plus a "beyond the week" table for anything
+   further out. Built by polling `company/corporate-actions/{symbol}/` across a ticker list.
+   Closes with the dividend-calendar link.
+8. **CTA** — watchlist for exclusive reports, workflow for alerts, in a tinted panel with the
+   magenta button. Then appendix and the disclaimer footer.
+
+Blocks 2 and 6 must not overlap: computed facts in Bites, news-sourced facts in Headlines,
+never the same fact twice. This type has **no** takeaway section, no sector-pulse section and
+no separate chart-of-the-week; the social cards in block 4 are the issue's visuals.
 
 ### Macro-reaction
 1. **The news** — what happened in the last ~2 days, cited. Bulleted, stat-first
@@ -444,7 +535,7 @@ are summed client-side from repeated daily calls, the same way every run).
    the actual shape of the flow and any real, dated news that plausibly relates, cited
    and stated as concurrent, never asserted as the proven cause. **Broker code links**
    (confirmed 2026-07-16): `https://sectors.app/idx/broker/<lowercase code>`, e.g.
-   `https://sectors.app/idx/broker/ak`, same bold ticker-blue (`#3288BD`) treatment as
+   `https://sectors.app/idx/broker/ak`, same bold ticker-blue (`#9E0142`) treatment as
    a ticker link, every code cell in both tables gets one.
 5. **Appendix: Sectors API endpoints (fields used)**, after Sources and before the
    disclaimer. Always included for this type (see the generic Appendix section below
@@ -454,9 +545,9 @@ are summed client-side from repeated daily calls, the same way every run).
 6. Disclaimer footer (Sources whenever either paragraph above cites something web-sourced).
 
 Color and ticker convention for this type's HTML delivery: every ticker mention
-renders in the shared ticker blue (`scripts/charts.mjs`'s `TICKER`, `#3288BD`), and
-every gain/loss reading renders in the shared brand green/red (`GAIN` `#1D8A4E` /
-`LOSS` `#D6295A`), consistently across every table, the chart, AND any inline prose
+renders in the shared ticker blue (`scripts/charts.mjs`'s `TICKER`, `#9E0142`), and
+every gain/loss reading renders in the shared brand green/red (`GAIN` `#568475` /
+`LOSS` `#D53E50`), consistently across every table, the chart, AND any inline prose
 mention (a bare `$TICKER` in a paragraph, not just table cells and bar labels, is the
 easy miss, same bold-linked-blue treatment applies there too, see the **Ticker-mention
 convention** section above).
@@ -571,6 +662,57 @@ recipient, only the values (and which tickers/sectors appear) change per
    format as every other issue type; Sectors-API-sourced facts only need the standard
    inline `(sectors.app)` citation, no separate Sources entry) + disclaimer footer.
 
+## Upcoming event closing block (required on every issue except `upcoming-event` itself, confirmed 2026-07-20)
+
+Every broadcast issue this skill delivers ends with a small promo block for the next
+Sectors workshop, live-fetched from a shared Google Sheet, not user-supplied. This is
+distinct from the dedicated `upcoming-event` issue type (a full broadcast built around
+one event, user-supplied details): this is a standing closing section every *other*
+type carries, sourced automatically. Skip it only on `upcoming-event` itself, that type
+already is the event promo, a second one would be redundant.
+
+**Placement**: after the issue's own primary CTA, before **Sources**. Order for every
+applicable type becomes: main content blocks → primary CTA → **Upcoming event closing
+block** → Sources → Appendix → disclaimer footer. It is the last thing a reader sees
+before the technical/legal footer, "at the end of the newsletter" as the standing rule.
+
+**Data source and selection logic**: see `upcoming-events-source.md` in full, summary
+here. Fetch the sheet fresh every run (`curl` the CSV export URL in that doc, don't
+reuse a cached row from a prior issue), pick the one event still in the future relative
+to this issue's send/data-as-of date that's soonest, drop the block entirely if every
+row in the sheet has already passed rather than featuring a stale event.
+
+**Content, both Markdown and HTML** (five fields, all from the sheet row, none
+invented): the event's `posterUrl` as a banner image, `title` as a bold heading,
+`description` as one paragraph, `details` (the sheet's JSON array) rendered as a
+labelled list in the array's own order and wording, and a **Register here** button
+whose `href` is `eventUrl`, styled exactly like every other CTA button in this skill
+(see the **Color convention** section's locked CTA button values, `background:#9E0142;
+color:#ffffff`).
+
+```markdown
+## Don't miss this
+
+![{title}]({posterUrl})
+
+**{title}**
+
+{description}
+
+- **{details[0].key}:** {details[0].value}
+- **{details[1].key}:** {details[1].value}
+  ...(one line per entry, in sheet order)
+
+[Register here]({eventUrl})
+```
+
+HTML delivery uses the same five fields inside the shared card layout (a full-width
+`<img>` for the banner, a bold `<div>` for the title, a `<p>` for the description, a
+`<ul>`/definition-style block for `details`, and the CTA button using the locked
+`background:#9E0142;color:#ffffff` pairing). Heading copy ("Don't miss this") can vary
+issue to issue if a livelier lead-in fits the piece, the five data fields and the button
+styling may never vary.
+
 ## Appendix: data sources (required for every issue, after Sources, before the disclaimer)
 
 A technical block mapping each metric actually used in the issue to its endpoint AND
@@ -603,6 +745,13 @@ those same figures already carry in the body, and it never appears before the So
 list or ahead of the disclaimer. **Required on every issue, every type** (confirmed
 2026-07-16): a short type with one or two endpoint calls still gets a short appendix,
 proportional to how much was actually fetched, never skipped for length.
+
+**Keep it short** (confirmed 2026-07-20): endpoint and fields only, no prose explaining
+what a date range covered, why a param was or wasn't used, or how a result got filtered
+or aggregated client-side. That reasoning belongs in `queries.md` during drafting, not in
+the delivered appendix. A bullet like `filings/?limit=30&offset=0..210` — filing dates is
+correct; a bullet that goes on to explain `start`/`end` filters on transaction date and
+silently drops certain days is not, cut it down to the endpoint and field.
 
 ## Standard disclaimer footer (fixed text, appended to every issue)
 

@@ -7,8 +7,11 @@
 // violations that are cheap to check in text, so the rendered output stays on-brand and
 // on-voice. It does NOT check layout (overflow, balance, collisions) — that's what reading
 // the rendered PNGs is for. ERRORS are real violations (exit 1); WARN are advisory (exit 0).
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { readFileSync, existsSync } from "node:fs";
+import { resolve, dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const LINT_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 import { collectTickers, CHART_KINDS } from "./blocks.mjs";
 import { COMPOSE_MARKS, COMPOSE_COLOR_TOKENS } from "./charts.mjs";
 
@@ -214,6 +217,27 @@ for (let i = 0; i < slides.length; i++) {
   if (role === "cover" && g === 0)
     add(n, "ERROR", "gradient", 'cover has no "emphasis" — gradient is emphasis-only; set emphasis to the verdict word/number.');
   if (g > 1) add(n, "ERROR", "gradient", `${g} gradient emphases on one slide — use exactly ONE (the verdict word).`);
+
+  // cover art: every cover should carry a representative image of its subject, either an
+  // explicit `coverArt.src` or a prepared assets/coverart/<TICKER>.png that render.mjs
+  // auto-resolves. WARN not ERROR: some subjects genuinely have no honest, licensable
+  // image (an index, a flow story, a screener of 40 names), and a wrong or generic photo
+  // is worse than none. See SKILL.md's cover-art step for how to source and prepare one.
+  if (role === "cover" && !(s.coverArt && s.coverArt.src)) {
+    const first = (s.tickers && s.tickers[0]) || (s.chip && s.chip.ticker);
+    const t = typeof first === "string" ? first : first && first.ticker;
+    const key = t ? String(t).toUpperCase().replace(/\.[A-Z]+$/, "") : null;
+    const prepared = key && existsSync(resolve(LINT_ROOT, "assets", "coverart", `${key}.png`));
+    if (!prepared)
+      add(
+        n,
+        "WARN",
+        "cover-art",
+        key
+          ? `cover has no subject image — prepare one with "node scripts/coverart.mjs <src> --ticker ${key}", or say why this subject has none.`
+          : 'cover has no subject image and names no ticker — see SKILL.md\'s cover-art step.'
+      );
+  }
   // emphasis must be an EXACT, case-sensitive substring: the renderer does indexOf and
   // silently renders the hook flat on a mismatch, while the presence-based count above
   // still says "1 gradient" — a typo'd emphasis used to pass lint and render no gradient.

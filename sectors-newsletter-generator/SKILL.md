@@ -3,10 +3,12 @@ name: sectors-newsletter-generator
 description: >-
   Generate an on-brand, data-backed Markdown newsletter about the Indonesian stock
   market (IDX) from live Sectors data and cited research. Use whenever the user wants
-  to write, draft, or produce a Sectors subscriber newsletter issue. Handles nine
+  to write, draft, or produce a Sectors subscriber newsletter issue. Handles ten
   built issue types the user picks from on each run, across five families: MARKET
-  PERFORMANCE ("weekly wrap" / "Saturday market wrap"; "monthly market pulse" a
-  trailing-30-day movers/volume/broker-flow read); MARKET INSIGHTS ("macro-reaction" / "macro newsletter" tying the
+  PERFORMANCE ("weekly insights v2" / "weekly insights" / "Saturday market wrap", the
+  current eight-block Saturday digest and the default for a weekly send; "weekly wrap"
+  the superseded eleven-section v1, kept until the user retires it; "monthly market
+  pulse" a trailing-30-day movers/volume/broker-flow read); MARKET INSIGHTS ("macro-reaction" / "macro newsletter" tying the
   last ~2 days of macro news to affected sectors and tickers); COMPANY INSIGHTS ("three
   stocks story" history/people/fun-facts/attributed-outlook; "single company deep dive"
   off an earnings or corporate-action trigger; "sector spotlight" peer-comparing one
@@ -68,31 +70,36 @@ cannot supply?**
 
 ## Pick the issue type (always first)
 
-This is **one issue per run**, never several at once. Nine issue types are built,
+This is **one issue per run**, never several at once. Ten issue types are built,
 grouped by content family (mirroring the newsletter content plan's type catalog). Each
 maps to a workflow doc in `references/workflows/` and an issue-type slug:
 
 **Market Performance**
-1. **Weekly wrap** (`weekly-wrap`) — the week's conclusion: index moves, sector/ticker
-   standouts, flows. Saturday send.
-2. **Monthly market pulse** (`monthly-market-pulse`) — the trailing 30 days' movers,
+1. **Weekly Insights v2** (`weekly-insights-v2`) — **the default weekly send.** Eight
+   blocks, info-packed, no long-form reading: greeting, Key Data Bites, Top Movers, one
+   "What the Data Unearthed" findings block built on the social cards, Insider Filings,
+   Headlines, a corporate-action week calendar, CTA. Saturday send.
+2. **Weekly wrap** (`weekly-wrap`) — **superseded by v2**, kept live until the user
+   retires it. The eleven-section long-form version: index moves, sector/ticker
+   standouts, flows. Only pick this if the user names v1 explicitly.
+3. **Monthly market pulse** (`monthly-market-pulse`) — the trailing 30 days' movers,
    most-traded, and broker flow, each aggregated across the whole window, not a single
    day's snapshot. Tight, table-first, chart-and-table led.
 
 **Market Insights**
-3. **Macro-reaction** (`macro-reaction`) — tie the last ~2 days of macro news to affected
+4. **Macro-reaction** (`macro-reaction`) — tie the last ~2 days of macro news to affected
    sectors/tickers, then report each name's fundamentals and valuation context.
 
 **Company Insights**
-4. **Three-stock storytelling** (`three-stock-story`) — three companies' history, people,
+5. **Three-stock storytelling** (`three-stock-story`) — three companies' history, people,
    fun facts, attributed forward outlook.
-5. **Single company deep dive** (`single-company-deep-dive`) — one name read in depth off
+6. **Single company deep dive** (`single-company-deep-dive`) — one name read in depth off
    a real earnings / corporate-action / ownership trigger.
-6. **Sector spotlight** (`sector-spotlight`) — one sub-sector's names peer-compared on
+7. **Sector spotlight** (`sector-spotlight`) — one sub-sector's names peer-compared on
    valuation ("which one is actually cheap," as context, not a call).
 
 **Sectors-org announcements** (about Sectors itself, not the market)
-7. **New release feature** (`new-release-feature`) — two sections: the issue itself is
+8. **New release feature** (`new-release-feature`) — two sections: the issue itself is
    a brief summary of the latest release off a user-supplied release note (PDF or
    Markdown, `sectors.app/release` is no longer live-fetchable, see the workflow doc;
    subject/preview/headline name only the release, never the feature), plus a
@@ -100,13 +107,13 @@ maps to a workflow doc in `references/workflows/` and an issue-type slug:
    (which may differ from the release's own headline item), with a "Try the feature
    now" CTA (or "Try it yourself now!" if the feature has no
    direct URL).
-8. **Upcoming event** (`upcoming-event`) — promo for a Sectors in-house workshop (online
+9. **Upcoming event** (`upcoming-event`) — promo for a Sectors in-house workshop (online
    or offline, teaching participants to build on live Sectors API data). Content is
    **user-supplied**: ask for date/time/venue, agenda/speaker/target audience,
    registration link, and marketing banner before drafting. Not market-data driven.
 
 **Personalized**
-9. **Watchlist/sector performance digest** (`watchlist-performance-digest`) — a fixed
+10. **Watchlist/sector performance digest** (`watchlist-performance-digest`) — a fixed
    template, same structure for every recipient, ranked performance + peer comparison
    table for up to 5 of that user's own tracked tickers/sectors (from the sibling
    dbquery skill's `watchlist-tracked-interest` query), only the values differ per
@@ -222,7 +229,18 @@ see their own workflow docs.
    the same type, not just compliant with the prose skeleton in isolation.
 5. **Deliver** — see Delivery below.
 
-### Weekly wrap
+### Weekly Insights v2
+Open `references/workflows/weekly-insights-v2.md` for the exact API recipe and section
+order, and `newsletter/samples/weekly-insights-v2/` for the worked reference. In brief:
+settle the Mon-Fri window as v1 does, then build eight blocks, not eleven. Key Data Bites
+carries every computed market-level fact; Other Major Headlines carries every news-sourced
+one; the two must never repeat a fact. The single analysis block joins two sources to find
+something the tables don't already say, illustrated with the carousel's social cards.
+**Open decision: ask the user which foreign-flow definition the issue should use before
+drafting any flow figure** (the cards and `foreign-flow/{symbol}` use different methods that
+disagree on direction, see the workflow doc §3), then apply that one definition throughout.
+
+### Weekly wrap (v1, superseded)
 Open `references/workflows/weekly-wrap.md` for the exact API recipe and section order.
 In brief: settle the week's Mon-Fri window, pull index/market-cap trend, weekly movers,
 most-traded, sector standouts, and flows; find the one non-obvious conclusion (not "the
@@ -330,20 +348,29 @@ dbquery skill's templates do.
    negative-parallelism ("it's not X, it's Y") or manufactured paradox, no emoji or
    decorative glyphs. Full treatment in `newsletter-format.md`'s **Prose style**
    section — read it before drafting any issue.
-7. **One fixed color palette, every issue, no per-type exceptions** (confirmed
-   2026-07-16). Ticker blue `#3288BD` for every ticker/sector/broker-code link,
-   table cell, chart label, AND inline prose mention, not just tables. Gain green
-   `#1D8A4E` / loss red `#D6295A` for every signed %-move, table or chart —
-   `barChart` needs `financial: true` to actually render green for a positive bar,
-   it doesn't default to it. Brand magenta `#d6336c` is the CTA button's color and
-   nothing else's. Full treatment in `newsletter-format.md`'s **Color convention**
-   section.
+7. **One fixed color palette, every issue, no per-type exceptions** (repalette
+   2026-07-20). Accent `#9E0142` on **every** `<a>` without exception (ticker, sector,
+   broker code, citation, footer, and the tickers inside the Top Gainers/Losers cards that
+   used to render dark) **and** on the CTA button background; the old blue-link/
+   magenta-button split is gone. Gain `#568475` / loss `#D53E50` for every signed %-move, table or
+   chart — `barChart` needs `financial: true` to render gain colour on a positive bar,
+   it doesn't default to it. Gain and loss clear AA only when bold on a numeric
+   reading, never as running copy. Full treatment in `newsletter-format.md`'s **Color
+   convention** section.
 8. **Appendix required on every issue** (confirmed 2026-07-16), not optional, not
    type-dependent: the endpoint/field trace block, after Sources, before the
    disclaimer, sized to how much was actually fetched. See
    `newsletter-format.md`'s **Appendix** section.
 9. **Every broker code links** to `sectors.app/idx/broker/<lower>`, same ticker-blue
    styling, on any type that has a broker/flow table (confirmed 2026-07-16).
+10. **Upcoming event closing block on every issue except `upcoming-event` itself**
+    (confirmed 2026-07-20): a small promo for the next Sectors workshop, live-fetched
+    from a shared Google Sheet (`references/upcoming-events-source.md`), not
+    user-supplied, placed after the issue's own CTA and before Sources. Posterimage,
+    title, description, details list, and a "Register here" button to `eventUrl`, five
+    fields straight off the sheet's nearest still-upcoming row, nothing invented. See
+    `newsletter-format.md`'s **Upcoming event closing block** section for the exact
+    contract.
 
 Full treatment, including the "good time to purchase" / "great future forecast"
 reconciliation, lives in `references/compliance.md` — read it before drafting the
@@ -364,7 +391,8 @@ Finished issues land at:
                                 contains PII, never copy elsewhere or commit)
 ```
 
-- `<type-slug>` is one of the nine built slugs: `weekly-wrap`, `monthly-market-pulse`,
+- `<type-slug>` is one of the ten built slugs: `weekly-insights-v2`, `weekly-wrap`,
+  `monthly-market-pulse`,
   `macro-reaction`, `three-stock-story`, `single-company-deep-dive`, `sector-spotlight`,
   `new-release-feature`, `upcoming-event`, `watchlist-performance-digest`.
 - `<YYYY-MM-DD>` is the issue/send date.
@@ -379,13 +407,18 @@ Finished issues land at:
   tracked tickers/sectors), same discipline as the dbquery skill's own
   `references/supabase-access.md`: flag it to the user, it stays local, never leaves
   this machine.
-- **Every issue type ships as HTML, and every issue gets a hero chart.** All nine types
+- **Every issue type ships as HTML, and every issue gets a hero chart.** All ten types
   are delivered as a send-ready `newsletter.html` (email-safe inline styles, table
   layout, tickers linked to `sectors.app/idx/<lower>`), replacing the old
   PDF-attachment format, plus at least one generated `chart-<slug>.svg` per issue.
   This was originally weekly-wrap- and upcoming-event-only; the samples in
-  `newsletter/samples/` now cover all nine types with both, and any newly delivered
-  issue matches that standard regardless of type. Keep `newsletter.md` as the review
+  `newsletter/samples/` now cover all ten types with both, and any newly delivered
+  issue matches that standard regardless of type. **`weekly-insights-v2` satisfies the
+  visual requirement with the social cards in its findings block instead of a generated
+  `chart-<slug>.svg`**; if no suitable card exists for a given week, generate a chart so
+  the issue is never image-less. This type is also the one exception to the
+  "at most one generated chart per issue" guidance in stage 3: its findings block runs one
+  visual per finding, so two or three charts is correct there, not a violation. Keep `newsletter.md` as the review
   draft, ship the `.html` alongside it. See `workflows/weekly-wrap.md` §2c and the
   worked reference `newsletter/newsletter_2026-07-06_weekly-wrap/newsletter.html` for
   the digest type; `workflows/upcoming-event.md` §4 and
@@ -415,8 +448,13 @@ references/
                                    section skeletons, disclaimer footer
   compliance.md                   hard rules + the advice-reconciliation guidance
   sourcing.md                     web research + citation rules
-  workflows/                      one doc per built issue type (nine)
-    weekly-wrap.md                API recipe + section outline, Saturday issue
+  upcoming-events-source.md       Google Sheet fetch recipe + selection logic for the
+                                   closing-block promo every issue but upcoming-event
+                                   carries (Hard rule 10)
+  workflows/                      one doc per built issue type (ten)
+    weekly-insights-v2.md         the current Saturday digest: eight blocks, social-card
+                                   findings block, corporate-action week calendar
+    weekly-wrap.md                v1, superseded by the above, kept until retired
     monthly-market-pulse.md       30-day movers/volume/broker-flow recipe, table-first
     macro-reaction.md             macro sourcing + affected-ticker + valuation-context
                                    recipe, non-advice framing
@@ -446,8 +484,8 @@ scripts/
                                    scripts/charts.mjs for a LIGHT chart surface — same
                                    geometry, own light-safe color constants (see the
                                    file's header comment for the validated role map;
-                                   GAIN/LOSS is brand green/red `#1D8A4E`/`#D6295A`,
-                                   ticker mentions are blue `#3288BD`, see Hard rule 7)
+                                   GAIN/LOSS is brand green/red `#568475`/`#D53E50`,
+                                   ticker mentions are blue `#9E0142`, see Hard rule 7)
 config.json                       own copy of the shared Sectors API key
                                    (sectorsApiKey); SECTORS_API_KEY env overrides
 ```

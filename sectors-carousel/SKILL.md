@@ -110,6 +110,12 @@ For each content slide, author the HTML against the design system:
 - **Balance the canvas**, no dead-zone voids; if a slide looks empty, you're missing the verdict, not a decoration.
 - **Pick each slide's archetype on purpose** (`references/archetypes.md`'s fifteen, across five families: Hero, Trend, Scorecard, Breakdown, Closer). Don't let two adjacent slides fall into the same family, and alternate density, no two dense slides back to back.
 - **The cover's stat is an editorial choice.** Give the cover a `stat` (see `visual-language.md`, `deck-format.md`), the figure that best proves the hook, not whichever's easiest to fetch. If the headline already states the numbers, don't repeat them in `stat`, make the headline qualitative instead and let `stat` carry the figures.
+- **The cover carries a representative image of the subject.** Every cover should show the thing the story is about, layered behind the hook via `coverArt` (see `deck-format.md`). A ticker is an abstraction; a jar of Tiger Balm, a bottle, a handset, a storefront is something a reader recognises before they have read a word. `brand-lint.mjs` WARNs on a cover without one. The step:
+  1. **Find an official asset.** The company's own site (product pages, press kit, newsroom) first, then Wikimedia Commons. Prefer a product/subject shot on a plain background, which cuts out cleanly.
+  2. **Prepare it**: `node scripts/coverart.mjs <url-or-path> --ticker BBCA` writes `assets/coverart/BBCA.png`, removing the background, trimming, and downscaling. Read that script's header for the two failure modes worth knowing (why it flood-fills instead of thresholding, and why soft shadows need `--crop` or `--shadow`). It prints warnings when the cutout looks wrong.
+  3. **Look at the PNG**, then render the cover and look again. A halo, a hole punched through the subject, or a surviving grey shadow is worse on the dark canvas than no art at all.
+  4. **Place it**: the cover picks up `assets/coverart/<TICKER>.png` automatically, so a bare `"coverArt": { "width": "72%", "top": "13%", "right": "-8%" }` is usually the whole deck-side change (tune those three plus `opacity` per image; the art is inlined at render time, so deck.json stays small).
+  - **When there is no honest image, say so and move on.** An index move, a foreign-flow story, a 40-name screener, or a company whose only available photo is a stock-library office building: skip it, and note in your handover that the cover has no art and why. A generic or misleading photo is a worse cover than a clean one, and a watermarked or third-party-attributed asset must never ship (see `sectors-api/endpoints.md`'s SGX logo note for the case that already burned us).
 - **The cover's backdrop matches the story shape, not habit.** 1 ticker uses `spark`; a 2-ticker head-to-head uses `duel` (both companies' price); 3+ tickers get no chart backdrop, just `tickers` for the logo row/stack. Always set `tickers` (or the legacy single `chip`) so every named company's logo actually shows.
 - **Stamp the date**: set `asOf` (a bare date, e.g. "1 Jul 2026") on any content slide whose figures are as-of a date, unless the slide carries its own dated source caption; it renders as a small "As of … · sectors.app" line and is how data-quality's "show the date" rule actually reaches the slide.
 - Run the copy through `references/writing/writing.md` section 3 (plain words, explain each ratio once, the AI-tell filter). Open `references/writing/dumbify.md` / `references/writing/anti-ai-writing.md` only for their full worked examples.
@@ -175,6 +181,8 @@ references/
   sectors-api/               endpoints, data-quality, README (the data layer, v2)
 scripts/
   render.mjs                 deck.json -> PNG slides (Puppeteer, one bundled Chromium)
+  coverart.mjs               subject photo -> transparent cover-art PNG (background removal,
+                             trim, downscale); writes assets/coverart/<TICKER>.png
   brand-lint.mjs             static brand + voice check (run before rendering)
   sectors.mjs                authenticated Sectors API GET (use this, not hand-written curl)
   blocks.mjs, charts.mjs     renderer internals (free-HTML injection, chart/logo SVG, helper blocks)
@@ -183,6 +191,7 @@ scripts/
 assets/
   styles/ (theme.css, fonts.css), fonts/   the house style, frozen as CSS
   logos/                     957 IDX ticker logos (auto-used via chips / data-logo / rankings)
+  coverart/                  prepared cover subject images, <TICKER>.png (auto-resolved by render.mjs)
   brand/                     sectors-mark.svg + app-overview.png (footer + outro art)
 config.json                  shared Sectors API key (sectorsApiKey); SECTORS_API_KEY env overrides
 package.json                 puppeteer dependency (run `npm install` once per machine)

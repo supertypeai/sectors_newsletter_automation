@@ -11,7 +11,7 @@
 // list), not swapped freely. Running that list through dataviz's validate_palette.js
 // against surface #fcfcfb left only 6 hexes clearing BOTH the categorical lightness band
 // and >=3:1 contrast (the rest are pastels that read near-invisible on white): a rose
-// (#c14d94), a red (#D53E4F), a blue (#3288BD), and a purple (#5E4FA2, in use; #6D5FA6 is
+// (#c14d94), a red (#D53E4F), a blue (#9E0142), and a purple (#5E4FA2, in use; #6D5FA6 is
 // a same-family spare for a 4th peer slot if one's ever needed), plus #8B004C which passes
 // contrast alone but fails the shared lightness band next to the others. That 22-hex list
 // has no green clearing 3:1 on white (a genuine green, #5BAA5A, sits at 2.79:1 and fails
@@ -20,10 +20,13 @@
 //
 // GAIN/LOSS now use a green/red pair sourced from OUTSIDE that 22-hex list instead: the
 // light-mode `gain`/`loss` tokens already shipped in the sibling `market-story-video`
-// skill's own brand tokens (`src/tokens.ts`, light theme: gain #1D8A4E, loss #D6295A),
+// skill's own brand tokens (`src/tokens.ts`, light theme: gain #568475, loss #D53E50),
 // picked over the newsletter's own list on explicit request to match the plain finance
-// green/red convention. Checked against this file's #fcfcfb chart surface: #1D8A4E is
-// ~4.2:1, #D6295A is ~4.7:1, both clear the >=3:1 mark comfortably (loss also lands close
+// green/red convention. Checked against this file's #fcfcfb chart surface: #568475 is
+// STALE RATIOS BELOW: recomputed after the 2026-07-20 repalette against #fdf7ee,
+// GAIN #568475 is 3.98:1, LOSS #D53E50 is 4.25:1, TICKER #9E0142 is 7.77:1. Gain/loss
+// clear the >=3:1 non-text mark but sit under 4.5:1, so bold numerics only, never body copy.
+// ~4.2:1, #D53E50 is ~4.7:1, both clear the >=3:1 mark comfortably (loss also lands close
 // to the brand mark's own crimson, #E11D48). This is a deliberate override of the 22-hex
 // list for this one semantic pair only, not a precedent for picking other hues outside it.
 // Every chart still prints its own signed value net to the mark regardless (this file's
@@ -38,7 +41,7 @@
 // carousel original's PINK/GOLD pair, not two series a reader needs to tell apart. The
 // real cross-series set that matters (self=PINK, GAIN, LOSS, and the two peer hues, GOLD
 // excluded) passes all four checks clean: `node validate_palette.js
-// "#C14D94,#3288BD,#D53E4F,#5E4FA2" --mode light`.
+// "#C14D94,#9E0142,#D53E4F,#5E4FA2" --mode light`.
 //
 // Neutral ink (primary text, muted/secondary text, reference-line gray) is deliberately
 // NOT drawn from that same 22-hex list. Per the dataviz skill's own separation, "text
@@ -62,12 +65,12 @@ const PINK = "#C14D94";
 const GOLD = "#8B004C";
 // GAIN/LOSS: bar/flow polarity, brand green/red sourced from market-story-video's light
 // tokens (see header note above), not the newsletter's own 22-hex categorical list.
-const GAIN = "#1D8A4E";
-const LOSS = "#D6295A";
+const GAIN = "#568475";  // repalette 2026-07-20, was #1D8A4E
+const LOSS = "#D53E50";  // repalette 2026-07-20, was #D6295A
 // TICKER: every ticker mention (a bar's own category label, a prose $TICKER, a table
 // cell) renders in this blue throughout a newsletter issue, kept from the same 22-hex
 // list so it stays distinguishable from GAIN/LOSS's green/red semantics right next to it.
-const TICKER = "#3288BD";
+const TICKER = "#9E0142";  // repalette 2026-07-20, was #3288BD; also the CTA button colour now
 // Neutral ink for muted text + reference/benchmark lines (not from the 22-hex list, see
 // header note above).
 const MUTED = "#52514E";
@@ -496,10 +499,10 @@ export function donut(segments, { size = 360, centerLabel = "", centerSub = "" }
 // Palette for non-"self" series (peers in a comparison): peer0 stays neutral ink (a
 // baseline peer reads as "the reference," not a second identity), peer1/peer2 are the
 // two remaining validated hues from the approved list not already spent on SELF/GAIN/LOSS
-// (blue #3288BD, dark purple #5E4FA2), both pass >=3:1 contrast and clear the adjacent-CVD
+// (blue #9E0142, dark purple #5E4FA2), both pass >=3:1 contrast and clear the adjacent-CVD
 // floor next to SELF (see the file header note). Exported so a caller can draw a matching
 // legend swatch.
-export const PEER_COLORS = ["#52514E", "#3288BD", "#5E4FA2"];
+export const PEER_COLORS = ["#52514E", "#9E0142", "#5E4FA2"];
 
 // Assigns each series its plot color ONCE, by peer order (self excluded from the count),
 // so a chart (radar/multiLine) and its legend can never disagree — both must read `.color`

@@ -117,7 +117,7 @@ capability from memory or assumption.
   call?
 - Is the release note in the Sources list?
 - If a data example includes a ticker, does it read bold, linked, and ticker-blue
-  (`#3288BD`), gain/loss green/red (`#1D8A4E`/`#D6295A`) if signed
+  (`#9E0142`), gain/loss green/red (`#568475`/`#D53E50`) if signed
   (`../newsletter-format.md`'s Color convention, applies to every issue)?
 - Is the Appendix (endpoint/field trace, or "sourced from the user-supplied release
   note, no live endpoint fetched" if no fresh API call was made) present, after Sources
