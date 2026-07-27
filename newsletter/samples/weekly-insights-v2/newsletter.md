@@ -11,7 +11,7 @@ data_as_of: 2026-07-10
 
 **Issue #28 | 13 July 2026 | week of 6-10 July | data as of 10 July 2026**
 
-Good morning!
+Hi there,
 
 ## Key Data Bites
 
