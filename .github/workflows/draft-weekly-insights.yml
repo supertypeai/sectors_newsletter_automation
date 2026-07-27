@@ -40,6 +40,9 @@ jobs:
       # Don't set both: ANTHROPIC_API_KEY takes precedence over the OAuth token.
       CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
       ISSUE_TYPE: ${{ github.event.inputs.issue_type || 'weekly-insights-v2' }}
+      # Optional chart compression. Lifted to job level so the install step can test
+      # for it with `env.` — the `secrets.` context is not dependable inside `if:`.
+      STORING_API_KEY: ${{ secrets.STORING_API_KEY }}
 
     steps:
       - uses: actions/checkout@v4
@@ -105,10 +108,20 @@ jobs:
       # vanish for most subscribers. Doing this here rather than at send time means
       # the reviewed HTML holds the real image URL and the PR preview matches the
       # delivered email. Fails the run if any inline data URI survives.
+      # Only needed when STORING_API_KEY is set; the publish step skips compression
+      # without it, so a missing key costs bytes rather than breaking the run.
+      - name: Install the Storing CLI
+        if: env.STORING_API_KEY != ''
+        run: npm install -g @supertype.ai/storing
+
       - name: Rasterize charts and host them on mailroom
         env:
           MAILROOM_API_KEY: ${{ secrets.MAILROOM_API_KEY }}
           MAILROOM_UPLOAD_URL: ${{ vars.MAILROOM_UPLOAD_URL || 'https://mailroom.supertype.ai/api/v1/uploads' }}
+          # STORING_API_KEY comes from the job env above. Unset it and the publish
+          # step skips compression, uploading charts at full size.
+          STORING_PROFILE: ${{ vars.STORING_PROFILE || 'balanced' }}
+          STORING_MAX_SIZE: ${{ vars.STORING_MAX_SIZE }}
         run: node .github/scripts/publish-charts.mjs "${{ steps.issue.outputs.folder }}"
 
       # Raw API JSON from --save-dir is scratch, never part of the reviewed diff.

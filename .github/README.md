@@ -33,6 +33,7 @@ Repo settings → Secrets and variables → Actions → **Secrets**:
 | `CLAUDE_CODE_OAUTH_TOKEN` | draft | Runs Claude Code. Uses your **existing Claude subscription**, no separate API plan needed. See below |
 | `SECTORS_API_KEY` | draft | Sectors market data. This is now the only source; no key ships in the repo |
 | `MAILROOM_API_KEY` | draft + send | Mailroom API key, sent as `Authorization: Bearer`. The draft job needs it too, to host chart images |
+| `STORING_API_KEY` | draft | **Optional.** Compresses chart PNGs through [Storing](https://storing.app) before upload. Leave unset and charts upload at full size. Generate from Storing's Settings page |
 
 ### Claude auth: subscription, not a second subscription
 
@@ -137,6 +138,31 @@ invisible to most of the list.
 
 `POST /api/v1/uploads` is the API-key twin of the dashboard's session-authenticated
 `/api/uploads`. It accepts PNG only, 1MB max, and returns a permanent public URL.
+
+#### Optional compression
+
+With `STORING_API_KEY` set, each PNG goes through the Storing CLI before upload.
+Charts compress unusually well: flat fills and few distinct colours are exactly what
+PNG quantisation handles best.
+
+Two things are deliberate and shouldn't be "simplified" later:
+
+- **`--format png` is forced, never `auto`.** Auto picks AVIF, which Gmail and Outlook
+  don't render — the same failure the SVG-to-PNG step exists to prevent. Mailroom would
+  reject it with a 422 anyway. PNG over JPEG too: these are flat-colour charts with fine
+  text and hairline gridlines, which JPEG rings around. The upload is guarded by a PNG
+  magic-byte check regardless.
+- **Compression failure never fails the run.** An uncompressed chart is completely
+  correct, just larger, so a Storing outage costs bytes rather than the issue.
+
+⚠️ **The CLI exits 0 even when authentication fails** (verified 2026-07-27 — a bad key
+prints `Authentication required` and still returns 0). Success is therefore judged by
+what lands in the output directory, not the exit code. If a key is set but nothing
+compresses, the run prints `Compressed 0/N chart(s)` plus a warning — that line is the
+only signal that the key is wrong, so check it on the first run.
+
+Tunable via variables: `STORING_PROFILE` (`conservative` / `balanced` / `aggressive`,
+default `balanced`) and `STORING_MAX_SIZE` (e.g. `200KB`, unset by default).
 
 ## Known gaps
 - **Social cards can't be fetched unattended.** The Supabase bucket needs a credential
