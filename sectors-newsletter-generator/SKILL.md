@@ -432,12 +432,13 @@ dbquery skill's templates do.
     block and note the omission in the appendix rather than failing the issue or
     inventing an event; the sheet is a public `curl`, so a failure here is transport,
     not content. Every row still upcoming is required whenever the fetch *does* succeed.
-11. **Weekly Insights v2 sends Monday, not Saturday** (confirmed 2026-07-20): the
-    header line's issue/send date is the Monday immediately after the reporting week's
-    Friday close, e.g. week of 6-10 Jul → issue date 13 Jul, week of 13-17 Jul → issue
-    date 20 Jul. `date:` in the frontmatter, the delivery folder's `<YYYY-MM-DD>`, and
-    every `utm_campaign` suffix all use this same Monday date, not the Friday
-    `data_as_of` date and not the old same-week Saturday. See
+11. **Weekly Insights v2's issue date is today's actual date, not a computed Monday**
+    (revised 2026-07-27, superseding the 2026-07-20 "Monday immediately after the
+    Friday close" rule). Use the real date the draft is generated on, whatever day
+    that is, never a theoretical Monday derived from the reporting window. `date:` in
+    the frontmatter, the delivery folder's `<YYYY-MM-DD>`, the HTML `<!-- -->` header
+    comment, and every `utm_campaign` suffix all use this same actual date, not the
+    Friday `data_as_of` date and not a window-derived Monday. See
     `workflows/weekly-insights-v2.md` and the **Header block** section of
     `newsletter-format.md`.
 12. **HTML disclaimer footer uses fixed markup, verbatim, every issue** (confirmed
