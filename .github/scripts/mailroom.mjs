@@ -3,11 +3,68 @@
 // Action, where a half-understood failure is worse than a stopped job, so every
 // helper here either succeeds or exits non-zero with the server's own message.
 
+import { readFileSync, existsSync } from "node:fs";
+import { join, basename } from "node:path";
+
 /** Print and exit non-zero. Every failure path in these scripts goes through here. */
 export const die = (msg) => {
   console.error(`ERROR: ${msg}`);
   process.exit(1);
 };
+
+/**
+ * Frontmatter: a leading `---` block of `key: value` lines. Split on the FIRST
+ * colon only, since subjects routinely contain one. Deliberately not a YAML
+ * parser: the send path stays dependency-free, and the frontmatter this skill
+ * emits is a flat scalar map by contract (see newsletter-format.md).
+ */
+function frontmatter(md, sourcePath) {
+  const m = md.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!m) die(`${sourcePath} has no --- frontmatter block`);
+  const out = {};
+  for (const line of m[1].split(/\r?\n/)) {
+    const i = line.indexOf(":");
+    if (i === -1) continue;
+    const key = line.slice(0, i).trim();
+    let value = line.slice(i + 1).trim();
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+    if (key) out[key] = value;
+  }
+  return out;
+}
+
+/**
+ * Read a delivered issue folder into the pieces every consumer needs. Shared so
+ * the test send and the real campaign can never disagree about what the issue's
+ * subject, body, date or type actually are.
+ */
+export function readIssue(folder) {
+  const mdPath = join(folder, "newsletter.md");
+  const htmlPath = join(folder, "newsletter.html");
+  for (const p of [mdPath, htmlPath]) {
+    if (!existsSync(p)) die(`missing ${p}. Both newsletter.md and newsletter.html are required.`);
+  }
+
+  const fm = frontmatter(readFileSync(mdPath, "utf8"), mdPath);
+  const html = readFileSync(htmlPath, "utf8").trim();
+
+  if (!fm.subject) die(`${mdPath} frontmatter has no \`subject\``);
+  if (!html) die(`${htmlPath} is empty`);
+
+  // The issue date anchors the campaign's idempotency key. Prefer the frontmatter's
+  // own `date` (the authoritative issue date per Hard rule 11); fall back to the
+  // folder name, which embeds the same date by the delivery convention.
+  const issueDate =
+    fm.date || (basename(folder).match(/newsletter_(\d{4}-\d{2}-\d{2})_/) || [])[1];
+  if (!issueDate) die("could not determine the issue date from frontmatter or folder name");
+
+  return { fm, html, mdPath, htmlPath, issueDate, issueType: fm.issue_type || "weekly-insights-v2" };
+}
 
 /**
  * POST to mailroom and return the parsed JSON body.
