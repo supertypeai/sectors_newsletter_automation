@@ -295,7 +295,14 @@ no-dash/no-AI-tell rules, it constrains *shape*.
   skill's chart engine: `import` the function for the kind you need (`sparkline`/`line`
   for a price series, `barChart` for year-over-year, `donut` for a mix, `multiline` for
   self-vs-peer, and so on, the same 13-kind grammar documented in the carousel skill's
-  `references/charts.md`) and write its returned SVG string to `chart-<slug>.svg`. Its
+  `references/charts.md`) and write its returned SVG string to `chart-<slug>.svg`.
+
+  **In the HTML, reference the chart by filename** (`<img src="chart-<slug>.png">`),
+  never as an inlined `data:` URI. Email delivery converts each `chart-*.svg` to a
+  hosted PNG and repoints the `src` at the returned URL, and it matches on that
+  filename; an inlined chart can't be matched to its file when an issue has more than
+  one, and would be left as a data URI, which Gmail and Outlook drop. See **Charts in
+  the HTML** below. Its
   colors are already fixed and validated to the shared palette above (green
   `#568475` gain, red `#D53E50` loss, blue `#9E0142` ticker, see the file's own header
   comment for the full role map), so don't re-derive a palette per issue, and see this
@@ -323,7 +330,36 @@ no-dash/no-AI-tell rules, it constrains *shape*.
   const full = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="${w}" height="${h}" fill="#fcfcfb"/>${inner}</svg>`;
   ```
   `#fcfcfb` is the same light chart surface `dataviz`'s palette validates against, keep
-  it in sync if that reference value ever changes.
+  it in sync if that reference value ever changes. `scripts/rasterize.mjs` uses the same
+  value as its backdrop, so a chart that skipped the wrap still matches one that didn't.
+
+### Charts in the HTML
+
+The `.md` draft references `chart-<slug>.svg`. **The `.html` references
+`chart-<slug>.png`**, by filename, in a plain `<img src>`:
+
+```html
+<img src="chart-weekly-insights-v2.png" width="536" alt="<every figure, restated>"
+     style="display:block;width:100%;max-width:536px;height:auto;">
+```
+
+Three rules, all of which exist because email clients are stricter than browsers:
+
+- **Never inline a chart as a `data:` URI.** Gmail and Outlook block `data:` in
+  `<img src>` outright, so the chart silently disappears for most of the list. The
+  delivery step also can't match an inlined chart back to its source file when an issue
+  carries more than one, and will fail the run rather than guess.
+- **Never ship SVG to the inbox.** Gmail and others strip it. `scripts/rasterize.mjs`
+  converts each `chart-*.svg` to PNG, and delivery uploads that PNG and rewrites the
+  `src` to the returned hosted URL. Keep the `.svg` in the folder as the source of truth;
+  it just isn't what gets sent.
+- **Size in the `<img>`, not in the chart call.** Render at the chart function's natural
+  width and let `width="536"` plus `max-width:100%` scale it down. Squeezing the SVG
+  itself (passing a small `w`) shrinks the plot area but not the label text, which is how
+  a value label ends up clipped off the canvas edge.
+
+Alt text still carries the full figure set, and every figure is still restated as HTML
+text near the image, because a reader with images off must lose nothing.
 
   **Reserve label margin for a series' endpoint.** A `compose` chart's `dot` mark prints
   its label immediately after the dot with no auto-margin (see the comment at that mark
