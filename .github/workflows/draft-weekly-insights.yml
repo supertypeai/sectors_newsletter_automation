@@ -1,0 +1,138 @@
+name: Draft weekly insights
+
+# Stage 1 of 2. Drafts the Monday weekly-insights-v2 issue and opens a PR.
+# Nothing reaches subscribers from this workflow; the PR review is the approval
+# gate, and merging it triggers send-on-merge.yml.
+
+on:
+  schedule:
+    # 07:00 WIB Monday = 00:00 UTC Monday. The type's own date math wants the issue
+    # date to be the Monday after the reporting week's Friday close, which is the run
+    # date itself, so no date arithmetic is needed here.
+    - cron: "0 0 * * 1"
+  workflow_dispatch:
+    inputs:
+      issue_type:
+        description: "Issue type slug to draft"
+        required: false
+        default: "weekly-insights-v2"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  draft:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    env:
+      # Where the skill writes delivered issues and looks for samples/.
+      NEWSLETTER_HOME: ${{ github.workspace }}/newsletter
+      # Tells the skill no human is reachable: never ask, never stall at a menu.
+      NEWSLETTER_UNATTENDED: "1"
+      SECTORS_API_KEY: ${{ secrets.SECTORS_API_KEY }}
+      # Authenticates against an existing Claude Pro/Max/Team/Enterprise subscription,
+      # so this needs no separate pay-per-token API plan. Generate the value by running
+      # `claude setup-token` locally (one-year OAuth token) and store it as a secret.
+      # To bill the API instead, swap this line for:
+      #   ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      # Don't set both: ANTHROPIC_API_KEY takes precedence over the OAuth token.
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+      ISSUE_TYPE: ${{ github.event.inputs.issue_type || 'weekly-insights-v2' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # Fail here with a readable message rather than deep inside the drafting step.
+      - name: Check Claude credentials are present
+        run: |
+          if [ -z "$CLAUDE_CODE_OAUTH_TOKEN" ] && [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "No Claude credential found." >&2
+            echo "Set the CLAUDE_CODE_OAUTH_TOKEN secret (run 'claude setup-token' locally" >&2
+            echo "to mint a one-year token against your existing subscription), or set" >&2
+            echo "ANTHROPIC_API_KEY to bill the API instead." >&2
+            exit 1
+          fi
+
+      # Claude Code discovers skills under .claude/skills/, so link the checkout
+      # into place.
+      - name: Make the skill discoverable
+        run: |
+          mkdir -p .claude/skills
+          ln -sfn "$GITHUB_WORKSPACE/sectors-newsletter-generator" .claude/skills/sectors-newsletter-generator
+          mkdir -p "$NEWSLETTER_HOME"
+
+      # sectors.mjs and charts.mjs are dependency-free; this is only for
+      # rasterize.mjs, which needs Puppeteer to turn chart SVGs into email-safe PNGs.
+      - name: Install the skill's render dependency
+        run: npm ci --prefix sectors-newsletter-generator || npm install --prefix sectors-newsletter-generator
+
+      - name: Sanity check the Sectors API
+        run: node sectors-newsletter-generator/scripts/sectors.mjs "idx-total/?start=2026-07-01&end=2026-07-02"
+
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Draft the issue
+        run: |
+          claude -p "Write this week's ${ISSUE_TYPE} newsletter issue using the sectors-newsletter-generator skill. Deliver to \$NEWSLETTER_HOME. This is an unattended CI run: do not ask any questions, apply the documented unattended defaults, and record every default you took in the issue's appendix." \
+            --permission-mode bypassPermissions
+
+      - name: Locate the delivered issue
+        id: issue
+        run: |
+          folder=$(ls -d "$NEWSLETTER_HOME"/newsletter_*_"${ISSUE_TYPE}" 2>/dev/null | sort | tail -1)
+          if [ -z "$folder" ]; then
+            echo "No issue folder was produced under $NEWSLETTER_HOME" >&2
+            exit 1
+          fi
+          for f in newsletter.md newsletter.html; do
+            if [ ! -s "$folder/$f" ]; then
+              echo "Missing or empty: $folder/$f" >&2
+              exit 1
+            fi
+          done
+          echo "folder=$folder" >> "$GITHUB_OUTPUT"
+          echo "date=$(basename "$folder" | sed -E 's/newsletter_([0-9-]+)_.*/\1/')" >> "$GITHUB_OUTPUT"
+
+      # Charts must be hosted PNGs by the time the PR is reviewed: Gmail and Outlook
+      # strip SVG and block data: URIs, so an SVG or inlined chart would silently
+      # vanish for most subscribers. Doing this here rather than at send time means
+      # the reviewed HTML holds the real image URL and the PR preview matches the
+      # delivered email. Fails the run if any inline data URI survives.
+      - name: Rasterize charts and host them on mailroom
+        env:
+          MAILROOM_API_KEY: ${{ secrets.MAILROOM_API_KEY }}
+          MAILROOM_UPLOAD_URL: ${{ vars.MAILROOM_UPLOAD_URL || 'https://api.mailroom.supertype.ai/v1/uploads' }}
+        run: node .github/scripts/publish-charts.mjs "${{ steps.issue.outputs.folder }}"
+
+      # Raw API JSON from --save-dir is scratch, never part of the reviewed diff.
+      - name: Drop scratch fetches
+        run: rm -rf "${{ steps.issue.outputs.folder }}"/{data,_draft}
+
+      - name: Open the review PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: newsletter/${{ env.ISSUE_TYPE }}-${{ steps.issue.outputs.date }}
+          title: "Newsletter: ${{ env.ISSUE_TYPE }} ${{ steps.issue.outputs.date }}"
+          commit-message: "newsletter: ${{ env.ISSUE_TYPE }} ${{ steps.issue.outputs.date }}"
+          add-paths: newsletter/**
+          body: |
+            Automated draft of the **${{ env.ISSUE_TYPE }}** issue for
+            ${{ steps.issue.outputs.date }}.
+
+            **Merging this PR sends the issue to subscribers.** `send-on-merge.yml`
+            picks it up and creates the mailroom campaign, scheduled with a short
+            cancellation window rather than sent on the spot.
+
+            Before merging, check:
+            - [ ] Every figure traces to a real endpoint, nothing invented
+            - [ ] No investment advice framing anywhere
+            - [ ] Appendix lists the unattended defaults this run took
+            - [ ] `newsletter.html` renders correctly in an email client
+            - [ ] Subject and preview read well in an inbox preview
