@@ -1,11 +1,11 @@
 # Weekly Insights v2, workflow
 
 Intended send: Monday morning (confirmed 2026-07-20, moved off the original Saturday
-cadence). Covers the trading week that just closed (Mon-Fri); the issue date is the
-Monday immediately after that week's Friday close, not the same-week Saturday and not
-the `data_as_of` Friday date. See **Header block, weekly-insights-v2** below for the
-exact date math. The successor to `weekly-wrap.md`. Both are live while the migration
-finishes; when v1 is retired this file becomes the only weekly recipe.
+cadence). Covers the trading week that just closed (Mon-Fri); the issue date is
+**today's actual date, whatever day the draft is generated on** (revised 2026-07-27,
+see **Header block, weekly-insights-v2** below), not the `data_as_of` Friday date and
+not a computed Monday. The successor to `weekly-wrap.md`. Both are live while the
+migration finishes; when v1 is retired this file becomes the only weekly recipe.
 
 Read `../newsletter-format.md`'s **Weekly Insights v2** skeleton and `../compliance.md`
 before drafting. Worked reference: `newsletter/samples/weekly-insights-v2/`.
@@ -33,7 +33,7 @@ because the prior-week WoW figure is a Friday-to-Friday change and the index end
 no prior-close field. Fetch `?start=<prior-mon-minus-2>&end=<prior-fri-minus-7>` and take the
 last row.
 
-### Header block, weekly-insights-v2 (confirmed 2026-07-20)
+### Header block, weekly-insights-v2 (revised 2026-07-27)
 
 The header line under the masthead reads `Issue #{n} | {issue_date} | week of
 {mon}-{fri} | data as of {data_as_of}`, four fields, three different dates. Don't
@@ -42,14 +42,19 @@ collapse any two of them:
 - **`week of {mon}-{fri}`**: the Mon-Fri window settled above.
 - **`data as of {data_as_of}`**: that window's Friday, the API's last trading day,
   matches the frontmatter `data_as_of` field.
-- **`{issue_date}`**: **the Monday immediately after that Friday**, one full week
-  minus 4 days after the window's own Monday, i.e. `window_monday + 7 days`. This is
-  the send date, it goes in the frontmatter `date:` field, the delivery folder's
-  `<YYYY-MM-DD>`, the HTML `<!-- -->` header comment, and every `utm_campaign=`
-  suffix on every link in the issue, all four must agree. Example: week of 6-10 Jul →
-  issue date 13 Jul (not 11 Jul, the old same-week Saturday convention this replaced).
-  Never use the window's own Monday here either, that's already shown in the "week
-  of" field and would make the two fields redundant.
+- **`{issue_date}`**: **today's actual date**, the real date this draft is generated
+  on, whatever day of the week that is. This is the send date, it goes in the
+  frontmatter `date:` field, the delivery folder's `<YYYY-MM-DD>`, the HTML `<!-- -->`
+  header comment, and every `utm_campaign=` suffix on every link in the issue, all
+  four must agree.
+
+  **Superseded 2026-07-27**: earlier revisions computed this as a theoretical Monday
+  (`window_monday + 7 days`, "the Monday immediately after that Friday's close") or an
+  even older same-week Saturday. Both are retired. Neither survives a draft that
+  actually runs on a different day than assumed, e.g. a manually re-triggered run or a
+  merge that lands a day late: the masthead would then name a date the issue didn't
+  actually go out on. Using the real run date makes the header self-consistent by
+  construction regardless of when drafting or sending happens.
 
 ## 2. Fetch
 
