@@ -28,7 +28,7 @@ if (!folder) die("no issue folder given. Usage: push-to-mailroom.mjs <issue-fold
 
 const {
   MAILROOM_API_KEY,
-  MAILROOM_API_URL = "https://api.mailroom.supertype.ai/v1/campaigns",
+  MAILROOM_API_URL = "https://mailroom.supertype.ai/api/v1/campaigns",
   MAILROOM_FROM,
   MAILROOM_GROUP_ID,
   MAILROOM_REPLY_TO,

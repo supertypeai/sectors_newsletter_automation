@@ -475,7 +475,11 @@ asks for v1 by name. **Eight blocks, info-packed, no long-form reading anywhere.
 recipe in `workflows/weekly-insights-v2.md`.
 
 1. **Masthead + greeting** — issue number, send date, window, data-as-of. Then a bare
-   `Good morning!`. No opening hook paragraph, no table of contents.
+   `Hi there,`. No opening hook paragraph, no table of contents.
+   **Keep the greeting time-neutral**, never "Good morning" (which this used to say):
+   delivery time is not the drafting time, it's whenever the issue is actually approved
+   and sent, so any greeting naming a part of the day will eventually be wrong in the
+   reader's inbox.
 2. **Key Data Bites** — 8 one-line facts in a tinted box, each **derived from data**, every
    ticker linked. This is where v1's market-level prose sections survive, one line each.
    Nothing here may repeat a Headlines item (see block 6).
