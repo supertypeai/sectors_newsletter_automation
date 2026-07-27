@@ -39,6 +39,16 @@ if (!MAILROOM_FROM) die("MAILROOM_FROM is not set (must be a verified sender)");
 
 const { fm, html, issueDate, issueType } = readIssue(folder);
 
+// The skip_draft fixture opens a real PR, and merging it would otherwise create a
+// real campaign. Refuse outright: a fixture is for testing the plumbing, never for
+// sending. Close that PR rather than merging it.
+if (/^\[FIXTURE\]/i.test(fm.subject)) {
+  die(
+    "this is a skip_draft fixture issue, not a real one, and must never be sent. " +
+      "Close the fixture PR instead of merging it."
+  );
+}
+
 const payload = {
   from: MAILROOM_FROM,
   subject: fm.subject,
