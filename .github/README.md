@@ -3,10 +3,22 @@
 Two workflows, in sequence. The PR merge between them is the only human gate.
 
 ```
-Monday 07:00 WIB          human reviews              on merge
-draft-weekly-insights.yml ──> PR ──> merge ──> send-on-merge.yml ──> mailroom
-     drafts the issue                              creates the campaign
+Monday 07:00 WIB                    human reviews         on merge
+draft-weekly-insights.yml ──> PR ─────> merge ──> send-on-merge.yml ──> mailroom
+     drafts the issue      └─> [TEST] email                creates the campaign
+                               to the reviewer
 ```
+
+**Review the test email, not the PR diff.** The PR carries the issue for the record and
+is the approval gate, but layout bugs only surface in a real client: a table that
+collapses in Outlook, a blocked image, a subject that truncates in the inbox list. The
+draft job emails a `[TEST]` copy so you review what subscribers will actually see.
+
+That copy goes out transactionally via `POST /api/v1/emails`, so it can never reach the
+subscriber list however the workflow is configured — the only recipient is
+`MAILROOM_TEST_TO`. The tradeoff: transactional sends skip the campaign pipeline, so the
+test has **no unsubscribe footer, no `List-Unsubscribe` header, and no preview text**.
+Those are injected at real send time. Body, layout, images and subject are identical.
 
 Nothing reaches subscribers from stage 1. Stage 2 creates the campaign with a
 `schedule_at` a short way out rather than sending on the spot, so a mistake caught
@@ -56,7 +68,8 @@ Same page → **Variables** (not secrets, these are not sensitive):
 
 | Variable | Default | What it is |
 | --- | --- | --- |
-| `MAILROOM_FROM` | *(required)* | Sender address. Must be your configured SES address or a verified sender, or the API rejects with `invalid_from_address` |
+| `MAILROOM_FROM` | *(required)* | Sender address, used by both the test send and the campaign. Must be your configured SES address or a verified sender, or the API rejects with `invalid_from_address` |
+| `MAILROOM_TEST_TO` | `aurellia@supertype.ai` | Where the `[TEST]` review copy goes. Set this to change reviewer |
 | `MAILROOM_GROUP_ID` | *(unset → all contacts)* | Subscriber group to send to. **Leave unset only if you really mean every contact** |
 | `MAILROOM_REPLY_TO` | *(unset)* | Optional reply-to |
 | `MAILROOM_SCHEDULE_DELAY_MINUTES` | `60` | Cancellation window. `0` sends immediately |
@@ -67,7 +80,9 @@ Do these in order before letting the cron fire:
 
 1. **Draft only.** Run `draft-weekly-insights.yml` via *Run workflow*. Check the PR
    it opens: `newsletter.md`, `newsletter.html`, and a chart should be there, and the
-   appendix should list which unattended defaults the run took.
+   appendix should list which unattended defaults the run took. You should also get the
+   `[TEST]` copy in your inbox — open it and confirm the chart image loads, since a
+   broken upload shows up there and nowhere else.
 2. **Dry-run the send.** Run `send-on-merge.yml` via *Run workflow* with the issue
    folder path and `dry_run: true`. It prints the payload and posts nothing.
 3. **Send to yourself.** Point `MAILROOM_GROUP_ID` at a throwaway group containing
@@ -112,7 +127,7 @@ Decide which you want before the first real send:
 
 `charts.mjs` emits SVG, which cannot be emailed: Gmail and Outlook strip SVG, and both
 block `data:` URIs in `<img src>`. So the draft job rasterizes each `chart-*.svg` to PNG
-with Puppeteer, uploads it to `POST /v1/uploads`, and rewrites `newsletter.html` to point
+with Puppeteer, uploads it to `POST /api/v1/uploads`, and rewrites `newsletter.html` to point
 at the returned `https://storage.googleapis.com/…` URL.
 
 This happens in the **draft** job on purpose, so the PR you review contains the real
@@ -120,7 +135,7 @@ hosted image and the preview matches what subscribers receive. The job fails if 
 inline `data:` URI survives the rewrite, rather than shipping an issue whose chart is
 invisible to most of the list.
 
-`POST /v1/uploads` is the API-key twin of the dashboard's session-authenticated
+`POST /api/v1/uploads` is the API-key twin of the dashboard's session-authenticated
 `/api/uploads`. It accepts PNG only, 1MB max, and returns a permanent public URL.
 
 ## Known gaps

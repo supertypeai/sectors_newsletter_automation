@@ -108,7 +108,7 @@ jobs:
       - name: Rasterize charts and host them on mailroom
         env:
           MAILROOM_API_KEY: ${{ secrets.MAILROOM_API_KEY }}
-          MAILROOM_UPLOAD_URL: ${{ vars.MAILROOM_UPLOAD_URL || 'https://api.mailroom.supertype.ai/v1/uploads' }}
+          MAILROOM_UPLOAD_URL: ${{ vars.MAILROOM_UPLOAD_URL || 'https://mailroom.supertype.ai/api/v1/uploads' }}
         run: node .github/scripts/publish-charts.mjs "${{ steps.issue.outputs.folder }}"
 
       # Raw API JSON from --save-dir is scratch, never part of the reviewed diff.
@@ -116,6 +116,7 @@ jobs:
         run: rm -rf "${{ steps.issue.outputs.folder }}"/{data,_draft}
 
       - name: Open the review PR
+        id: pr
         uses: peter-evans/create-pull-request@v6
         with:
           branch: newsletter/${{ env.ISSUE_TYPE }}-${{ steps.issue.outputs.date }}
@@ -126,6 +127,9 @@ jobs:
             Automated draft of the **${{ env.ISSUE_TYPE }}** issue for
             ${{ steps.issue.outputs.date }}.
 
+            A `[TEST]` copy has been emailed to the reviewer — **review that, not this
+            diff**. Layout bugs only show up in a real client.
+
             **Merging this PR sends the issue to subscribers.** `send-on-merge.yml`
             picks it up and creates the mailroom campaign, scheduled with a short
             cancellation window rather than sent on the spot.
@@ -134,5 +138,19 @@ jobs:
             - [ ] Every figure traces to a real endpoint, nothing invented
             - [ ] No investment advice framing anywhere
             - [ ] Appendix lists the unattended defaults this run took
-            - [ ] `newsletter.html` renders correctly in an email client
-            - [ ] Subject and preview read well in an inbox preview
+            - [ ] The test email renders correctly in your client
+            - [ ] Subject reads well in the inbox list
+
+            The test copy goes out transactionally, so it has no unsubscribe footer,
+            no `List-Unsubscribe` header, and no preview text. The campaign pipeline
+            adds all three at real send time; everything else is identical.
+
+      # After the PR on purpose: if the mail fails, the draft still survives as a PR
+      # rather than being lost with the runner.
+      - name: Email the draft to the reviewer
+        env:
+          MAILROOM_API_KEY: ${{ secrets.MAILROOM_API_KEY }}
+          MAILROOM_EMAIL_URL: ${{ vars.MAILROOM_EMAIL_URL || 'https://mailroom.supertype.ai/api/v1/emails' }}
+          MAILROOM_FROM: ${{ vars.MAILROOM_FROM }}
+          MAILROOM_TEST_TO: ${{ vars.MAILROOM_TEST_TO || 'aurellia@supertype.ai' }}
+        run: node .github/scripts/send-test.mjs "${{ steps.issue.outputs.folder }}"

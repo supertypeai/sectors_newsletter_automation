@@ -29,7 +29,7 @@ if (!folder) die("no issue folder given. Usage: publish-charts.mjs <issue-folder
 
 const {
   MAILROOM_API_KEY,
-  MAILROOM_UPLOAD_URL = "https://api.mailroom.supertype.ai/v1/uploads",
+  MAILROOM_UPLOAD_URL = "https://mailroom.supertype.ai/api/v1/uploads",
   SKILL_DIR = "sectors-newsletter-generator",
   // Env-facing name for rasterize.mjs's --scale, since a workflow step configures
   // through the environment rather than argv. Deliberately has no default here:
