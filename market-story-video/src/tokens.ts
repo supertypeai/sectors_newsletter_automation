@@ -44,11 +44,54 @@ export const thread = {
   textHalo: "drop-shadow(0 0 6px #F3EEE5) drop-shadow(0 0 10px #F3EEE5)",
 } as const;
 
+// "product" is the feature-promo system: the same warm-black brand shell as noir (so a feature
+// reel and a market story read as the same publisher) plus the things a market story never
+// needs — a device frame to hold real app footage, callout pills that point into that footage,
+// and a reserved corner for a talking head. Palette is deliberately identical to noir; only the
+// hardware/annotation tokens below are new. See references/themes.md and references/product-reel.md.
+export const product = {
+  bg: noir.bg,
+  surface: noir.surface,
+  surface2: noir.surface2,
+  text: noir.text,
+  muted: noir.muted,
+  dim: noir.dim,
+  brandPink: noir.brandPink,
+  brandGold: noir.brandGold,
+  border: noir.border,
+  glassBg: "rgba(28,23,20,0.62)",
+  glassBorder: "rgba(246,241,238,0.16)",
+  nebula: "radial-gradient(ellipse 92% 38% at 50% 6%, rgba(229,51,126,0.20), transparent 72%)",
+  dots: noir.dots,
+  // device frame: the bezel holding a screen recording or screenshot of the app
+  deviceBezel: "#161210",
+  deviceEdge: "rgba(246,241,238,0.16)",
+  deviceInner: "rgba(246,241,238,0.08)",
+  deviceGlow: "0 40px 120px rgba(0,0,0,0.55), 0 0 90px rgba(229,51,126,0.16)",
+  deviceChrome: "#221C18",
+  // annotation layer drawn on top of the footage
+  calloutBg: "rgba(20,16,14,0.92)",
+  calloutRing: "rgba(229,51,126,0.9)",
+  cursor: "#F6F1EE",
+} as const;
+
+// The reserved talking-head corner. This skill does NOT composite footage — it reserves the
+// space, keeps every scene's copy out of it, and renders a dashed guide in draft/stills so the
+// framing is checkable before filming. The clip gets dropped in downstream, in the editor.
+// Sized in canvas px (1080-wide) so it matches what SAFE/`SceneLayout` already speak.
+export const PIP = {
+  size: 320, // default box edge; storyboard.humanSlot.size overrides
+  margin: 48, // gap from the safe-area edge, not from the raw canvas edge
+  ringWidth: 5,
+  gap: 40, // extra breathing room between the slot and the nearest copy
+} as const;
+
 export const gradient = "linear-gradient(to right, #E5337E 0%, #DF9439 100%)";
 export const peerColorsNoir = [noir.muted, noir.peerBlue, noir.peerPlum] as const;
 
 // canvas: portrait video (Reels/TikTok/Shorts), 1080x1920, 30fps. A short (10-15s) story
-// is 300-450 frames at this rate; a long-form (~45-75s) story is 1350-2250 frames.
+// is 300-450 frames at this rate; a long-form (~45-75s) story is 1350-2250 frames; a product
+// feature reel (12-18s) is 360-540 frames.
 export const CANVAS = { width: 1080, height: 1920, fps: 30 } as const;
 
 // safe area: keep on-screen text clear of native platform UI (Reels caption bar bottom,

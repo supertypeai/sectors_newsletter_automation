@@ -11,10 +11,10 @@ rendering.
 
 ```jsonc
 {
-  "theme": "noir",              // "noir" | "thread" — see themes.md for which fits the story
-  "length": "short",            // "short" (10-15s, default if omitted) | "long" (~45-75s) — see length.md
-  "tickers": ["BBRI"],           // every ticker this piece is about
-  "sourceDate": "9 Jul 2026",    // bare date, stamped once for the whole video (noir only; thread has no persistent footer)
+  "theme": "noir",              // "noir" | "thread" | "product" — see themes.md
+  "length": "short",            // "short" (10-15s, default) | "long" (~45-75s) | "reel" (12-18s, product only) — see length.md
+  "tickers": ["BBRI"],           // every ticker this piece is about (omit for a product reel, which names none)
+  "sourceDate": "9 Jul 2026",    // bare date, stamped once for the whole video (noir only; thread/product have no footer)
   "scenes": [ /* Scene objects, see below */ ],
   "outro": {                     // optional; omit for the default brand sign-off
     "headline": "Know who owns it.",
@@ -37,12 +37,13 @@ when the story covers 2+ tickers or a theme/sector with no single ticker page, i
 
 ## Scene
 
-Five roles, five jobs. Every scene needs `role` and `duration` (seconds); everything else is
-role-appropriate.
+Every scene needs `role` and `duration` (seconds); everything else is role-appropriate. The
+five market-story roles are below. The product theme adds three more (`feature`/`demo`/`cta`)
+and a reworked `cover` — those are documented in `references/product-reel.md`, not here.
 
 ```jsonc
 {
-  "role": "cover" | "stat" | "chart" | "breakdown" | "takeaway",
+  "role": "cover" | "stat" | "chart" | "breakdown" | "takeaway",  // + feature|demo|cta in the product theme
   "duration": 3.0,                 // seconds. 1.2-6s is the readable range per scene (motion.md)
   "kicker": "IDX · DIVIDENDS",      // small eyebrow label, optional but almost always present
   "headline": "A high yield, the hard way.",

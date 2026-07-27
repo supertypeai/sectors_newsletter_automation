@@ -60,7 +60,7 @@ function normFrac(v, min, max) {
 // extremes (opt-in): labels the interior peak and trough with their values (endpoints excluded,
 // they already carry start/end numbers), the same "label the narratively load-bearing points"
 // rule barChart uses past 6 bars — gives a y-sense without a gridded axis.
-export function sparkline(values, { w = 852, h = 150, strokeWidth = 4, area = false, pad = 10, endpointLabel = false, benchmark, startLabel = false, extremes = false } = {}) {
+export function sparkline(values, { w = 852, h = 150, strokeWidth = 4, area = false, pad = 10, endpointLabel = false, benchmark, startLabel = false, extremes = false, points = null } = {}) {
   const id = uid("sp");
   const vs = values.length > 1 ? values : [values[0] ?? 0, values[0] ?? 0];
   let min = Math.min(...vs), max = Math.max(...vs);
@@ -126,6 +126,23 @@ export function sparkline(values, { w = 852, h = 150, strokeWidth = 4, area = fa
       <text x="${px.toFixed(1)}" y="${ty.toFixed(1)}" fill="${MUTED}" font-family="${MONO}" font-size="20" font-weight="600" text-anchor="middle">${esc(trimNum(val))}</text>`;
     };
     if (maxI !== minI) out += mark(maxI, maxV, true) + mark(minI, minV, false);
+  }
+  // points (opt-in): caller-specified markers at arbitrary indices with caller-written text
+  // (a value + a date, unlike extremes' auto-detected raw number), e.g. labeling the exact
+  // day a series hit its low alongside its start/end. Unlike extremes, this covers index
+  // 0/n-1 too (the caller may want the start/end point labeled with a date, not just the
+  // default startLabel/endpointLabel numbers), so it's the caller's job not to double up.
+  if (points && points.length) {
+    for (const p of points) {
+      const idx = p.i ?? p.index;
+      if (idx == null || idx < 0 || idx >= n) continue;
+      const px = X(idx), py = Y(vs[idx]);
+      const above = p.above != null ? p.above : py >= h / 2;
+      const ty = above ? Math.max(py - 14, pad + 16) : Math.min(py + 26, h - 8);
+      const anchor = idx === 0 ? "start" : idx === n - 1 ? "end" : "middle";
+      out += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="4" fill="${MUTED}"/>
+      <text x="${px.toFixed(1)}" y="${ty.toFixed(1)}" fill="#F6F1EE" font-family="${MONO}" font-size="21" font-weight="700" text-anchor="${anchor}">${esc(p.label ?? trimNum(vs[idx]))}</text>`;
+    }
   }
   return out + `</svg>`;
 }

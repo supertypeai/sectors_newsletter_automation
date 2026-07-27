@@ -49,32 +49,41 @@ node ../../scripts/sectors.mjs \
   in step 5. Not every window will have a clean answer, if nothing real turns up, say
   so rather than manufacturing a reason.
 
-## 3. Broker flow (separate loop, no range param exists)
+## 3. Broker flow (fixed Supabase query, not an API loop)
 
 `brokers/top` **only accepts a single `date`, confirmed live** (`start`/`end` 400s:
 `"Invalid query parameters: start, end."`). There is no market-wide "top brokers over a
-range" endpoint. The only correct way to get a genuine 30-day broker read is:
+range" endpoint via the Sectors API. Don't loop it day by day. Instead run the pinned
+query at `../../scripts/fixed-queries/broker-summary-range.sql` through the Supabase
+MCP connector (read-only), substituting the window's `{{start}}`/`{{end}}`:
 
-```bash
-for d in <every trading date from the most-traded response's own date keys>; do
-  node ../../scripts/sectors.mjs "brokers/top/?date=$d&metric=net&origin=all&n_brokers=10" \
-    --save-dir <scratch-dir>/brokers
-done
-node ../../scripts/sectors.mjs "brokers/?" --save-dir <scratch-dir>
+```sql
+with agg as (
+  select broker_code, sum(bval) as buy_val, sum(sval) as sell_val,
+         sum(nval) as net_val, count(distinct date) as days_active
+  from idx_broker_summary_daily
+  where date between '<window-start>' and '<data_as_of>'
+  group by broker_code
+)
+select a.broker_code, r.broker_name, a.buy_val, a.sell_val, a.net_val, a.days_active
+from agg a
+left join idx_broker_registry r on r.broker_code = a.broker_code
+order by a.net_val desc;
 ```
 
-- Reuse the exact trading-date list `most-traded` already echoed back (its response
-  keys), don't re-derive a separate date range, the two should agree on which days were
-  actually trading days.
-- Sum `net` (and `gross`) per `broker_code` across every daily file, and count how many
-  days each broker placed in that day's top 10 (a broker with a huge one-day print but
-  low `daysTop10` reads differently than one that's consistently there).
-- Resolve `broker_code` → full name via the one `brokers/` registry call (cacheable,
-  0 credits, call once per run not once per day).
-- This is ~22 calls for a full trading month. That's the accepted cost for a type that
-  runs once a month, not something to shortcut by sampling a handful of dates, a
-  partial-month sample silently understates brokers who were active on days outside the
-  sample.
+- One query gives the full ranking; take the top N rows for buyers, the bottom N
+  (lowest `net_val`, i.e. most negative) for sellers. No second query needed.
+- `days_active` is the sanity check: every broker row should show the same count as
+  the number of actual trading days in the window (idx_broker_summary_daily only has
+  trading-day rows, so this isn't a weekend/holiday artifact). A broker sitting below
+  that count simply sat out some sessions, not a data gap, state it that way if it
+  comes up in copy.
+- `broker_name` comes free from the join, no separate registry call needed.
+- This is public market data, not user-account data, so it does not go through
+  `sectors-newsletter-dbquery`'s PII-only approved-queries gate (see that skill's
+  `references/supabase-access.md`); it's still read-only, verified live 2026-07-27
+  against 13-17 Jul 2026 (top buyer BB/Verdhana Sekuritas Indonesia +612.12B,
+  `days_active`=5 on every row for that 5-day window).
 - Once the top buyers/sellers are ranked, web-search or `news/` for anything real that
   plausibly explains the pattern (a regulatory story, a macro flow narrative), for the
   required observation paragraph in step 5. State a concurrent story as concurrent, not
@@ -114,13 +123,13 @@ Follow `../newsletter-format.md`'s skeleton exactly:
    ticker-blue like a ticker link, both tables, every row.
 5. **Appendix: Sectors API endpoints (fields used)**, always included for this type
    (not the skill-wide "optional" default, `../newsletter-format.md`'s Appendix
-   section), after Sources and before the disclaimer. This type touches five distinct
-   endpoints with real client-side aggregation behind it (whole-window `most-traded`
-   summing, the 22-call `brokers/top` loop), exactly the case that section's own
-   "add it when a reader might plausibly want to trace the pull" guidance calls for.
-   One bullet per endpoint actually called this run, the resolved params, and which
-   section it backed, see `queries.md` in `newsletter/samples/monthly-market-pulse/`
-   for the worked pattern to follow.
+   section), after Sources and before the disclaimer. This type touches four distinct
+   API endpoints with real client-side aggregation behind whole-window `most-traded`
+   summing, plus the one Supabase fixed query for Broker Flow (§3), exactly the case
+   that section's own "add it when a reader might plausibly want to trace the pull"
+   guidance calls for. One bullet per endpoint/query actually used this run, the
+   resolved params or window, and which section it backed, see `queries.md` in
+   `newsletter/samples/monthly-market-pulse/` for the worked pattern to follow.
 6. Disclaimer footer.
 
 ## 6. Self-review before delivery

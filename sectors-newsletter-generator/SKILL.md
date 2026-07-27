@@ -62,11 +62,15 @@ cannot supply?**
 - **Yes, and it's which tickers/sectors a user tracks** (this is the `watchlist-performance-digest`
   personalized type): invoke the `sectors-newsletter-dbquery` skill (via the Skill tool)
   to run its approved `watchlist-tracked-interest` query and return the raw audience
-  rows. **Never write or improvise SQL in this skill, and never ask for Supabase access
-  directly here** — this skill has no database credential of its own by design; the
+  rows. **Never write or improvise SQL for user-account data in this skill** — the
   dbquery skill is the only path to that data, and it only ever runs a query that's
   already sitting approved in its `scripts/approved-queries/` folder. See
-  `references/workflows/watchlist-performance-digest.md` step 1.
+  `references/workflows/watchlist-performance-digest.md` step 1. (This skill does hold
+  its own Supabase MCP access for public market-data aggregates that the Sectors API
+  can't range-query, e.g. broker flow and foreign flow, via the two pinned queries in
+  `scripts/fixed-queries/`, see workflows/monthly-market-pulse.md §3 and
+  workflows/weekly-insights-v2.md. That's a different category from account data and
+  doesn't go through dbquery's approval gate.)
 
 ## Pick the issue type (always first)
 
@@ -282,10 +286,11 @@ median and its own history, valuation context only, never "the one to buy."
 Open `references/workflows/monthly-market-pulse.md`. In brief: `top-changes`
 (`periods=30d`) for the month's gainers/losers, `most-traded` over the 30-day window
 aggregated client-side into one ranking (the endpoint itself only returns per-date
-top-N), `brokers/top` called once per trading day in the window and aggregated the same
-way (no native range param), and `idx-total` start/end for the month's index read; write
-the headline off that month's own idx-total trend, a combined Top Movers table+chart,
-Most traded, and Broker Flow, table-first throughout.
+top-N), Broker Flow pulled with the fixed `scripts/fixed-queries/broker-summary-range.sql`
+Supabase query over the 30-day window (no native `brokers/top` range param, so this
+replaces looping the API day by day), and `idx-total` start/end for the month's index
+read; write the headline off that month's own idx-total trend, a combined Top Movers
+table+chart, Most traded, and Broker Flow, table-first throughout.
 
 ### New release feature
 Open `references/workflows/new-release-feature.md`. This type is **not** a live fetch,
@@ -382,6 +387,13 @@ dbquery skill's templates do.
     `data_as_of` date and not the old same-week Saturday. See
     `workflows/weekly-insights-v2.md` and the **Header block** section of
     `newsletter-format.md`.
+12. **HTML disclaimer footer uses fixed markup, verbatim, every issue** (confirmed
+    2026-07-24): the bordered `<tr>` block with the non-advice line, the `sectors.app`
+    citation link, and the `Sectors | sectors.app | @sectorsapp` line. Fill only the
+    UTM campaign slug/date, the `data_as_of` date, both `sectors.app` links carrying
+    the same footer UTM string, Instagram left untagged. Exact HTML in
+    `newsletter-format.md`'s **Standard disclaimer footer** section, don't hand-write
+    a variant per issue.
 
 Full treatment, including the "good time to purchase" / "great future forecast"
 reconciliation, lives in `references/compliance.md` — read it before drafting the

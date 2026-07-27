@@ -109,9 +109,12 @@ always lowercase:
 &utm_term=<ticker>            # ticker/broker links only, omit otherwise
 ```
 
-In HTML the separator is `&amp;`, not a bare `&` — an unescaped ampersand in an `href` is
-invalid markup and some clients mangle the tail of the URL. In the `.md` draft it's a plain
-`&`.
+**The separator is a bare `&`, in both `newsletter.md` and `newsletter.html`, never
+`&amp;`** (confirmed 2026-07-24, reversing an earlier version of this doc that called for
+`&amp;` in HTML). Every `sectors.app` link in the shipped HTML must carry a raw `&`
+between UTM params, exactly as it appears in the `.md` draft, copy-paste identical. Before
+shipping any issue's HTML, grep it for `&amp;utm_` and fix every hit, that string should
+never appear in a finished `newsletter.html`.
 
 - **`utm_source=newsletter`, `utm_medium=email`** are fixed for everything this skill
   produces. Don't vary them per type.
@@ -180,6 +183,24 @@ style variant, this section is the single source of truth, don't re-derive per t
   `LOSS`, `TICKER` constants) — if a future session needs to change a hex value,
   change it there and this doc follows, don't hand-pick a different value in one
   issue's HTML.
+
+## Header logo (every issue type, HTML delivery, confirmed 2026-07-24)
+
+The top-right corner of the header row is the wide Sectors wordmark, not the small
+inline SVG bar mark or a plain "Sectors" text label older samples used, both retired.
+One fixed asset, one fixed markup, every issue type:
+
+```html
+<img src="https://storage.googleapis.com/sectorsapp-sea/app_assets/sectors_logo_wide.png" alt="Sectors" width="110" height="29" style="display:block;width:110px;height:auto;">
+```
+
+- Source PNG is 7363x1945 (ratio ~3.79:1); `width="110" height="29"` keeps that ratio at
+  a size that fits the header row's `width="90"`-ish right-hand cell without crowding
+  the title on the left.
+- Sits inside the same right-aligned `<td>` the old mark/text occupied, no other change
+  to the header row's layout.
+- Hosted asset, not copied into the issue folder — link directly, same as every other
+  externally-hosted image this skill already references (event posters, etc.).
 
 ## Prose style (newsletter-specific, overrides the carousel's short-declarative slide voice)
 
@@ -768,6 +789,23 @@ silently drops certain days is not, cut it down to the endpoint and field.
 *This newsletter is data reporting and market commentary, not investment advice or a
 recommendation to buy or sell any security. Figures are from sectors.app as of
 {data_as_of} unless otherwise cited. Do your own research.*
+```
+
+**HTML delivery (fixed markup, confirmed 2026-07-24), use verbatim on every HTML issue**,
+last table row before `</table></body>`, filling only the four placeholders (both
+`sectors.app` links share the same UTM string, built per the **UTM parameters** section
+above: `utm_source=newsletter&utm_medium=email&utm_campaign={content-slug}_{YYYY-MM-DD}
+&utm_content=footer`, no `utm_term`/`utm_author` on a footer link). The Instagram link
+stays untagged, per the third-party/own-account-not-our-analytics rule above. Accent
+`#9E0142` on every link per the **Color convention** section, no exceptions here either.
+
+```html
+<tr><td style="padding:20px 32px 30px 32px;">
+    <div style="border-top:1px solid #e4cdb4;padding-top:14px;font-size:11.5px;line-height:1.6;color:#8a8a8a;">
+      This newsletter is data reporting and market commentary, not investment advice or a recommendation to buy or sell any security. Figures are from <a href="https://sectors.app?utm_source=newsletter&utm_medium=email&utm_campaign={content-slug}_{YYYY-MM-DD}&utm_content=footer" style="color:#9E0142;">sectors.app</a> as of {data_as_of, e.g. 23 July 2026} unless otherwise cited. Do your own research.<br><br>
+      Sectors &nbsp;|&nbsp; <a href="https://sectors.app?utm_source=newsletter&utm_medium=email&utm_campaign={content-slug}_{YYYY-MM-DD}&utm_content=footer" style="color:#9E0142;text-decoration:underline;">sectors.app</a> &nbsp;|&nbsp; <a href="https://www.instagram.com/sectorsapp" style="color:#9E0142;text-decoration:underline;">@sectorsapp</a>
+    </div>
+  </td></tr>
 ```
 
 ## Length guidance

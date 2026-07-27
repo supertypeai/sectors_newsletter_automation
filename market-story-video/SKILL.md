@@ -1,21 +1,43 @@
 ---
 name: market-story-video
 description: >-
-  Generate a vertical (1080x1920) story video, either a 10-15 second short or a ~45-75 second
-  long-form piece, about the Indonesian stock market (IDX) from live Sectors financial data, in
-  the visual style of the team's existing Reels/TikTok/Shorts content. Use whenever the user
-  wants a short video, a Reel, a TikTok, a Short, or "video content" about an IDX-listed
-  company or ticker, a market-wide move, a regulatory/index event, or a company's
-  ownership/history/plans and how they shaped its financial performance. Trigger even when the
-  user just says "make a video about GOTO", "turn BBRI's dividend story into a video", or
-  "what's a good market story to post this week as a video", this skill handles the whole
-  pipeline from topic to a finished MP4 with on-screen text and motion, no voiceover. Do NOT
-  use it for non-IDX markets, for a static carousel/slides (use the sectors-carousel skill for
-  that), or for a video with voiceover/narration (this skill is visual-only: on-screen text and
-  motion, no audio track).
+  Generate a vertical (1080x1920) Reel/TikTok/Short in the team's brand style, either a MARKET
+  STORY about the Indonesian stock market (IDX) from live Sectors financial data, or a PRODUCT
+  FEATURE REEL promoting a sectors.app feature. Market story: a 10-15s short or ~45-75s
+  long-form piece about an IDX ticker, a market-wide move, a regulatory/index event, or a
+  company's ownership/history — triggered by "make a video about GOTO", "turn BBRI's dividend
+  story into a video", "what's a good market story to post this week"; finished MP4 with
+  on-screen text and motion, no audio. Product feature reel: a 12-18s intro/demo/CTA piece about
+  a sectors.app capability (Screener, Financial Search, Watchlist, Ownership Search, workflows,
+  and so on) — triggered by "make a reel introducing our screener", "a 15-second promo for
+  Sectors' search feature", "demo the watchlist as a Reel", "feature intro video for the app";
+  it frames a real screen recording or screenshot of the app in a device mockup, adds callouts
+  and a Ken Burns push, reserves a corner for a talking-head clip, and writes a timed voiceover
+  script the presenter reads (the skill writes the words and reserves the space; it does not
+  record or composite audio/video). Do NOT use it for non-IDX markets, for static
+  carousel/slides (use the sectors-carousel skill), or, for a market story, for narration (the
+  market-story path is visual-only).
 ---
 
 # Market Story Video
+
+This skill makes two kinds of vertical video, sharing one Remotion renderer, one brand system,
+and the same story-first discipline:
+
+- **A market story** (themes `noir`/`thread`) — a real IDX story found by research, real numbers
+  from the Sectors API, every scene landing a verdict, rendered to MP4 with on-screen text and
+  motion, no audio. This is the default and the rest of this file (steps 1-7) describes it.
+- **A product feature reel** (theme `product`) — a 12-18s intro/demo/CTA promoting a sectors.app
+  feature: the app shown working inside a device frame, callouts, a reserved talking-head
+  corner, and a timed voiceover script. **If that's the ask, jump to the "Product feature
+  reels" section below** and follow its shorter pipeline instead of steps 1-7. Everything else
+  in this file (the brand system, the render/lint scripts, the hard rules) still applies.
+
+Which one? A piece built from market DATA about a ticker or event is a market story. A piece
+selling what the APP can do is a product reel. When a request could read either way ("a video
+about Sectors"), ask.
+
+## Market story pipeline
 
 Turn a topic into a finished vertical video about the Indonesian stock market: a real story
 found by research, real numbers from the Sectors API, a storyboard where every scene lands a
@@ -209,6 +231,49 @@ if the folder doesn't already have one from a carousel piece on the same topic).
 `--stills` draft pass against a scratch path (`output/_draft`, deleted before delivery), then
 render the final MP4 straight into the `scs` story folder once approved.
 
+## Product feature reels (theme `product`)
+
+A different job from a market story: sell a sectors.app feature, not tell a data story. Same
+brand shell, same renderer, same hard rules against fabrication and advice; a shorter pipeline
+and its own machinery (a device frame for real app footage, callouts, a talking-head corner).
+**Read `references/product-reel.md` in full before composing one**, and `references/voiceover.md`
+if it has narration or a talking head. The short version:
+
+**1. Settle the feature.** It comes from `inputs/features.json`, the facts catalog — compose the
+copy FROM an entry there, never from memory. If the feature isn't catalogued, ask the user for
+its promise, proof, and destination, write the entry (with a `verified` note on what grounds it),
+then compose. Set the storyboard's top-level `feature` key to the catalog key for traceability.
+
+**2. Line up the footage.** Each demo scene needs a screen recording (`inputs/demo/*.mov`) or a
+screenshot (`inputs/shots/*.png`) of the app. Compose the storyboard pointing `media.src` at
+where the file will live; the lint and renderer error on a missing file, so you'll know exactly
+what to capture. For a first pass with nothing recorded, `assets/brand/app-overview.png` (a real
+sectors.app overview screenshot shipping with the skill) is a legitimate stand-in as a `shot`.
+
+**3. Compose the four beats:** `cover` (the problem, not the feature name) -> `feature` (name it,
+one-line promise, up to 3 chips) -> `demo` (the app working, the longest beat, callouts pinned by
+0-1 screen fractions, optional Ken Burns `pan` and synthetic `cursor`) -> `cta` (the line, the
+mark, the exact `sectors.app/...` path). Set `"outro": false`. Add per-scene `vo` lines for the
+voiceover and a `humanSlot` if a face rides the corner (`voiceover.md`). Use `length: "reel"`.
+
+**4. Lint, render, self-review, deliver** — same scripts as a market story, plus the script
+compiler:
+
+```bash
+node scripts/storyboard-lint.mjs <storyboard.json>                       # four-beat structure, vo budget, media, coords
+node scripts/script-out.mjs   <storyboard.json> --out <folder>/script.md # the timed voiceover script
+node scripts/render.mjs <storyboard.json> --out output/_draft --stills   # draws the talking-head guide box too
+node scripts/render.mjs <storyboard.json> --out <folder>                 # final MP4, slot renders empty
+```
+
+Read every still: is the feature name the one gradient moment on its scene? Do the callout rings
+sit exactly on the UI they name? Does the demo get at least a third of the runtime? Does the CTA
+point at the feature's real path, not the bare homepage? Deliver the MP4 and `script.md`
+together; whoever films records against the script and composites the clip into the reserved
+corner downstream. Start from `samples/financial-search-feature.storyboard.json`, not a blank
+file. Delivery folder convention: `/Users/evelyn/Desktop/scs/<feature-slug>/` (a feature slug,
+not a ticker, since a reel names no ticker).
+
 ## Hard rules (these override style every time)
 
 1. **Never fabricate a number.** Every figure traces to a real Sectors field or a confirmed,
@@ -228,31 +293,37 @@ render the final MP4 straight into the `scs` story folder once approved.
 ```
 SKILL.md                     ← you are here
 references/
-  themes.md                  which visual system (noir/thread) fits which story shape
+  themes.md                  which visual system (noir/thread/product) fits which piece
   length.md                  short (10-15s) vs long (~45-75s) targets and beat budgets
   narrative-approaches.md    storytelling (resolves) vs teaser (open question) closing beat
+  product-reel.md            feature reels: the four beats, the demo scene, features.json (product theme)
+  voiceover.md               the vo script + the reserved talking-head corner (product theme)
   storyboard-format.md       the storyboard.json contract
-  scenes.md                  the 5 scene roles (cover/stat/chart/breakdown/takeaway)
+  scenes.md                  the 5 market-story scene roles (cover/stat/chart/breakdown/takeaway)
   motion.md                  the timing/easing vocabulary every scene draws from
   writing/                   same craft reference the carousel skill uses (story, hook, voice, caption)
-  sectors-api/               endpoints, data-quality, README (the data layer, v2 — shared with the carousel skill)
+  sectors-api/               endpoints, data-quality, README (market-story data layer, v2 — shared with carousel)
 scripts/
-  render.mjs                 storyboard.json -> MP4 (Remotion bundler + renderer)
-  storyboard-lint.mjs        static structural + voice checks (run before rendering)
-  sectors.mjs                authenticated Sectors API GET (same script the carousel skill uses)
+  render.mjs                 storyboard.json -> MP4 (Remotion bundler + renderer; stages media, draws guides)
+  storyboard-lint.mjs        static structural + voice checks, all three themes (run before rendering)
+  script-out.mjs             compile a reel's vo lines into a timed voiceover script (product theme)
+  sectors.mjs                authenticated Sectors API GET (market story only; same script as the carousel)
 src/
   index.ts, Root.tsx          Remotion entry + composition (duration computed from the storyboard)
-  StoryboardComposition.tsx  lays out scenes as Sequences, picks the theme, drives the thread line
+  StoryboardComposition.tsx  lays out scenes as Sequences, picks the theme, drives the thread line + human-slot guide
   types.ts                   the Storyboard/Scene TypeScript contract (mirrors storyboard-format.md)
-  tokens.ts, fonts.ts         design tokens (both themes) and the font registry (Google Fonts)
-  components/                GradientText, Logo, BrandMark, SceneShell, charts/ (Bar, Line, OwnershipTree)
-  themes/noir/, themes/thread/  the two theme's Background/Chrome/scene renderers/Outro
+  tokens.ts, fonts.ts         design tokens (all three themes) and the font registry (Google Fonts)
+  components/                GradientText, Logo, BrandMark, SceneShell, DeviceFrame, HumanSlot, charts/
+  themes/noir/, themes/thread/, themes/product/   each theme's Background/Chrome/scene renderers/Outro
+inputs/
+  features.json               the product-reel facts catalog (what each sectors.app feature does)
+  demo/  shots/               your screen recordings and screenshots for reels (git-ignored)
 assets/
   logos.json                  957 IDX ticker logos (base64), shared with the carousel skill
-  brand/                       sectors-mark.svg (also inlined as a component in BrandMark.tsx)
+  brand/                       sectors-mark.svg, app-overview.png (a real sectors.app screenshot for reel drafts)
 config.json                   shared Sectors API key (sectorsApiKey); SECTORS_API_KEY env overrides
 package.json                 remotion + @remotion/cli + @remotion/google-fonts
-samples/  output/             two worked examples (one per theme), and where rendered stories land
+samples/  output/             three worked examples (noir, thread, product reel), and where renders land
 ```
 
 ## Setup (once per machine)

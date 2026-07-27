@@ -1,0 +1,78 @@
+{
+  "_readme": [
+    "The source of truth for what a sectors.app feature does. A feature reel is composed FROM an entry",
+    "here, never from memory: the claims on screen and the claims in the voiceover both trace back to a",
+    "line in this file, so two reels shipped a month apart describe the same feature the same way.",
+    "",
+    "If the feature you have been asked to promote is not in here, do not invent an entry. Ask for the",
+    "promise, the proof and the destination, write the entry, and compose from it. That way the next reel",
+    "about that feature starts from something checked rather than from this conversation's guesswork.",
+    "",
+    "Fields:",
+    "  name      what the product calls it on screen, exactly. Not a friendlier synonym.",
+    "  promise   one line, what it does for the viewer. The `feature` scene renders this verbatim.",
+    "  chips     up to 3 capability tags, 1-4 words each. Nouns and figures, never sentences.",
+    "  proof     the single strongest concrete fact. Becomes a cover stat or the demo's body line.",
+    "  who       who this is for, in the team's own words. Steers the hook, never rendered.",
+    "  demo      the footage: kind (clip|shot), src, and the device frame it belongs in.",
+    "  cta       the path a viewer types. Real and specific, never the bare homepage for a named feature.",
+    "  verified  what the entry is grounded in, and when. An unverified claim is a claim you must confirm",
+    "            with the user before it reaches a rendered frame.",
+    "",
+    "Put recordings in inputs/demo/ and stills in inputs/shots/. render.mjs resolves a relative src",
+    "against the storyboard file first, then against the skill root."
+  ],
+
+  "features": {
+    "financial-search": {
+      "name": "Financial Search Engine",
+      "promise": "Ask for a company, a sector or an investor in plain English. Get the figure, not a list of links.",
+      "chips": ["Natural language", "Tickers and investors", "Agentic mode"],
+      "proof": "Purpose-built for professionals and enterprise research teams, with natural language query support.",
+      "who": "Analysts who currently open six tabs to answer one question.",
+      "demo": { "kind": "shot", "src": "assets/brand/app-overview.png", "device": "browser", "url": "sectors.app" },
+      "cta": "sectors.app",
+      "verified": "Wording taken from the product surface in assets/brand/app-overview.png (search panel, Agentic Search on Standard+). Confirm the plan gating before quoting it in a new reel. Superseded by the ai-search-console entry below (per product team, 2026-07-24)."
+    },
+
+    "ai-search-console": {
+      "name": "AI Search Console",
+      "promise": "Ask in plain English. Get the answer, the ownership, and the receipts.",
+      "chips": ["Natural language", "Ownership + news", "CSV + API export"],
+      "proof": "Every AI answer surfaces its own API query and a one-click CSV download, so the number is checkable, not just quoted.",
+      "who": "Analysts and portfolio teams who need a checkable answer, not just a chat reply.",
+      "demo": { "kind": "clip", "src": "inputs/demo/ai-search-console.mp4", "device": "browser", "url": "sectors.app/search" },
+      "cta": "sectors.app/search",
+      "verified": "Captured from a screen recording provided by the user (AI console.mp4, 2026-07-24) showing unified ticker/sector/investor search with keyboard navigation, watchlist, ownership drill-down, related news, and an AI natural-language query with year filter, CSV export, and visible API query path. Per product team (2026-07-24), this is the developed successor to financial-search. Promise/chip wording synthesized from the recording; confirm with product owner before reuse in a future reel."
+    },
+
+    "ownership-search": {
+      "name": "Ownership Search",
+      "promise": "Follow a stake from the listed company up to whoever actually controls it.",
+      "chips": ["Parent to subsidiary", "Insider stakes"],
+      "proof": "",
+      "who": "Anyone who has tried to work out who is behind an IDX name from the filings alone.",
+      "demo": { "kind": "shot", "src": "assets/brand/app-overview.png", "device": "browser", "url": "sectors.app" },
+      "cta": "sectors.app",
+      "verified": "Surface confirmed in assets/brand/app-overview.png (Ownership Search toggle). The promise line is a description of the feature's purpose and needs a product owner's sign-off before it ships."
+    },
+
+    "watchlist": {
+      "name": "Watchlist",
+      "promise": "Keep the names you actually follow in one place, priced and updated without you asking.",
+      "chips": ["Track tickers", "Track sectors"],
+      "proof": "",
+      "who": "Retail investors following a handful of IDX names across several brokers.",
+      "demo": { "kind": "shot", "src": "", "device": "browser", "url": "sectors.app/watchlist" },
+      "cta": "sectors.app/watchlist",
+      "verified": "Surface confirmed in assets/brand/app-overview.png (Watchlist tab) and the sibling sectors-newsletter-dbquery skill, which reads watchlist tracking per user. No footage captured yet."
+    }
+  },
+
+  "_todo": [
+    "Entries still to write, each seen in the product but not yet described by anyone who owns it:",
+    "Overview, Exploration, Weekly Digest, AI Stock Screener, workflows and alerts (sectors.app/workflow),",
+    "recipes (sectors.app/recipes), the dividend calendar, broker pages, and the SGX coverage.",
+    "Capture footage into inputs/demo/ as each one gets its first reel."
+  ]
+}

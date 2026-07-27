@@ -10,6 +10,7 @@ are independent choices: any theme can pair with any length and any narrative ap
 |---|---|---|---|
 | `"short"` (default) | 10-15s | 3-6 scenes | a single hook, one or two proof beats, a Reel/Short/TikTok meant to be watched in one pass |
 | `"long"` | ~45-75s | 8-18 scenes | a fuller arc — a company's history timeline, its structure, several numbers, a fun fact — that needs more than a couple of proof beats to land |
+| `"reel"` | 12-18s | 3-6 scenes | a product feature reel only (theme `product`): cover -> feature -> demo -> cta. See `references/product-reel.md`; the rest of this file is about market stories |
 
 `scripts/storyboard-lint.mjs` and `scripts/render.mjs` both read `storyboard.length` (defaults
 to `"short"` if the field is omitted, so existing storyboards need no change) and validate

@@ -600,7 +600,10 @@ function waterfallBlock(b, ctx) {
   // dropped bar, so the failure is loud twice rather than a NaN-blank chart.
   const bars = sanitizeBars(b.bars, ctx, "waterfall");
   const chart = waterfall(bars, { w: b.w || 936, h: b.h || 460 });
-  const key = `<div class="legend" style="margin-top:8px;">
+  const key =
+    b.legend === false
+      ? ""
+      : `<div class="legend" style="margin-top:8px;">
     <div class="item"><span class="sw" style="background:var(--brandGradient)"></span><span class="caption-t">Total</span></div>
     <div class="item"><span class="sw" style="background:#1FB36A"></span><span class="caption-t">Increase</span></div>
     <div class="item"><span class="sw" style="background:#E0003B"></span><span class="caption-t">Decrease</span></div>
@@ -1404,14 +1407,25 @@ function renderChartSpec(kind, spec, ctx) {
     // call above (the `priceSnapshot` block renderer): that block already prints the price +
     // delta beside its mini-chart, a second number on the chart itself would double-label.
     const benchmark = sanitizeBenchmark(s.benchmark, ctx, "line");
-    return sparkline(values, { w: s.w || 852, h: s.h || 150, area: s.area, strokeWidth: s.strokeWidth || 4, endpointLabel: true, benchmark, startLabel: s.startLabel, extremes: s.extremes });
+    const points = Array.isArray(s.points)
+      ? s.points.filter((p) => {
+          const idx = p?.i ?? p?.index;
+          const ok = Number.isInteger(idx) && idx >= 0 && idx < values.length && typeof p.label === "string";
+          if (!ok) ctx.warnings?.push(`line: dropped an invalid "points" entry (needs integer i/index within range and a string label)`);
+          return ok;
+        })
+      : undefined;
+    // points supersedes the default endpoint %-change: a caller labeling specific points
+    // (often including the last one, with its own date/value text) is opting out of the
+    // auto pct label, not adding to it, so the two never stack on the same dot.
+    return sparkline(values, { w: s.w || 852, h: s.h || 150, area: s.area, strokeWidth: s.strokeWidth || 4, pad: s.pad, endpointLabel: !points, benchmark, startLabel: s.startLabel, extremes: s.extremes, points });
   }
   if (kind === "donut") return donutBlock({ segments: s.segments || [], size: s.size, centerLabel: s.centerLabel, centerSub: s.centerSub, caption: s.caption }, ctx);
   if (kind === "radar") return radarBlock({ axes: s.axes, series: s.series || [], maxValue: s.maxValue, size: s.size, caption: s.caption }, ctx);
   if (kind === "multiline") return multiLineBlock({ series: s.series || [], w: s.w, h: s.h, caption: s.caption, index: s.index, startLabel: s.startLabel }, ctx);
   if (kind === "stackedbar") return stackedBarBlock({ bars: s.bars || [], w: s.w, h: s.h, maxTotal: s.maxTotal, caption: s.caption, legend: s.legend }, ctx);
   if (kind === "table") return matrixBlock({ columns: s.columns || [], rows: s.rows || [] }, ctx);
-  if (kind === "waterfall") return waterfallBlock({ bars: s.bars || [], w: s.w, h: s.h, caption: s.caption }, ctx);
+  if (kind === "waterfall") return waterfallBlock({ bars: s.bars || [], w: s.w, h: s.h, caption: s.caption, legend: s.legend }, ctx);
   if (kind === "timeline") return timelineBlock({ events: s.events || [] });
   if (kind === "scatter")
     return scatterBlock(

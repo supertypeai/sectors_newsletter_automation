@@ -1,20 +1,19 @@
 import React from "react";
 import { interpolate, useCurrentFrame } from "remotion";
-import { noir, SAFE } from "../../tokens";
+import { product, SAFE, MOTION } from "../../tokens";
 import { fontFamilies } from "../../fonts";
-import { MOTION } from "../../tokens";
 import { useReservedPadding } from "../../components/HumanSlot";
 
-// Shared per-scene chrome: the mono uppercase kicker top-left, fading/sliding in first, then
-// its children. Matches sectors-carousel's .kicker exactly (gold mono, uppercase, tracked).
-export const NoirSceneLayout: React.FC<{
+// Per-scene chrome for the product theme: the same gold mono kicker as noir, plus the
+// talking-head reservation. The reservation is padding rather than a positioned void, so a
+// long headline reflows above the slot instead of running under it.
+export const ProductSceneLayout: React.FC<{
   kicker?: string;
   justify?: "center" | "space-between" | "flex-start";
+  gap?: number;
   children: React.ReactNode;
-}> = ({ kicker, justify = "center", children }) => {
+}> = ({ kicker, justify = "center", gap = 32, children }) => {
   const frame = useCurrentFrame();
-  // Zero unless a "product" reel reserved a talking-head corner (HumanSlot.tsx); noir/thread
-  // stories never set it, so their layout is unchanged.
   const reserved = useReservedPadding();
   const kickerOpacity = interpolate(frame, [0, MOTION.enterFrames], [0, 1], {
     extrapolateLeft: "clamp",
@@ -33,7 +32,7 @@ export const NoirSceneLayout: React.FC<{
         display: "flex",
         flexDirection: "column",
         justifyContent: justify,
-        gap: 32,
+        gap,
       }}
     >
       {kicker && (
@@ -42,7 +41,7 @@ export const NoirSceneLayout: React.FC<{
             fontFamily: fontFamilies.mono,
             fontSize: 30,
             fontWeight: 600,
-            color: noir.brandGold,
+            color: product.brandGold,
             textTransform: "uppercase",
             letterSpacing: "0.14em",
             opacity: kickerOpacity,

@@ -278,7 +278,7 @@ body { background:#000; }
    headline that runs the full 3-line budget (viral-hooks.md caps it at ~9 words/1-3 lines,
    but nothing enforces that mechanically, so a long headline still needs to not look broken
    when it happens, see brand-lint's headline-length check). */
-.cover .headline { font-weight:800; line-height:1.06; letter-spacing:-0.035em; margin:18px 0 20px; }
+.cover .headline { font-weight:800; line-height:1.06; letter-spacing:-0.035em; margin:18px 0 56px; }
 .cover .support { font-size:36px; color:var(--muted); font-weight:500; line-height:1.35; max-width:840px; }
 .cover .spark-callout {
   position:absolute; right:72px; top:206px; display:inline-flex; align-items:center; gap:16px;

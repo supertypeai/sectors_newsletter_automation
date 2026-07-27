@@ -235,20 +235,11 @@ Two ways to fix that, when the user wants to:
 - **Supabase key.** Give the skill a storage credential so it can list by date prefix. More
   power, more setup, and another secret to hold alongside `config.json`'s API key.
 
-> ### OPEN DECISION, ask the user before drafting
->
-> **This is unresolved as of 2026-07-20. On the next weekly-insights-v2 run, ask the user
-> which foreign-flow definition this issue should use, before writing any flow figure.**
-> Do not silently pick one. Once they answer, record the choice here, delete this box, and
-> make the corresponding edits so later runs stop asking.
->
-> Put the question to them in these terms: the exchange definition (what the cards show, what
-> the press calls "asing net buy/sell") or the broker-domicile definition (what
-> `foreign-flow/{symbol}` returns). Mention that the two disagreed on direction for BBRI and
-> ANTM in the 13-17 Jul week, so the choice changes headline facts, not just decimals.
->
-> The 18 Jul 2026 issue was deliberately left mixed and is **not** a model to copy on this
-> point. Its Key Data Bites carries the broker figure next to exchange-definition cards.
+> **Resolved 2026-07-27: default to the exchange definition (`idx_daily_data`) for weekly
+> aggregated foreign flow. Never use the broker-domicile aggregation (`idx_broker_summary_daily`
+> / `idx_broker_registry`, what `broker-summary/top` and `foreign-flow/{symbol}` return) for this
+> figure.** The 18 Jul 2026 issue was left mixed (broker figure in Key Data Bites next to
+> exchange-definition cards) and is not a model to copy.
 
 > **The cards and the API use two different definitions of foreign flow. Pick one per issue
 > and never mix them.** Resolved 2026-07-20 against the database, after an earlier note here
@@ -270,6 +261,30 @@ Two ways to fix that, when the user wants to:
 > also show a card built on the other definition. Caveat on the exchange figure: net volume
 > times `close` is an approximation, since only volumes are stored and a true value would need
 > separate buy-side and sell-side average prices.
+
+**Fixed query, not a per-ticker API loop.** Run
+`../../scripts/fixed-queries/foreign-flow-range.sql` through the Supabase MCP connector
+(read-only), substituting the week's Mon-Fri `{{start}}`/`{{end}}`:
+
+```sql
+select symbol,
+       sum((foreign_buy_volume - foreign_sell_volume) * close) as net_foreign_flow,
+       count(distinct date) as days_active
+from idx_daily_data
+where date between '<mon>' and '<fri>'
+group by symbol
+order by net_foreign_flow desc;
+```
+
+One query ranks the whole market for the week; top rows are net foreign buys, bottom
+rows net foreign sells, no need to loop `foreign-flow/{symbol}` per ticker per day.
+Add `and symbol in ('BBCA.JK', ...)` to check a specific name's own figure instead of
+the full ranking. Mind the `.JK` suffix, a bare ticker returns zero rows silently, not
+an error. `days_active` should equal 5 for every row in a normal Mon-Fri week; a lower
+count means that name was suspended or newly listed mid-week, not a data gap. Verified
+live 2026-07-27 against 13-17 Jul: reproduces the hand-checked figures above to the
+cent (BMRI +563.16B, ANTM +237.89B, TPIA +237.83B, BBCA +145.62B, ASII -534.22B,
+MAPI -187.83B, BBRI -30.27B).
 
 Every figure in block 4 is restated as HTML text under its image, because many clients block
 remote images by default. Alt text carries the full figure set for the same reason. This is
@@ -341,9 +356,10 @@ right-hand column below.
   restatement? Bullets, never paragraphs?
 - Were the findings derived from the API **first**, with cards picked to illustrate them,
   rather than written around whatever images existed?
-- **Was the user asked which foreign-flow definition to use** (§3 OPEN DECISION), and is that
-  one definition used throughout? Card figures and prose figures must come from the same
-  method; exchange and broker disagree on direction, so mixing them publishes a contradiction.
+- **Foreign flow uses the exchange definition (`idx_daily_data`) throughout, never the broker
+  aggregation** (§3), pulled via the fixed `foreign-flow-range.sql` query, not a per-ticker API
+  loop. Card figures and prose figures must come from the same method; exchange and broker
+  disagree on direction, so mixing them publishes a contradiction.
 - Card windows read off the image and stated in copy where they differ from the wrapped week?
 - Movers labelled with the window they belong to, `latest_close_date` checked, and the
   computed-LQ45 route (§2b) used plus disclosed if the snapshot didn't match?

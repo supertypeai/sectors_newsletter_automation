@@ -14,7 +14,7 @@ export const RemotionRoot: React.FC = () => {
       width={CANVAS.width}
       height={CANVAS.height}
       durationInFrames={computeFrames(sampleStoryboard as Storyboard, CANVAS.fps).total}
-      defaultProps={{ storyboard: sampleStoryboard as Storyboard }}
+      defaultProps={{ storyboard: sampleStoryboard as Storyboard, guides: false }}
       calculateMetadata={async ({ props }) => {
         const storyboard = props.storyboard as Storyboard;
         const { total } = computeFrames(storyboard, CANVAS.fps);

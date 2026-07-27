@@ -1,0 +1,74 @@
+{
+  "theme": "product",
+  "length": "reel",
+  "feature": "financial-search",
+  "outro": false,
+  "humanSlot": {
+    "corner": "bottom-left",
+    "size": 320,
+    "shape": "circle",
+    "note": "Half-body, plain wall, look down the lens. Energy up on the hook, flat and factual over the demo."
+  },
+  "scenes": [
+    {
+      "role": "cover",
+      "duration": 2.8,
+      "kicker": "SECTORS.APP",
+      "headline": "One number. Six tabs.",
+      "emphasis": "Six tabs.",
+      "body": "Filings in one window, prices in another, ownership somewhere else.",
+      "vo": "Six tabs. One number. Every single time."
+    },
+    {
+      "role": "feature",
+      "duration": 3.2,
+      "kicker": "WHAT IT IS",
+      "feature": {
+        "name": "Financial Search Engine",
+        "promise": "Ask in plain English. Get the figure, not a page of links.",
+        "chips": ["Natural language", "Tickers and investors", "Agentic mode"]
+      },
+      "vo": "So we built one search box."
+    },
+    {
+      "role": "demo",
+      "duration": 5.6,
+      "kicker": "IN THE APP",
+      "headline": "Type the question the way you'd say it.",
+      "emphasis": "the way you'd say it.",
+      "media": {
+        "kind": "shot",
+        "src": "assets/brand/app-overview.png",
+        "device": "browser",
+        "url": "sectors.app",
+        "fit": "cover",
+        "pan": {
+          "from": { "x": 0.7, "y": 0.18, "zoom": 1.0 },
+          "to": { "x": 0.7, "y": 0.18, "zoom": 1.45 }
+        }
+      },
+      "callouts": [
+        { "at": 1.1, "text": "Ask in plain English", "anchor": { "x": 0.706, "y": 0.169 }, "side": "below" },
+        { "at": 3.4, "text": "Ownership search", "anchor": { "x": 0.924, "y": 0.102 }, "side": "left" }
+      ],
+      "cursor": [
+        { "at": 0.3, "x": 0.4, "y": 0.55 },
+        { "at": 1.4, "x": 0.6, "y": 0.169, "click": true },
+        { "at": 3.6, "x": 0.924, "y": 0.102, "click": true }
+      ],
+      "body": "Companies, sectors, investors, all from one box.",
+      "vo": "Search a company, a sector, or the investor behind it. One box, plain English."
+    },
+    {
+      "role": "cta",
+      "duration": 2.6,
+      "headline": "Search the whole exchange in one line.",
+      "emphasis": "one line.",
+      "cta": {
+        "url": "sectors.app",
+        "action": "Agentic Search on Standard and above"
+      },
+      "vo": "It's on the homepage."
+    }
+  ]
+}

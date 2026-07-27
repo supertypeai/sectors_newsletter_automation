@@ -1,8 +1,12 @@
-# Themes: "noir" vs "thread"
+# Themes: "noir", "thread", "product"
 
-Two distinct, deliberate visual systems, not a light/dark toggle on one design — each was
-reverse-engineered from a real reference video the team already produced. Pick the theme by
-**story shape**, not by preference.
+Three deliberate visual systems, not moods of one design. The first two tell a **market story**
+from Sectors data; the third sells a **sectors.app feature**. Pick by what the piece is FOR.
+
+- Telling a market story from data (a ticker, an index event, an ownership structure)? It's
+  noir or thread — read on.
+- Promoting a product feature (introduce it, demo it, drive to it)? It's **product** — this
+  section, then `references/product-reel.md` and `references/voiceover.md` for the full machinery.
 
 ## "noir" — reverse-engineered from `indofood-empire.mp4`
 
@@ -32,27 +36,50 @@ dark = a neutral fact).
 sector-wide move, anything framed as "here's what happened and why it matters" rather than one
 company's internal case. The dotted thread visually means "this is all one connected event."
 
+## "product" — the feature-promo system
+
+The warm-black brand shell (same palette and type ramp as noir, so a feature reel and a market
+story read as the same publisher) plus the machinery a market story never needs: a **device
+frame** holding a real screen recording or screenshot of the app, a **callout layer** of rings
+and pills that point into that footage, a **synthetic cursor** for stills, and a reserved
+**talking-head corner**. It carries the brand badge but no dated source footer (there's no
+market figure on screen to date-stamp, and a stale date shortens an evergreen promo's shelf
+life).
+
+**Use for**: introducing or promoting a sectors.app feature — features intro, features demo,
+CTA. It is a different job from a market story, with its own four-beat structure (cover ->
+feature -> demo -> cta), its own `length: "reel"` (12-18s), its own roles, and a facts catalog
+(`inputs/features.json`) instead of the Sectors API. Everything specific to it lives in
+`references/product-reel.md`; the voiceover/talking-head half in `references/voiceover.md`.
+
 ## Picking between them
 
-| story shape | theme |
+| what the piece is for | theme |
 |---|---|
 | one company, its structure/history/numbers | noir |
-| a market/index/regulatory event, several actors | thread |
 | a single ticker's earnings or dividend story | noir |
+| a market/index/regulatory event, several actors | thread |
 | "why did the whole market move this week" | thread |
+| introduce/demo/promote a sectors.app feature | product |
 
-If genuinely unsure, ask which lens the user wants rather than guessing — the two read as
-different products, not different moods of the same one.
+Market story vs. product promo is a clear split (data story vs. selling the app). Between noir
+and thread, if genuinely unsure, ask which lens the user wants rather than guessing — they read
+as different products, not different moods of the same one.
 
 ## What's shared vs. per-theme
 
-Both themes render the exact same `storyboard.json` scene contract (see
-`storyboard-format.md`) — role, headline, emphasis, stat, chart, breakdown all mean the same
-thing regardless of theme. Only the DECORATION differs: background, kicker style, headline
-font, badge/pill treatment, and the persistent chrome (noir's corner badge + footer vs.
-thread's drawn line + markers). This is deliberate: composing a story never requires deciding
-per-field which theme you're in, only the top-level `"theme"` key.
+The market-story roles (`cover`/`stat`/`chart`/`breakdown`/`takeaway`) render the same
+`storyboard.json` contract in noir and thread — role, headline, emphasis, stat, chart,
+breakdown all mean the same thing; only the DECORATION differs (background, kicker style,
+headline font, badge/pill treatment, persistent chrome). Composing a market story never
+requires deciding per-field which theme you're in, only the top-level `"theme"` key.
+
+The product theme shares noir's palette, type ramp, and the `stat`/`chart`/`breakdown`/
+`takeaway` renderers (it reuses noir's components rather than copying them), and adds four new
+roles of its own (`feature`/`demo`/`cta`, plus a reworked `cover`). Those four exist only in
+the product theme; the `feature`/`demo`/`cta` roles error if used under noir/thread, and the
+market-story `chart`/`breakdown` roles merely warn under product (a feature reel proves the
+product with a demo, not a market chart).
 
 Charts (`LineChart`, `BarChart`, `OwnershipTree`) are shared components parameterized by a
-color palette per theme, not reimplemented per theme, so both themes get the same chart
-kinds and the same animation behavior.
+color palette per theme, so every theme gets the same chart kinds and animation behavior.

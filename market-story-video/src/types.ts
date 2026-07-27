@@ -50,7 +50,75 @@ export interface Badge {
   color?: BadgeColor;
 }
 
-export type SceneRole = "cover" | "stat" | "chart" | "breakdown" | "takeaway";
+// ---- product theme (feature reels) ----------------------------------------------------
+// Everything below is meaningful only when `theme: "product"`. See references/product-reel.md.
+
+export interface FeatureSpec {
+  name: string; // the feature as the product calls it, e.g. "Screener"
+  promise: string; // one line, what it does for the viewer
+  chips?: string[]; // up to 3 short capability tags — nouns/figures, never sentences
+}
+
+// A point of interest inside the footage, in 0-1 fractions of the DEVICE SCREEN box (not the
+// canvas): {x:0.5, y:0.5} is the middle of the screen regardless of how the frame is sized.
+export interface FocusPoint {
+  x: number;
+  y: number;
+  zoom?: number; // 1 = fit as-is; 1.4-2.0 is the useful range for "look here"
+}
+
+export type MediaSpec = {
+  kind: "clip" | "shot"; // clip = a screen recording (mp4/mov/webm); shot = a still (png/jpg)
+  src: string; // resolved by render.mjs relative to the storyboard file, then the skill root
+  device?: "browser" | "phone" | "bare"; // the frame drawn around it; default "browser"
+  url?: string; // "browser" device only: what the fake address bar reads
+  fit?: "cover" | "contain"; // default "cover"
+  trim?: [number, number]; // clip only: [start, end] seconds into the SOURCE file
+  focus?: FocusPoint; // hold this point/zoom for the whole scene
+  pan?: { from: FocusPoint; to: FocusPoint }; // or ease between two — the Ken Burns move
+  resolved?: string; // written by render.mjs (a staticFile path); never authored by hand
+};
+
+export interface Callout {
+  at: number; // seconds into the scene when it appears
+  text: string;
+  anchor: { x: number; y: number }; // 0-1 of the device screen box, where the ring is pinned
+  side?: "left" | "right" | "above" | "below"; // which way the pill sits off the ring; default "right"
+}
+
+export interface CursorKeyframe {
+  at: number; // seconds into the scene
+  x: number; // 0-1 of the device screen box
+  y: number;
+  click?: boolean; // draw a click ripple at this keyframe
+}
+
+export interface CtaSpec {
+  url: string; // where the viewer goes, e.g. "sectors.app/screener" — no protocol, no trailing slash
+  action?: string; // one short qualifier line, e.g. "Free plan, no card"
+}
+
+export type HumanCorner = "bottom-left" | "bottom-right" | "top-left" | "top-right";
+
+// The reserved talking-head slot. This skill writes the script and holds the space; it does
+// not composite footage (see references/voiceover.md).
+export interface HumanSlot {
+  corner?: HumanCorner; // default "bottom-left" — clear of the Reels like/share column on the right
+  size?: number; // canvas px, default PIP.size (320)
+  shape?: "circle" | "rounded"; // default "circle"
+  reserve?: boolean; // default true — pad every scene's copy out of the slot's band
+  note?: string; // direction that lands in script.md's recording notes, e.g. "half-body, plain wall"
+}
+
+export type SceneRole =
+  | "cover"
+  | "stat"
+  | "chart"
+  | "breakdown"
+  | "takeaway"
+  | "feature"
+  | "demo"
+  | "cta";
 
 export interface Scene {
   role: SceneRole;
@@ -68,6 +136,17 @@ export interface Scene {
   breakdown?: BreakdownSpec;
   badges?: Badge[]; // "thread" theme only: stacked pill call-outs (thread.md)
   marker?: { kind: "dot" | "logo"; color?: BadgeColor }; // "thread" theme only: the bead on the thread line for this scene
+
+  // "product" theme only — see references/product-reel.md
+  feature?: FeatureSpec; // role "feature": the capability being introduced
+  media?: MediaSpec; // role "demo": the recording or screenshot being shown
+  callouts?: Callout[]; // role "demo": rings + pills pinned into the footage
+  cursor?: CursorKeyframe[]; // role "demo": a synthetic pointer path, mainly for `kind: "shot"`
+  cta?: CtaSpec; // role "cta": the destination and its one qualifier line
+
+  // The spoken line for this scene. Never rendered on screen — it is the source `script-out.mjs`
+  // compiles into the timed voiceover script the presenter reads. See references/voiceover.md.
+  vo?: string;
 }
 
 export interface OutroSpec {
@@ -77,10 +156,14 @@ export interface OutroSpec {
 }
 
 export interface Storyboard {
-  theme: "noir" | "thread";
-  length?: "short" | "long"; // "short" (10-15s, default) or "long" (~45-75s) — see storyboard-format.md
-  tickers: string[]; // every ticker the piece is about
+  theme: "noir" | "thread" | "product";
+  length?: "short" | "long" | "reel"; // "short" (10-15s, default), "long" (~45-75s), "reel" (12-18s, product only)
+  tickers?: string[]; // every ticker the piece is about — omitted by a product reel, which names none
   sourceDate?: string; // bare date, e.g. "17 Jun 2026" — stamped once for the whole video
   outro?: OutroSpec | false; // false to suppress; default outro used if omitted
   scenes: Scene[];
+
+  // "product" theme only
+  feature?: string; // the key in inputs/features.json this reel was built from — traceability, not display
+  humanSlot?: HumanSlot | false; // false (or omitted) means no talking head and no reserved space
 }

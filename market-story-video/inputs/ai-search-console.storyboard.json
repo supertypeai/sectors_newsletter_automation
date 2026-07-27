@@ -1,0 +1,79 @@
+{
+  "theme": "product",
+  "length": "reel",
+  "feature": "ai-search-console",
+  "outro": false,
+  "humanSlot": {
+    "corner": "bottom-left",
+    "size": 320,
+    "shape": "circle",
+    "note": "Half-body, plain wall, look down the lens. Energy up on the hook, curious and confident through the demo."
+  },
+  "scenes": [
+    {
+      "role": "cover",
+      "duration": 2.4,
+      "kicker": "SECTORS.APP",
+      "headline": "One ticker. Five tabs to explain it.",
+      "emphasis": "Five tabs",
+      "body": "Price in one place, ownership in another, news somewhere else.",
+      "vo": "Five tabs, still no straight answer."
+    },
+    {
+      "role": "feature",
+      "duration": 2.8,
+      "kicker": "WHAT IT IS",
+      "feature": {
+        "name": "AI Search Console",
+        "promise": "Ask in plain English. Get the answer, the ownership, and the receipts.",
+        "chips": ["Natural language", "Ownership + news", "CSV + API export"]
+      },
+      "vo": "So we built a smarter search box."
+    },
+    {
+      "role": "demo",
+      "duration": 5.6,
+      "kicker": "IN THE APP",
+      "headline": "Search any ticker, sector, or the person behind it.",
+      "emphasis": "the person behind it.",
+      "media": {
+        "kind": "clip",
+        "src": "inputs/demo/ai-search-console.mp4",
+        "device": "browser",
+        "url": "sectors.app/search",
+        "fit": "cover",
+        "trim": [3.0, 8.6]
+      },
+      "body": "Tickers, sectors, or the investor behind them, one box.",
+      "vo": "Say it however you'd normally ask. It finds the ticker, the owner, the news."
+    },
+    {
+      "role": "demo",
+      "duration": 6.0,
+      "kicker": "GO DEEPER",
+      "headline": "Ask a real question, get a real answer.",
+      "emphasis": "get a real answer.",
+      "media": {
+        "kind": "clip",
+        "src": "inputs/demo/ai-search-console.mp4",
+        "device": "browser",
+        "url": "sectors.app/search",
+        "fit": "cover",
+        "trim": [9.0, 15.0]
+      },
+      "body": "Every AI answer comes with its own data query and a downloadable file.",
+      "vo": "Ask a real question. Get the answer, the query, and the numbers to check it."
+    },
+    {
+      "role": "cta",
+      "duration": 2.2,
+      "headline": "Ask the whole exchange, in your own words.",
+      "emphasis": "in your own words.",
+      "cta": {
+        "url": "sectors.app/search",
+        "action": "Type your question, get the receipts."
+      },
+      "vo": "It's built right into search."
+    }
+  ]
+}

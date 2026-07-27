@@ -16,10 +16,13 @@ itself (which tickers/sectors a specific user tracks). See SKILL.md's
 
 Invoke the `sectors-newsletter-dbquery` skill (Skill tool) to run its approved
 `watchlist-tracked-interest` query. That query returns, per eligible user: `user_id`,
-`email`, `first_name`, `tickers` (array), `sectors` (array). **Never write SQL here,
-never ask for Supabase access directly**, this skill has no DB credential and that
+`email`, `first_name`, `tickers` (array), `sectors` (array). **Never write or improvise
+SQL for this, and never query Supabase directly for user-account data**, that
 discipline is load-bearing, not a formality, see dbquery's
-`references/supabase-access.md`.
+`references/supabase-access.md`. (This is distinct from the two public market-data
+fixed queries this skill runs itself, `scripts/fixed-queries/broker-summary-range.sql`
+and `foreign-flow-range.sql`, used by monthly-market-pulse and weekly-insights-v2;
+those hold no PII and don't go through dbquery's gate.)
 
 Known data-quality caveat in the real rows (per that query's own header comment,
 pending upstream DB cleanup): tickers are inconsistently suffixed (`.JK` for IDX,

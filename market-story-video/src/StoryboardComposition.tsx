@@ -1,9 +1,11 @@
 import React from "react";
 import { AbsoluteFill, Sequence, useVideoConfig } from "remotion";
-import { Storyboard } from "./types";
+import { Scene, SceneRole, Storyboard } from "./types";
 import { noirTheme } from "./themes/noir";
 import { threadTheme, ThreadLine, ThreadMarker } from "./themes/thread";
+import { productTheme } from "./themes/product";
 import { SceneShell } from "./components/SceneShell";
+import { HumanSlotGuide, ReservedPaddingContext, reservedPadding } from "./components/HumanSlot";
 
 const DEFAULT_OUTRO_SECONDS = 2.2;
 const MARKER_COLOR_CYCLE = ["#E5337E", "#DF9439", "#1D8A4E", "#211B15"];
@@ -12,8 +14,9 @@ const MARKER_COLOR_CYCLE = ["#E5337E", "#DF9439", "#1D8A4E", "#211B15"];
 // single-ticker story that means the ticker's own sectors.app page, not a generic homepage
 // link, so a viewer who wants to verify a number lands exactly where it lives.
 function defaultTagline(storyboard: Storyboard): string {
-  if (storyboard.tickers.length === 1) {
-    return `sectors.app/idx/${storyboard.tickers[0].toLowerCase()}`;
+  const tickers = storyboard.tickers ?? [];
+  if (tickers.length === 1) {
+    return `sectors.app/idx/${tickers[0].toLowerCase()}`;
   }
   return "sectors.app";
 }
@@ -25,10 +28,19 @@ export function computeFrames(storyboard: Storyboard, fps: number) {
   return { sceneFrames, outroFrames, total };
 }
 
-export const StoryboardComposition: React.FC<{ storyboard: Storyboard }> = ({ storyboard }) => {
+const THEMES = { noir: noirTheme, thread: threadTheme, product: productTheme } as const;
+
+// `guides` is set by render.mjs on a --stills/draft pass (or with --guides): it draws the
+// talking-head framing box so the reserved corner is checkable before anything is filmed. The
+// delivered MP4 renders that area empty.
+export const StoryboardComposition: React.FC<{ storyboard: Storyboard; guides?: boolean }> = ({
+  storyboard,
+  guides = false,
+}) => {
   const { fps } = useVideoConfig();
   const { sceneFrames, outroFrames, total } = computeFrames(storyboard, fps);
-  const theme = storyboard.theme === "thread" ? threadTheme : noirTheme;
+  const theme = THEMES[storyboard.theme] ?? noirTheme;
+  const reserved = reservedPadding(storyboard.humanSlot);
 
   let cursor = 0;
   const starts = sceneFrames.map((f) => {
@@ -59,7 +71,7 @@ export const StoryboardComposition: React.FC<{ storyboard: Storyboard }> = ({ st
     const newThisScene = scene.tickers.filter((ticker) => {
       if (seenThisLap.has(ticker)) return false;
       seenThisLap.add(ticker);
-      if (seenThisLap.size >= storyboard.tickers.length) seenThisLap = new Set();
+      if (seenThisLap.size >= (storyboard.tickers ?? []).length) seenThisLap = new Set();
       return true;
     });
     return newThisScene.map((ticker, j) => ({
@@ -86,7 +98,13 @@ export const StoryboardComposition: React.FC<{ storyboard: Storyboard }> = ({ st
       return { ...m, atFrame };
     });
 
+  // Each theme implements only the roles it has a renderer for (the product theme has no
+  // thread markers; noir/thread have no demo frame), so the lookup is a partial map and a
+  // missing role is a loud authoring error rather than a blank scene.
+  const sceneRenderers = theme.scenes as Partial<Record<SceneRole, React.FC<{ scene: Scene }>>>;
+
   return (
+    <ReservedPaddingContext.Provider value={reserved}>
     <AbsoluteFill>
       <theme.Background />
       {storyboard.theme === "thread" && (
@@ -94,9 +112,13 @@ export const StoryboardComposition: React.FC<{ storyboard: Storyboard }> = ({ st
       )}
       {theme.Chrome && <theme.Chrome sourceDate={storyboard.sourceDate} />}
       {storyboard.scenes.map((scene, i) => {
-        const SceneComponent = theme.scenes[scene.role];
+        const SceneComponent = sceneRenderers[scene.role];
         if (!SceneComponent) {
-          throw new Error(`No "${storyboard.theme}" theme renderer for scene role "${scene.role}".`);
+          throw new Error(
+            `No "${storyboard.theme}" theme renderer for scene role "${scene.role}". ` +
+              `The feature-reel roles (feature/demo/cta) exist only in the "product" theme; ` +
+              `the market-story roles (chart/breakdown) exist in all three.`
+          );
         }
         // If there's no outro (outroFrames === 0, i.e. "outro": false), the last authored
         // scene IS the last frame of the video, so it inherits the outro's no-fade-out rule.
@@ -124,6 +146,8 @@ export const StoryboardComposition: React.FC<{ storyboard: Storyboard }> = ({ st
           </SceneShell>
         </Sequence>
       )}
+      {guides && <HumanSlotGuide slot={storyboard.humanSlot} />}
     </AbsoluteFill>
+    </ReservedPaddingContext.Provider>
   );
 };

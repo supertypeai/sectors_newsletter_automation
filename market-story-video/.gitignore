@@ -1,5 +1,8 @@
 node_modules/
 output/
+public/
+inputs/demo/
+inputs/shots/
 .remotion/
 *.log
 .DS_Store
