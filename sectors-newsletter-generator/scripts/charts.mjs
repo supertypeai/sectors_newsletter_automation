@@ -387,6 +387,22 @@ export function moversChart(items, { w = 936, rowH = 46, labelZone = 190, pad = 
   const halfW = cx - plotL;
   const maxAbs = Math.max(1e-9, ...items.map((it) => Math.abs(it.value)));
   const fmt = (it) => (it.display != null ? it.display : `${it.value >= 0 ? "+" : ""}${trimNum(it.value)}%`);
+  // Reserve room for the value label before sizing bars. The longest-magnitude row's
+  // bar is the constraint: its label sits LABEL_GAP past the bar end, so without a
+  // reserve it runs off the canvas and the raster clips it (measured: "+45.71%"
+  // overflowed a 936-wide chart by 40px). Because labels are MONO, the width is
+  // predictable from the character count and needs no text measurement.
+  //
+  // LABEL_SIZE is shared by the reserve below and the <text> that draws the label, so
+  // the two can't drift: raising the font size without widening the reserve is exactly
+  // the bug this reserve exists to prevent.
+  const LABEL_SIZE = 23;
+  const LABEL_GAP = 10;
+  const MONO_ADVANCE = 0.6; // JetBrains Mono advance width, in em
+  const maxLabelPx = Math.max(...items.map((it) => fmt(it).length * LABEL_SIZE * MONO_ADVANCE));
+  // Floor keeps a pathological label (a very long `display` string) from collapsing
+  // the bars to nothing; it would rather overflow than render an unreadable chart.
+  const usableW = Math.max(halfW * 0.25, halfW - maxLabelPx - LABEL_GAP);
   let out = `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
     <line x1="${cx.toFixed(1)}" y1="${pad}" x2="${cx.toFixed(1)}" y2="${(h - pad).toFixed(1)}" stroke="rgba(11,11,11,0.14)" stroke-width="2"/>`;
   items.forEach((it, i) => {
@@ -400,12 +416,12 @@ export function moversChart(items, { w = 936, rowH = 46, labelZone = 190, pad = 
     const tickerX = pad + logoSize + 10;
     out += `<text x="${tickerX}" y="${(midY + 7).toFixed(1)}" fill="${TICKER}" font-family="${MONO}" font-size="24" font-weight="800" text-anchor="start">${esc(it.symbol)}</text>`;
     const neg = it.value < 0;
-    const barLen = (Math.abs(it.value) / maxAbs) * halfW * 0.86;
+    const barLen = (Math.abs(it.value) / maxAbs) * usableW;
     const barX = neg ? cx - barLen : cx;
     const fill = neg ? LOSS : GAIN;
     out += `<rect x="${barX.toFixed(1)}" y="${(rowY + 8).toFixed(1)}" width="${Math.max(2, barLen).toFixed(1)}" height="${(rowH - 16).toFixed(1)}" rx="6" fill="${fill}"/>`;
-    const labelX = neg ? barX - 10 : barX + barLen + 10;
-    out += `<text x="${labelX.toFixed(1)}" y="${(midY + 7).toFixed(1)}" fill="${fill}" font-family="${MONO}" font-size="23" font-weight="800" text-anchor="${neg ? "end" : "start"}">${esc(fmt(it))}</text>`;
+    const labelX = neg ? barX - LABEL_GAP : barX + barLen + LABEL_GAP;
+    out += `<text x="${labelX.toFixed(1)}" y="${(midY + 7).toFixed(1)}" fill="${fill}" font-family="${MONO}" font-size="${LABEL_SIZE}" font-weight="800" text-anchor="${neg ? "end" : "start"}">${esc(fmt(it))}</text>`;
   });
   return out + `</svg>`;
 }
