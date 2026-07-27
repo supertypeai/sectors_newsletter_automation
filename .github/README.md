@@ -33,6 +33,7 @@ Repo settings → Secrets and variables → Actions → **Secrets**:
 | `CLAUDE_CODE_OAUTH_TOKEN` | draft | Runs Claude Code. Uses your **existing Claude subscription**, no separate API plan needed. See below |
 | `SECTORS_API_KEY` | draft | Sectors market data. This is now the only source; no key ships in the repo |
 | `MAILROOM_API_KEY` | draft + send | Mailroom API key, sent as `Authorization: Bearer`. The draft job needs it too, to host chart images |
+| `NEWSLETTER_PAT` | draft | **Recommended.** PAT with `repo` + `workflow` scope for the PR push. `GITHUB_TOKEN` cannot push anything under `.github/workflows/`, and no `permissions:` key can grant it that |
 | `STORING_API_KEY` | draft | **Optional.** Compresses chart PNGs through [Storing](https://storing.app) before upload. Leave unset and charts upload at full size. Generate from Storing's Settings page |
 
 ### Claude auth: subscription, not a second subscription
