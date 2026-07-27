@@ -1,4 +1,0 @@
-{
-  "sectorsApiKey": "b92505154040e057674bcf773004f9c732157b6098691f619841ec09a4f2f3dd",
-  "_note": "Shared team key for the Sectors API so peers can use the skill with zero setup. Precedence: the SECTORS_API_KEY env var overrides this if set. SECURITY: keep this repo private; if the key leaks or this goes to a public remote, rotate it at sectors.app and update only this line."
-}

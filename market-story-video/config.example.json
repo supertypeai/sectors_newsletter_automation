@@ -1,0 +1,4 @@
+{
+  "sectorsApiKey": "",
+  "_note": "Optional local fallback. The SECTORS_API_KEY environment variable is the primary source and overrides this file; see the repo README for setup. Copy to config.json and fill in only if you prefer a file to an env var. config.json is gitignored: never commit a real key."
+}

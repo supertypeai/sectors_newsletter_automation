@@ -321,7 +321,7 @@ inputs/
 assets/
   logos.json                  957 IDX ticker logos (base64), shared with the carousel skill
   brand/                       sectors-mark.svg, app-overview.png (a real sectors.app screenshot for reel drafts)
-config.json                   shared Sectors API key (sectorsApiKey); SECTORS_API_KEY env overrides
+config.example.json           template for the optional local key file; SECTORS_API_KEY env is the primary source
 package.json                 remotion + @remotion/cli + @remotion/google-fonts
 samples/  output/             three worked examples (noir, thread, product reel), and where renders land
 ```
@@ -333,8 +333,10 @@ samples/  output/             three worked examples (noir, thread, product reel)
 - **Fonts**: loaded live from Google Fonts at render time via `@remotion/google-fonts`
   (Plus Jakarta Sans, JetBrains Mono, Lora) — needs network the same way the Sectors API call
   does; there is no local font cache to pre-warm.
-- **API key**: a shared team key ships in `config.json`. Override with
-  `export SECTORS_API_KEY=<key>` if you have your own.
+- **API key**: `export SECTORS_API_KEY=<key>`, ideally in your shell profile so it's
+  always set. **No key ships in the repo.** A local `config.json` with `sectorsApiKey`
+  still works as a fallback if you prefer a file (copy `config.example.json`), but it is
+  gitignored and must never carry a real key into git.
 - **Sanity check**: `node scripts/render.mjs samples/bbri-vs-bonds.storyboard.json --out output/_sample`.
 - **Preview while iterating**: `npx remotion studio src/index.ts` opens Remotion's interactive
   player (scrub the timeline, hot-reload on save) — faster than re-rendering for a layout-only
