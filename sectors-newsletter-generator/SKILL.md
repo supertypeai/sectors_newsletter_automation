@@ -49,7 +49,8 @@ skill govern everything here:
 
 ## Personalization check (run before picking an issue type)
 
-Ask one question first: **does this content need real per-user data (which tickers or
+Settle one question first, by reading the request rather than asking the user:
+**does this content need real per-user data (which tickers or
 sectors a specific user tracks, their account/billing state) that the Sectors API
 cannot supply?**
 
@@ -71,6 +72,45 @@ cannot supply?**
   `scripts/fixed-queries/`, see workflows/monthly-market-pulse.md §3 and
   workflows/weekly-insights-v2.md. That's a different category from account data and
   doesn't go through dbquery's approval gate.)
+
+## Running unattended (CI, cron, scheduled runs)
+
+When the environment variable `NEWSLETTER_UNATTENDED=1` is set, **no human is
+reachable during the run**. Never ask a question, never pause for input, never stop at
+a menu. Every decision this skill would normally put to the user has a documented
+default below; take it, and record the choice in the issue's own appendix so a reviewer
+can see what was decided on their behalf.
+
+| Decision point | Unattended default |
+| --- | --- |
+| Issue type, none named in the prompt | `weekly-insights-v2` |
+| Foreign-flow definition | exchange (`idx_daily_data`) via `scripts/fixed-queries/foreign-flow-range.sql`; **needs the Supabase MCP connector**, see below |
+| Block 4 visuals, no card URLs supplied | generate with `scripts/charts.mjs`, never wait for cards |
+| `$NEWSLETTER_HOME/samples/<type-slug>/` absent | proceed without it, note the absence in the appendix |
+| Upcoming-events sheet unreachable | omit that block, note it, don't fail the issue |
+| A requested type isn't built yet | stop with a clear error naming the type, don't substitute a different one |
+| Anything else this skill would ask | take the documented default and state the choice in the appendix |
+
+Two things stay hard failures even here, because the alternative is publishing
+something false: a **fetch that returns no usable data for a required block** (say the
+window's index series comes back empty), and any figure that would have to be invented
+to fill a gap. Fail the run loudly instead. Hard rules 1 through 3 outrank the
+never-stall instruction above, always.
+
+**Foreign flow needs the Supabase MCP connector, not just the Sectors API.** The
+exchange definition is only reachable through `scripts/fixed-queries/foreign-flow-range.sql`
+against `idx_daily_data`; no Sectors API endpoint exposes the foreign buy/sell volume
+split (`daily/{symbol}` carries close/volume/market-cap only, and `foreign-flow/{symbol}`
+is the broker-domicile measure the rule forbids for this figure). So if the connector
+isn't configured in the runner, **omit the flow figure and note the omission** rather
+than substituting the broker endpoint, which would publish the contradiction the rule
+exists to prevent. Flow is one line in Key Data Bites, not a required block; the issue
+stands without it.
+
+**Types that need human-supplied source material** (`upcoming-event`,
+`new-release-feature`, `watchlist-performance-digest`) are not automatable and must not
+be attempted unattended. If one is requested with `NEWSLETTER_UNATTENDED=1`, stop and
+say why.
 
 ## Pick the issue type (always first)
 
@@ -130,7 +170,11 @@ maps to a workflow doc in `references/workflows/` and an issue-type slug:
 subject ("do the Saturday wrap," "deep dive on BBRI earnings," "spotlight the banks"), go
 straight into that pipeline. If they delegate the choice ("you pick this week's issue"),
 choose and state a one-line "why this, why now" as you proceed. Only a bare "write the
-newsletter" with no type named gets the menu, offer the nine above grouped by family.
+newsletter" with no type named gets the menu, offer the ten above grouped by family.
+
+**Under `NEWSLETTER_UNATTENDED=1` there is no menu.** A bare "write the newsletter" with
+no type named runs `weekly-insights-v2`, the default weekly send; say so in the appendix
+and carry on. See **Running unattended** above.
 
 ### Not yet built (in scope, will be added iteratively)
 
@@ -212,11 +256,14 @@ see their own workflow docs.
 1. **Research the angle** — web search and/or API discovery, before any drafting.
 2. **Fetch and validate data** — `sectors.mjs`, then band-check against
    `references/sectors-api/data-quality.md`. Before fetching, check
-   `/Users/evelyn/Desktop/newsletter/samples/<type-slug>/queries.md` for that issue
+   `$NEWSLETTER_HOME/samples/<type-slug>/queries.md` for that issue
    type's resolved endpoint list, param shape, and date/window rule (e.g. weekly-wrap's
    Mon-Fri anchor, macro-reaction's last-2-days news window) — reuse the same criteria
    this run, only the dates/tickers change. If no sample exists yet for a type, the file
-   still holds the documented recipe pattern; populate the sample after this run. This
+   still holds the documented recipe pattern; populate the sample after this run.
+   **If the folder itself is absent** (a fresh clone, a CI runner), fall back to the
+   recipe in this type's own workflow doc, note the absence in the appendix, and carry
+   on — a missing sample is never a reason to stall or to fail the run. This
    folder lives next to the delivered issues, not inside the skill, specifically so it's
    easy to open and edit directly when the user wants to adjust a type's format or
    presentation, without touching skill internals.
@@ -229,9 +276,11 @@ see their own workflow docs.
    visual formatting** section, which routes chart work through the `dataviz` skill).
 4. **Self-review** — the checklist at the end of the chosen workflow doc, plus
    `references/compliance.md`'s one-line test. Also diff the draft's section order and
-   heading logic against `/Users/evelyn/Desktop/newsletter/samples/<type-slug>/newsletter.md`
+   heading logic against `$NEWSLETTER_HOME/samples/<type-slug>/newsletter.md`
    (when one exists) so flow and section-title logic stay consistent issue to issue for
-   the same type, not just compliant with the prose skeleton in isolation.
+   the same type, not just compliant with the prose skeleton in isolation. When no
+   sample exists, review against the type's own skeleton in
+   `references/newsletter-format.md` instead and say so in the appendix.
 5. **Deliver** — see Delivery below.
 
 ### Weekly Insights v2
@@ -241,9 +290,10 @@ settle the Mon-Fri window as v1 does, then build eight blocks, not eleven. Key D
 carries every computed market-level fact; Other Major Headlines carries every news-sourced
 one; the two must never repeat a fact. The single analysis block joins two sources to find
 something the tables don't already say, illustrated with the carousel's social cards.
-**Open decision: ask the user which foreign-flow definition the issue should use before
-drafting any flow figure** (the cards and `foreign-flow/{symbol}` use different methods that
-disagree on direction, see the workflow doc §3), then apply that one definition throughout.
+**Foreign flow uses the exchange definition** (`idx_daily_data`), settled 2026-07-27,
+pulled via `scripts/fixed-queries/foreign-flow-range.sql`. Don't ask, and don't mix in
+`foreign-flow/{symbol}`'s broker-domicile figure, the two disagree on direction
+(workflow doc §3).
 
 ### Weekly wrap (v1, superseded)
 Open `references/workflows/weekly-wrap.md` for the exact API recipe and section order.
@@ -378,7 +428,10 @@ dbquery skill's templates do.
     button to `eventUrl`, five fields per event straight off the sheet, nothing
     invented. Heading is the fixed text "Upcoming Events," not a variable lead-in. See
     `newsletter-format.md`'s **Upcoming events closing block** section for the exact
-    contract.
+    contract. **If the sheet is unreachable** (network failure, the doc moved), omit the
+    block and note the omission in the appendix rather than failing the issue or
+    inventing an event; the sheet is a public `curl`, so a failure here is transport,
+    not content. Every row still upcoming is required whenever the fetch *does* succeed.
 11. **Weekly Insights v2 sends Monday, not Saturday** (confirmed 2026-07-20): the
     header line's issue/send date is the Monday immediately after the reporting week's
     Friday close, e.g. week of 6-10 Jul → issue date 13 Jul, week of 13-17 Jul → issue
@@ -401,13 +454,28 @@ macro-reaction or three-stock-story types.
 
 ## Delivery
 
+**`$NEWSLETTER_HOME` is the root for both delivered issues and the `samples/`
+reference folder.** Resolve it in this order, and state which one you used in the
+appendix:
+
+1. the `NEWSLETTER_HOME` environment variable, if set (this is what CI sets);
+2. otherwise `<repo-root>/newsletter/`, alongside the skills checkout;
+3. otherwise ask, but only when a human is present — under `NEWSLETTER_UNATTENDED=1`
+   never ask, take option 2.
+
+Create the folder if it doesn't exist rather than treating its absence as an error.
+Never write a delivered issue to a path outside this root.
+
 Finished issues land at:
 
 ```
-/Users/evelyn/Desktop/newsletter/newsletter_<YYYY-MM-DD>_<type-slug>/
+$NEWSLETTER_HOME/newsletter_<YYYY-MM-DD>_<type-slug>/
     newsletter.md
     newsletter.html            every type: the send-ready HTML email
-    chart-<slug>.svg           every issue's required hero chart
+    chart-<slug>.svg           every issue's required hero chart, the source of truth
+    chart-<slug>.png           the same chart rasterized for email; what the HTML
+                                actually references, since Gmail and Outlook strip SVG
+                                (generated by scripts/rasterize.mjs, needs `npm install`)
     banner-<slug>.<ext>        upcoming-event only: the user-supplied banner, copied in
     sample-rows.csv            watchlist-performance-digest only: the real audience rows
                                 the dbquery skill's query returned this run (local only,
@@ -450,16 +518,21 @@ Finished issues land at:
   worked reference.
 - Scratch fetches (raw `sectors.mjs --save-dir` JSON) go to the scratchpad or a
   `_draft`/`data` subfolder, not into the delivered folder.
-- `newsletter/` is a plain folder, separate from the skills repo and from the
+- Locally, `$NEWSLETTER_HOME` is a plain folder, separate from the
   `sectors-carousel` skill's `scs/<ticker>_<slug>/` git repo, no git init needed here.
-- **`samples/` lives in this same `newsletter/` folder, not inside the skill.**
-  `/Users/evelyn/Desktop/newsletter/samples/<type-slug>/` holds one `newsletter.md`
+  In CI it resolves inside the repo checkout instead, because the delivered issue is
+  what the review PR carries; that's the one case where issues are committed.
+- **`samples/` lives in this same `$NEWSLETTER_HOME` folder, not inside the skill.**
+  `$NEWSLETTER_HOME/samples/<type-slug>/` holds one `newsletter.md`
   (+`.html`/chart where applicable) and a `queries.md` per issue type, deliberately kept
   next to the delivered issues rather than under the skill's own `references/` so the
   user can open and edit a type's format/presentation reference directly, without
   digging into skill internals. See **Shared pipeline shape** steps 2 and 4 for when
   this skill reads it, and refresh a type's sample here after any run whose output is
   more current or more refined than what's stored.
+  **This folder is not shipped with the skill** and will be missing on a fresh clone or
+  a CI runner. Both read sites above degrade gracefully when it is; nothing here is a
+  hard dependency.
 
 ## What's in this skill
 
@@ -509,11 +582,11 @@ scripts/
                                    file's header comment for the validated role map;
                                    GAIN/LOSS is brand green/red `#568475`/`#D53E50`,
                                    ticker mentions are blue `#9E0142`, see Hard rule 7)
-config.json                       own copy of the shared Sectors API key
-                                   (sectorsApiKey); SECTORS_API_KEY env overrides
+config.example.json               template for the optional local key file;
+                                   SECTORS_API_KEY env is the primary source
 ```
 
-**This skill is self-contained**: `scripts/sectors.mjs`, `config.json`,
+**This skill is self-contained**: `scripts/sectors.mjs`,
 `references/sectors-api/`, and `references/writing/{writing,brand-voice}.md` are local
 copies, not relative-path reuse of `sectors-carousel` — this skill runs standalone even
 if `sectors-carousel` isn't installed. They originate from `sectors-carousel` (the
@@ -527,9 +600,14 @@ references. It has no dependency relationship with this skill in either directio
 
 ## Setup
 
-No install needed. Unlike `sectors-carousel` there is no slide-rendering step — the
-only dependency is `node` (built-ins only, no npm packages) to run `sectors.mjs`, and
-the shared API key already ships in `config.json`. The required hero chart is generated
+`sectors.mjs` and `charts.mjs` need nothing but `node`, no npm packages, so a
+Markdown-only draft needs no install. **`scripts/rasterize.mjs` is the one exception**:
+it needs Puppeteer (`npm install` in this folder, once per machine) to turn the chart
+SVGs into the PNGs email clients can actually display. Skip it if you only want the
+`.md`; you need it for any issue you intend to send. Set
+the API key once with `export SECTORS_API_KEY=<key>`; no key ships in the repo, and a
+local `config.json` (copied from `config.example.json`) is an optional gitignored
+fallback if you prefer a file. The required hero chart is generated
 with this skill's own `scripts/charts.mjs` (import the chart-kind function you need —
 `sparkline`/`line` for a price series, `barChart` for year-over-year (pass `financial:
 true` for a signed gain/loss series), `donut` for a mix, `moversChart` for a ranked

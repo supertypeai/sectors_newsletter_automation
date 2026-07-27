@@ -193,7 +193,7 @@ assets/
   logos/                     957 IDX ticker logos (auto-used via chips / data-logo / rankings)
   coverart/                  prepared cover subject images, <TICKER>.png (auto-resolved by render.mjs)
   brand/                     sectors-mark.svg + app-overview.png (footer + outro art)
-config.json                  shared Sectors API key (sectorsApiKey); SECTORS_API_KEY env overrides
+config.example.json          template for the optional local key file; SECTORS_API_KEY env is the primary source
 package.json                 puppeteer dependency (run `npm install` once per machine)
 examples/  responses/        cached Sectors v2 shapes (structure reference; data is a snapshot)
 samples/   output/           a worked example deck, and where rendered slides land
@@ -203,7 +203,7 @@ samples/   output/           a worked example deck, and where rendered slides la
 
 - **Install**: run `npm install` in the skill directory once (downloads Puppeteer + its pinned Chromium, so rendering is identical on macOS/Windows with no system browser). Needs network for this one step.
 - **Fonts**: pre-bundled in `assets/styles/fonts.css`. Only re-run `node scripts/build-fonts.mjs` if you change `assets/fonts/*.woff2`.
-- **API key**: a shared team key ships in `config.json`, so live data works out of the box. Override with `export SECTORS_API_KEY=<key>` if you have your own.
+- **API key**: `export SECTORS_API_KEY=<key>`, ideally in your shell profile so it's always set. **No key ships in the repo.** A local `config.json` with `sectorsApiKey` still works as a fallback if you prefer a file (copy `config.example.json`), but it is gitignored and must never carry a real key into git.
 - **Sanity check**: `node scripts/render.mjs samples/*.deck.json --out output/_sample`.
 
 To extend the renderer or the design system, see **`CLAUDE.md`**.

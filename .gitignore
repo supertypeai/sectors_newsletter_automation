@@ -1,0 +1,19 @@
+# Local secrets. Never commit these.
+.env
+.env.*
+!.env.example
+
+# Local API-key fallback. SECTORS_API_KEY in the environment is the primary source;
+# config.json is an optional local convenience and must never carry a key into git.
+# Copy config.example.json if you want one.
+*/config.json
+
+# Scratch API fetches (sectors.mjs --save-dir output), never part of a reviewed diff.
+newsletter/**/data/
+newsletter/**/_draft/
+
+# Real audience rows from the dbquery skill: contains PII, stays local, never committed.
+newsletter/**/sample-rows.csv
+
+# Claude Code skill discovery symlink, created by CI at runtime.
+.claude/skills/

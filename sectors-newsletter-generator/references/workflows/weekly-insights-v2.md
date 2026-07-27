@@ -225,7 +225,30 @@ The bucket cannot be listed programmatically without a credential:
 404s/400s, and the trailing `_<n>` is not predictable). So today the URLs are **supplied by
 the user at generation time**. Ask for them; do not attempt to enumerate or guess.
 
-Two ways to fix that, when the user wants to:
+### When no card URLs are available (the unattended path)
+
+Under `NEWSLETTER_UNATTENDED=1` there is nobody to ask, so **don't**. Cards are an
+illustration layer, never the source of a finding (see "Findings first, images second"
+above), so an issue without them is complete, not degraded:
+
+1. Derive the week's two or three findings from the API exactly as always.
+2. Render each finding's visual with `../../scripts/charts.mjs` instead of pulling a card.
+   Pick the chart kind from the finding's own shape, the same judgement the `dataviz`
+   skill's form heuristic describes: `moversChart` for a ranked signed list,
+   `barChart` (with `financial: true`) for a signed comparison, `sparkline`/`line` for a
+   path over the week, `donut` for a mix.
+3. Skip the Instagram/Threads credit line under a generated chart, it credits card
+   artwork that isn't there. Keep the follow-us block at the end of block 4, that one is
+   a standing CTA rather than an attribution.
+4. Note in the appendix that visuals were generated rather than sourced from cards, so a
+   reviewer knows why the issue looks different from a hand-made week.
+
+The same fallback applies interactively whenever a week genuinely has no eligible card
+(every filename outside the window, or all of them story-only renders). It is the
+existing "so the issue is never image-less" rule below, made routine rather than
+exceptional.
+
+Two ways to get cards into an automated run, when the user wants to:
 
 - **Manifest file (preferred, no credential).** Have the carousel pipeline write a small JSON
   to a predictable public path as it renders, e.g.
@@ -241,8 +264,8 @@ Two ways to fix that, when the user wants to:
 > figure.** The 18 Jul 2026 issue was left mixed (broker figure in Key Data Bites next to
 > exchange-definition cards) and is not a model to copy.
 
-> **The cards and the API use two different definitions of foreign flow. Pick one per issue
-> and never mix them.** Resolved 2026-07-20 against the database, after an earlier note here
+> **The cards and the API use two different definitions of foreign flow. Never mix them
+> in one issue.** Resolved 2026-07-20 against the database, after an earlier note here
 > wrongly called the cards buggy.
 >
 > | Source | Definition | Table |
@@ -255,10 +278,9 @@ Two ways to fix that, when the user wants to:
 > broker one; ANTM was +237.89B versus -136.67B. A foreign investor trading through a domestic
 > broker lands in a different bucket under each method.
 >
-> **Default to the exchange definition** (`idx_daily_data`) for this issue type. It is what
+> **Use the exchange definition** (`idx_daily_data`) for this issue type, always. It is what
 > Indonesian press quotes as "asing net buy/sell", and it is what the cards show, so card and
-> copy agree by construction. If you quote `foreign-flow/{symbol}` instead, say so and do not
-> also show a card built on the other definition. Caveat on the exchange figure: net volume
+> copy agree by construction. Caveat on the exchange figure: net volume
 > times `close` is an approximation, since only volumes are stored and a true value would need
 > separate buy-side and sell-side average prices.
 

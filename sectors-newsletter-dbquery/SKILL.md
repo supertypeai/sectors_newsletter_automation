@@ -232,9 +232,10 @@ scripts/
                                     currently built issue type
   charts.mjs                       inline-SVG chart generator; not used by any
                                     currently built issue type
-config.json                        Sectors API key (sectorsApiKey), unused by any
-                                    currently built issue type; Supabase access is via
-                                    the separate `supabase` MCP connector, not this
+config.example.json                template for the optional local Sectors key file
+                                    (SECTORS_API_KEY env is the primary source), unused
+                                    by any currently built issue type; Supabase access is
+                                    via the separate `supabase` MCP connector, not this
                                     file, no DB credential lives here
 ```
 
