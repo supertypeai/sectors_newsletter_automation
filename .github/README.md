@@ -24,6 +24,25 @@ Nothing reaches subscribers from stage 1. Stage 2 creates the campaign with a
 `schedule_at` a short way out rather than sending on the spot, so a mistake caught
 right after merge can still be cancelled in the mailroom UI.
 
+### One branch, reused every week
+
+The PR branch is `newsletter/weekly-insights-v2`, fixed rather than per-run — this is
+`create-pull-request`'s own default design, meant for exactly this: a scheduled job
+that reuses one branch instead of accumulating a new one every week.
+
+**That reuse has a real hazard if a week gets skipped.** If last week's PR is still
+open when this week's cron fires, a plain push to the same branch would silently
+*update that same PR*, replacing last week's still-unreviewed draft with this week's —
+no conflict, no warning, the old content just isn't in git anymore. The **first step**
+of the workflow guards against this: it checks for an open PR on the branch before
+doing anything else (before spending any Claude usage or Sectors API credits) and
+fails the run if one exists, with a link to the PR that needs attention.
+
+In practice this means **the cron goes quiet if you fall behind on review** — no new
+issue drafts until the pending one is merged or closed. That's the tradeoff for never
+losing an unreviewed issue silently. `delete-branch: true` on the PR step cleans the
+branch up once merged, so it doesn't linger.
+
 ## Required secrets
 
 Repo settings → Secrets and variables → Actions → **Secrets**:
