@@ -54,6 +54,33 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # One branch per issue type, reused week to week, rather than a new branch every
+      # run — this is create-pull-request's own default design ("the branch name...
+      # enables the branch to be reused across multiple workflow runs"). The hazard
+      # that comes with reuse: if last week's PR on this branch is still open when this
+      # week's run fires, a plain push would UPDATE that same PR in place, silently
+      # replacing last week's still-unreviewed draft with this week's — no conflict, no
+      # warning, the old content is just gone from git. Refuse instead, and do it as
+      # the very first step: check before spending any Claude usage or Sectors API
+      # credits on a draft the run is about to discard anyway.
+      - name: Refuse to run over a still-open prior PR
+        env:
+          GH_TOKEN: ${{ secrets.NEWSLETTER_PAT || secrets.GITHUB_TOKEN }}
+        run: |
+          branch="newsletter/${ISSUE_TYPE}"
+          # `.[0].url // empty` matters: on no match, `.[0]` alone is the JSON value
+          # null, and `gh --jq` prints that as the 4-character string "null", not
+          # nothing — piping that into `[ -n ... ]` would read as non-empty and block
+          # every run unconditionally. `// empty` makes the no-match case print truly
+          # nothing, so this check only trips on a real open PR (verified locally).
+          url=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$branch" --state open --json url --jq '.[0].url // empty')
+          if [ -n "$url" ]; then
+            echo "A newsletter PR is already open and unreviewed on branch '$branch': $url" >&2
+            echo "Merge or close it before this workflow can draft the next issue —" >&2
+            echo "pushing over it now would silently replace its content." >&2
+            exit 1
+          fi
+
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -184,6 +211,21 @@ jobs:
       - name: Drop scratch fetches
         run: rm -rf "${{ steps.issue.outputs.folder }}"/{data,_draft}
 
+      # Before the PR step, not after. peter-evans/create-pull-request commits the
+      # issue folder to the new branch, pushes, then runs `git checkout main` to leave
+      # the runner on the base branch. Since the issue folder exists only on that new
+      # branch, checking back out to main removes it from the working directory —
+      # any step reading the folder afterward finds it gone (surfaced 2026-07-27 as
+      # "missing newsletter.md" from the email step when it ran second). Sending the
+      # test email first means it reads the folder while it still exists on disk.
+      - name: Email the draft to the reviewer
+        env:
+          MAILROOM_API_KEY: ${{ secrets.MAILROOM_API_KEY }}
+          MAILROOM_EMAIL_URL: ${{ vars.MAILROOM_EMAIL_URL || 'https://mailroom.supertype.ai/api/v1/emails' }}
+          MAILROOM_FROM: ${{ vars.MAILROOM_FROM }}
+          MAILROOM_TEST_TO: ${{ vars.MAILROOM_TEST_TO || 'aurellia@supertype.ai' }}
+        run: node .github/scripts/send-test.mjs "${{ steps.issue.outputs.folder }}"
+
       - name: Open the review PR
         id: pr
         uses: peter-evans/create-pull-request@v6
@@ -199,7 +241,11 @@ jobs:
           # Pathspec, not a glob: `newsletter` stages that directory and nothing else,
           # keeping .github/ out of the commit in the first place.
           add-paths: newsletter
-          branch: newsletter/${{ env.ISSUE_TYPE }}-${{ steps.issue.outputs.date }}
+          # Fixed per type, not per date — see the guard step above for why that's
+          # safe. delete-branch removes it once merged with nothing left to diff, so
+          # a stale branch never lingers between weeks.
+          branch: newsletter/${{ env.ISSUE_TYPE }}
+          delete-branch: true
           title: "Newsletter: ${{ env.ISSUE_TYPE }} ${{ steps.issue.outputs.date }}"
           commit-message: "newsletter: ${{ env.ISSUE_TYPE }} ${{ steps.issue.outputs.date }}"
           body: |
@@ -223,13 +269,3 @@ jobs:
             The test copy goes out transactionally, so it has no unsubscribe footer,
             no `List-Unsubscribe` header, and no preview text. The campaign pipeline
             adds all three at real send time; everything else is identical.
-
-      # After the PR on purpose: if the mail fails, the draft still survives as a PR
-      # rather than being lost with the runner.
-      - name: Email the draft to the reviewer
-        env:
-          MAILROOM_API_KEY: ${{ secrets.MAILROOM_API_KEY }}
-          MAILROOM_EMAIL_URL: ${{ vars.MAILROOM_EMAIL_URL || 'https://mailroom.supertype.ai/api/v1/emails' }}
-          MAILROOM_FROM: ${{ vars.MAILROOM_FROM }}
-          MAILROOM_TEST_TO: ${{ vars.MAILROOM_TEST_TO || 'aurellia@supertype.ai' }}
-        run: node .github/scripts/send-test.mjs "${{ steps.issue.outputs.folder }}"
