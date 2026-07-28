@@ -1,0 +1,9 @@
+<svg width="936" height="460" viewBox="0 0 936 460"><defs>
+    <linearGradient id="bar0s" x1="0" y1="0" x2="936" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#C14D94"/><stop offset="100%" stop-color="#8B004C"/>
+    </linearGradient>
+    <linearGradient id="bar0f" x1="0" y1="0" x2="0" y2="460" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="rgba(193,77,148,0.18)"/><stop offset="100%" stop-color="rgba(193,77,148,0)"/>
+    </linearGradient>
+  </defs>
+    <line x1="0" y1="348.0" x2="936" y2="348.0" stroke="rgba(11,11,11,0.12)" stroke-width="2"/><rect x="77.2" y="40.0" width="171.0" height="308.0" rx="8" fill="#568475"/><text x="162.7" y="26.0" fill="#0B0B0B" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="28" font-weight="700" text-anchor="middle">+21.43%</text><text x="162.7" y="424" fill="#52514E" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="24" text-anchor="middle">DEWA</text><rect x="382.5" y="146.8" width="171.0" height="201.2" rx="8" fill="#568475"/><text x="468.0" y="132.8" fill="#0B0B0B" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="28" font-weight="700" text-anchor="middle">+14.00%</text><text x="468.0" y="424" fill="#52514E" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="24" text-anchor="middle">BUMI</text><rect x="687.8" y="188.3" width="171.0" height="159.7" rx="8" fill="#568475"/><text x="773.3" y="174.3" fill="#0B0B0B" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="28" font-weight="700" text-anchor="middle">+11.11%</text><text x="773.3" y="424" fill="#52514E" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="24" text-anchor="middle">CUAN</text></svg>

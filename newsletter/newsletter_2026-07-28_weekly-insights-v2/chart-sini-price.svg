@@ -1,0 +1,12 @@
+<svg width="852" height="220" viewBox="0 0 852 220"><defs>
+    <linearGradient id="sp0s" x1="0" y1="0" x2="852" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#C14D94"/><stop offset="100%" stop-color="#8B004C"/>
+    </linearGradient>
+    <linearGradient id="sp0f" x1="0" y1="0" x2="0" y2="220" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="rgba(193,77,148,0.18)"/><stop offset="100%" stop-color="rgba(193,77,148,0)"/>
+    </linearGradient>
+  </defs>
+    <path d="M10.0,117.1 L158.4,149.4 L306.8,102.9 L455.2,113.0 L603.6,64.5 L752.0,10.0 L752.0,220 L10.0,220 Z" fill="url(#sp0f)"/><line x1="10" y1="210.0" x2="842.0" y2="210.0" stroke="#52514E" stroke-width="2" stroke-dasharray="8 6" opacity="0.85"/>
+    <text x="738.0" y="200.0" fill="#52514E" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="22" font-weight="700" text-anchor="end">Insider buy price · IDR 5,000</text><path d="M10.0,117.1 L158.4,149.4 L306.8,102.9 L455.2,113.0 L603.6,64.5 L752.0,10.0" fill="none" stroke="url(#sp0s)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="752.0" cy="10.0" r="5" fill="#8B004C"/>
+    <text x="764.0" y="25.0" fill="#0B0B0B" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="24" font-weight="800" text-anchor="start">+21.5%</text><circle cx="10.0" cy="117.1" r="4" fill="#52514E"/>
+    <text x="10.0" y="103.1" fill="#52514E" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="22" font-weight="700" text-anchor="start">6150</text></svg>
