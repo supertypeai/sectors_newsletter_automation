@@ -224,6 +224,7 @@ jobs:
           MAILROOM_EMAIL_URL: ${{ vars.MAILROOM_EMAIL_URL || 'https://mailroom.supertype.ai/api/v1/emails' }}
           MAILROOM_FROM: ${{ vars.MAILROOM_FROM }}
           MAILROOM_TEST_TO: ${{ vars.MAILROOM_TEST_TO || 'aurellia@supertype.ai' }}
+          MAILROOM_REPLY_TO: ${{ vars.MAILROOM_REPLY_TO }}
         run: node .github/scripts/send-test.mjs "${{ steps.issue.outputs.folder }}"
 
       - name: Open the review PR
