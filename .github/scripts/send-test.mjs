@@ -30,6 +30,7 @@ const {
   MAILROOM_EMAIL_URL = "https://mailroom.supertype.ai/api/v1/emails",
   MAILROOM_FROM,
   MAILROOM_TEST_TO,
+  MAILROOM_REPLY_TO,
   DRY_RUN,
 } = process.env;
 
@@ -44,6 +45,7 @@ const payload = {
   to: MAILROOM_TEST_TO,
   subject: `[TEST] ${fm.subject}`,
   html,
+  ...(MAILROOM_REPLY_TO ? { reply_to: MAILROOM_REPLY_TO } : {}),
 };
 
 console.log(`issue        : ${issueType} ${issueDate}`);
