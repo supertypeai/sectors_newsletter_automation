@@ -54,6 +54,7 @@ Repo settings → Secrets and variables → Actions → **Secrets**:
 | `MAILROOM_API_KEY` | draft + send | Mailroom API key, sent as `Authorization: Bearer`. The draft job needs it too, to host chart images |
 | `NEWSLETTER_PAT` | draft | **Recommended.** PAT with `repo` + `workflow` scope for the PR push. `GITHUB_TOKEN` cannot push anything under `.github/workflows/`, and no `permissions:` key can grant it that |
 | `STORING_API_KEY` | draft | **Optional.** Compresses chart PNGs through [Storing](https://storing.app) before upload. Leave unset and charts upload at full size. Generate from Storing's Settings page |
+| `SUPABASE_ACCESS_TOKEN` | draft | **Optional.** Enables real social-card auto-selection (block 4 visuals) and the exchange-definition foreign-flow figure, both via the Supabase MCP connector. Leave unset and the run falls back to generated charts / an omitted flow figure, exactly as documented in SKILL.md. See **Supabase MCP setup** below before generating one |
 
 ### Claude auth: subscription, not a second subscription
 
@@ -126,23 +127,44 @@ Two things still fail the run loudly, because the alternative is publishing some
 false: a required block whose data comes back empty, and any figure that would have to
 be invented to fill a gap.
 
-### Foreign flow needs Supabase, not just the Sectors API
+### Foreign flow, and real social cards, both need Supabase
 
-The weekly foreign-flow figure uses the **exchange** definition, which lives in the
-`idx_daily_data` table and is pulled by the pinned query
-`sectors-newsletter-generator/scripts/fixed-queries/foreign-flow-range.sql`. No Sectors
-API endpoint exposes it: `daily/{symbol}` carries close/volume/market-cap only, and
-`foreign-flow/{symbol}` returns the broker-domicile measure, which is forbidden for this
-figure because the two disagree on direction, not just magnitude.
+Two things in the skill are better with real Supabase access than without it:
 
-So the runner needs the **Supabase MCP connector** configured (read-only) for that line
-to appear. Without it the skill omits the flow line and notes the omission; the issue is
-otherwise complete, since flow is a single Key Data Bite rather than a required block.
-Decide which you want before the first real send:
+- The weekly **foreign-flow figure** uses the exchange definition, which lives in the
+  `idx_daily_data` table and is pulled by the pinned query
+  `scripts/fixed-queries/foreign-flow-range.sql`. No Sectors API endpoint exposes it:
+  `daily/{symbol}` carries close/volume/market-cap only, and `foreign-flow/{symbol}`
+  returns the broker-domicile measure, forbidden for this figure since the two
+  disagree on direction, not just magnitude.
+- Block 4's **visuals** default to a real social card over a generated chart whenever
+  one is eligible, via `scripts/fixed-queries/social-media-bucket-listing.sql`, which
+  lists the carousel pipeline's Supabase storage bucket.
 
-- **Skip it for now** — no extra secret; automated issues carry no flow figure.
-- **Wire it up** — add the Supabase MCP server to the runner with a read-only,
-  project-scoped credential, and the flow line works unattended.
+Both fixed queries run through the same Supabase MCP connector. Without it, the skill
+degrades gracefully rather than failing: the foreign-flow line is omitted and noted,
+and block 4 falls back to generated charts — exactly the behavior from before this was
+wired up.
+
+#### Supabase MCP setup
+
+1. Generate a Personal Access Token at
+   [supabase.com/dashboard/account/tokens](https://supabase.com/dashboard/account/tokens).
+   **This token is account-wide**, not scoped to one project — Supabase's own docs warn
+   against connecting it to production data for exactly that reason. It's your call
+   whether that risk is acceptable for this project; a narrower read-only Postgres role
+   scoped to just `storage.objects` and `idx_daily_data` is the safer alternative if not
+   (ask if you want that path instead, it needs a different wiring).
+2. Add it as the repo secret `SUPABASE_ACCESS_TOKEN`.
+3. That's it — the workflow does the rest. It writes a temporary MCP config to the
+   runner's own temp directory (never committed, gone when the job ends) pointing at
+   `https://mcp.supabase.com/mcp?project_ref=rfiycxgjbnkefczvbosm&read_only=true`, and
+   passes it to Claude via `--mcp-config` for that run only.
+
+**The token itself never goes in a file you'd commit.** A project-scoped `.mcp.json` at
+the repo root is git-tracked by design (so teammates share the same server config) —
+that's exactly why this workflow generates its own config at runtime instead of using
+one, and why you should never paste a real token into a committed `.mcp.json` yourself.
 
 ### Charts become hosted PNGs at draft time
 

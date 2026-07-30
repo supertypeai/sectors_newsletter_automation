@@ -78,18 +78,43 @@ cannot supply?**
 When the environment variable `NEWSLETTER_UNATTENDED=1` is set, **no human is
 reachable during the run**. Never ask a question, never pause for input, never stop at
 a menu. Every decision this skill would normally put to the user has a documented
-default below; take it, and record the choice in the issue's own appendix so a reviewer
-can see what was decided on their behalf.
+default below; take it, and record the choice in a **separate `run-notes.md` file in
+the delivery folder**, never anywhere inside `newsletter.md` or `newsletter.html`.
+
+**Why a separate file and not a comment in the HTML.** The delivery pipeline sends
+`newsletter.html` to subscribers byte for byte, comments included — an HTML comment is
+invisible in a mail client but still ships in the message source, where any recipient
+can read it, and it counts against Gmail's ~102KB clipping threshold. `run-notes.md`
+is never read by the send path at all, so it reaches the PR reviewer and nobody else.
+It also keeps the distinction structural rather than syntactic: internal notes are a
+different *file*, not the same file relying on comment markers to stay hidden. That
+fragile in-file distinction is what produced the original bug.
+
+```markdown
+<!-- run-notes.md, sits beside newsletter.md, never sent -->
+# Unattended-run notes, 2026-07-29
+
+- Issue type: not named in the request, defaulted to weekly-insights-v2.
+- Foreign flow: Supabase MCP connector unavailable, figure omitted (not substituted).
+- Block 4 visuals: 2 of 3 findings used real cards; the third fell back to charts.mjs.
+```
+
+A run once rendered these notes as a visible `<div>` in the delivered email (confirmed
+2026-07-29, caught by the user) — that must never happen again, in any form. If in
+doubt whether something belongs in the visible Appendix or in `run-notes.md`: the
+Appendix answers "what data backs this issue" and is normal reader-facing content on
+every issue (Hard rule 8); `run-notes.md` answers "what did the robot decide on its own
+because nobody was there to ask," and is for nobody but a PR reviewer.
 
 | Decision point | Unattended default |
 | --- | --- |
 | Issue type, none named in the prompt | `weekly-insights-v2` |
 | Foreign-flow definition | exchange (`idx_daily_data`) via `scripts/fixed-queries/foreign-flow-range.sql`; **needs the Supabase MCP connector**, see below |
-| Block 4 visuals, no card URLs supplied | generate with `scripts/charts.mjs`, never wait for cards |
-| `$NEWSLETTER_HOME/samples/<type-slug>/` absent | proceed without it, note the absence in the appendix |
+| Block 4 visuals, no card URLs supplied | **auto-select real cards from the Supabase bucket first** via `scripts/fixed-queries/social-media-bucket-listing.sql` through the same Supabase MCP connector; generate with `scripts/charts.mjs` only if that connector isn't available this run. See `workflows/weekly-insights-v2.md`'s **Auto-selecting cards, unattended** section |
+| `$NEWSLETTER_HOME/samples/<type-slug>/` absent | proceed without it, note the absence in `run-notes.md` |
 | Upcoming-events sheet unreachable | omit that block, note it, don't fail the issue |
 | A requested type isn't built yet | stop with a clear error naming the type, don't substitute a different one |
-| Anything else this skill would ask | take the documented default and state the choice in the appendix |
+| Anything else this skill would ask | take the documented default and state the choice in `run-notes.md` |
 
 Two things stay hard failures even here, because the alternative is publishing
 something false: a **fetch that returns no usable data for a required block** (say the
@@ -102,10 +127,10 @@ exchange definition is only reachable through `scripts/fixed-queries/foreign-flo
 against `idx_daily_data`; no Sectors API endpoint exposes the foreign buy/sell volume
 split (`daily/{symbol}` carries close/volume/market-cap only, and `foreign-flow/{symbol}`
 is the broker-domicile measure the rule forbids for this figure). So if the connector
-isn't configured in the runner, **omit the flow figure and note the omission** rather
-than substituting the broker endpoint, which would publish the contradiction the rule
-exists to prevent. Flow is one line in Key Data Bites, not a required block; the issue
-stands without it.
+isn't configured in the runner, **omit the flow figure and note the omission in the
+`run-notes.md`** (never inside the sent HTML) rather than substituting the broker
+endpoint, which would publish the contradiction the rule exists to prevent. Flow is one
+line in Key Data Bites, not a required block; the issue stands without it.
 
 **Types that need human-supplied source material** (`upcoming-event`,
 `new-release-feature`, `watchlist-performance-digest`) are not automatable and must not
@@ -262,8 +287,9 @@ see their own workflow docs.
    this run, only the dates/tickers change. If no sample exists yet for a type, the file
    still holds the documented recipe pattern; populate the sample after this run.
    **If the folder itself is absent** (a fresh clone, a CI runner), fall back to the
-   recipe in this type's own workflow doc, note the absence in the appendix, and carry
-   on — a missing sample is never a reason to stall or to fail the run. This
+   recipe in this type's own workflow doc, note the absence in `run-notes.md`
+   (never inside the sent HTML), and carry on — a missing sample is never a
+   reason to stall or to fail the run. This
    folder lives next to the delivered issues, not inside the skill, specifically so it's
    easy to open and edit directly when the user wants to adjust a type's format or
    presentation, without touching skill internals.
@@ -429,9 +455,10 @@ dbquery skill's templates do.
     invented. Heading is the fixed text "Upcoming Events," not a variable lead-in. See
     `newsletter-format.md`'s **Upcoming events closing block** section for the exact
     contract. **If the sheet is unreachable** (network failure, the doc moved), omit the
-    block and note the omission in the appendix rather than failing the issue or
-    inventing an event; the sheet is a public `curl`, so a failure here is transport,
-    not content. Every row still upcoming is required whenever the fetch *does* succeed.
+    block and note the omission in `run-notes.md` (never inside the sent HTML)
+    rather than failing the issue or inventing an event; the sheet is a public `curl`,
+    so a failure here is transport, not content. Every row still upcoming is required
+    whenever the fetch *does* succeed.
 11. **Weekly Insights v2's issue date is today's actual date, not a computed Monday**
     (revised 2026-07-27, superseding the 2026-07-20 "Monday immediately after the
     Friday close" rule). Use the real date the draft is generated on, whatever day
@@ -473,6 +500,10 @@ Finished issues land at:
 $NEWSLETTER_HOME/newsletter_<YYYY-MM-DD>_<type-slug>/
     newsletter.md
     newsletter.html            every type: the send-ready HTML email
+    run-notes.md               unattended runs only: which documented defaults this run
+                                took, for the PR reviewer. NEVER read by the send path,
+                                so it can't reach a subscriber. See **Running
+                                unattended** above
     chart-<slug>.svg           every issue's required hero chart, the source of truth
     chart-<slug>.png           the same chart rasterized for email; what the HTML
                                 actually references, since Gmail and Outlook strip SVG

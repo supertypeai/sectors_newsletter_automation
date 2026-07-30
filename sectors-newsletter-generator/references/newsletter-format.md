@@ -474,12 +474,19 @@ The successor to Weekly wrap, and the one to reach for on a Monday send unless t
 asks for v1 by name. **Eight blocks, info-packed, no long-form reading anywhere.** Full
 recipe in `workflows/weekly-insights-v2.md`.
 
-1. **Masthead + greeting** — issue number, send date, window, data-as-of. Then a bare
-   `Hi there,`. No opening hook paragraph, no table of contents.
-   **Keep the greeting time-neutral**, never "Good morning" (which this used to say):
-   delivery time is not the drafting time, it's whenever the issue is actually approved
-   and sent, so any greeting naming a part of the day will eventually be wrong in the
-   reader's inbox.
+1. **Masthead, no greeting line** (revised 2026-07-29, superseding both the original
+   "Good morning!" and the later "Hi there," it was changed to) — issue number, send
+   date, window, data-as-of, straight into Key Data Bites. No opening hook paragraph,
+   no table of contents, and **no greeting line of any kind**. This is a broadcast
+   digest with no per-recipient binding (unlike `watchlist-performance-digest`, which
+   *does* keep its own "Hi there," as the compliance-mandated null-`first_name`
+   fallback for a genuinely personalized send, see that type's own workflow doc — don't
+   port that back here). A greeting implies a one-to-one address this type doesn't
+   have; the masthead's own issue number and date already do the job of opening the
+   issue. "Good morning" was time-of-day-specific and wrong whenever delivery slipped
+   past the morning (see Hard rule 11's own history); "Hi there," fixed that but was
+   still an ungrounded greeting with nothing to greet the reader *as*. Cutting it
+   entirely removes the whole class of problem.
 2. **Key Data Bites** — 8 one-line facts in a tinted box, each **derived from data**, every
    ticker linked. This is where v1's market-level prose sections survive, one line each.
    Nothing here may repeat a Headlines item (see block 6).
@@ -488,8 +495,10 @@ recipe in `workflows/weekly-insights-v2.md`.
 4. **What the Data Unearthed** — the issue's only analysis. Two or three findings, each a
    **join of two sources** (movers × corporate actions, price × foreign flow, volume ×
    filings), each with a heading stating the finding, a social card image, and 3-5 short
-   bullets. Never paragraphs. Two images under one heading go side by side; a single image
-   runs half width. Closes with a follow-us line (Instagram, Threads).
+   bullets. Never paragraphs. Two images under one heading go side by side, each at half
+   width; **a single image runs at 500px** (revised 2026-07-29, was half width), near
+   the full content column, not squeezed down just for being alone. Closes with a
+   follow-us line (Instagram, Threads).
 5. **Insider Filings** — the 5 most recent disclosures as one table: date, holder, ticker,
    buy/sell, shares, stake before → after. Structured fields only, filtered by `timestamp`
    to on-or-before the window's Friday. One short line calling out the standout filing.

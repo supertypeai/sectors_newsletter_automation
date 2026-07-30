@@ -20,7 +20,9 @@ inside Key Data Bites. What replaces them is one analysis block that has to earn
 
 The format borrows from two references the user supplied: Carbon Finance (dated masthead,
 one-line greeting, a dense linked-facts box, tagless headline one-liners) and Algo Research
-(a findings block, a forward calendar).
+(a findings block, a forward calendar). **The greeting itself was dropped 2026-07-29**
+(see `newsletter-format.md`'s **Weekly Insights v2** skeleton, block 1) — everything
+else about the Carbon Finance masthead influence still applies.
 
 ## 1. Settle the window
 
@@ -160,8 +162,10 @@ mirroring step. Filenames follow `<topic>_<YYYYMMDD>_<n>.jpg`, sometimes with a 
 so read the window off the image itself and state it in copy. The worked sample's CUAN card
 is dated 10 July and covers 19 Jan to 9 Jul, which is why its bullets say so explicitly.
 
-Two images under one heading go **side by side, two columns**; a single image runs at half
-column width (268px), not full.
+Two images under one heading go **side by side, two columns** (each ~263-268px, half the
+content column); **a single image under its own heading runs at 500px** (revised
+2026-07-29, was half column at 268px), near the full content width, not squeezed to
+the two-column size just because it happens to be alone.
 
 **Credit every social image to `instagram.com/sectorsapp`, always, whatever the actual
 source.** That is the public home of this content and the only attribution a reader should
@@ -221,46 +225,89 @@ Selection criteria, applied in order:
 
 **Where the filenames come from.** The bucket lives at
 `supabase.com/dashboard/project/rfiycxgjbnkefczvbosm/storage/files/buckets/social_media_generation`.
-Read the file list there, take the names whose `YYYYMMDD` falls in the window, and build the
-public URLs from them.
+A human can read the file list there directly, take the names whose `YYYYMMDD` falls in
+the window, and build the public URLs from them.
 
-The bucket cannot be listed programmatically without a credential:
+The bucket cannot be listed through its own public HTTP API without a credential:
 `POST /storage/v1/object/list/<bucket>` returns `headers must have required property
 'authorization'`, and public reads only resolve for an exactly-known filename (a guessed name
-404s/400s, and the trailing `_<n>` is not predictable). So today the URLs are **supplied by
-the user at generation time**. Ask for them; do not attempt to enumerate or guess.
+404s/400s, and the trailing `_<n>` is not predictable). **This skill already carries a
+working path around that**, though: `scripts/fixed-queries/social-media-bucket-listing.sql`
+lists the same bucket's contents through the Supabase MCP connector, by querying the
+`storage.objects` Postgres table Supabase Storage keeps this metadata in — the same
+connector already used for the foreign-flow fixed query, no new credential. Run that
+query first (see **Auto-selecting cards, unattended** below); asking the user for URLs is
+the fallback for an interactive session with no MCP connector attached, not the default.
 
-### When no card URLs are available (the unattended path)
+### Auto-selecting cards, unattended (or whenever the MCP connector is available)
 
-Under `NEWSLETTER_UNATTENDED=1` there is nobody to ask, so **don't**. Cards are an
-illustration layer, never the source of a finding (see "Findings first, images second"
-above), so an issue without them is complete, not degraded:
+**Prefer this over generating a chart, always — a real social card beats a generated
+one whenever one is actually eligible.** Chart generation is the fallback for when the
+Supabase MCP connector genuinely isn't available this run, not a first choice taken for
+convenience:
 
-1. Derive the week's two or three findings from the API exactly as always.
-2. Render each finding's visual with `../../scripts/charts.mjs` instead of pulling a card.
-   Pick the chart kind from the finding's own shape, the same judgement the `dataviz`
-   skill's form heuristic describes: `moversChart` for a ranked signed list,
-   `barChart` (with `financial: true`) for a signed comparison, `sparkline`/`line` for a
-   path over the week, `donut` for a mix.
-3. Skip the Instagram/Threads credit line under a generated chart, it credits card
-   artwork that isn't there. Keep the follow-us block at the end of block 4, that one is
-   a standing CTA rather than an attribution.
-4. Note in the appendix that visuals were generated rather than sourced from cards, so a
-   reviewer knows why the issue looks different from a hand-made week.
+1. Derive the week's two or three findings from the API exactly as always ("Findings
+   first, images second," above — this doesn't change).
+2. Run `scripts/fixed-queries/social-media-bucket-listing.sql` through the Supabase MCP
+   connector to list the bucket's filenames.
+3. Apply the existing selection criteria above (date filter, drop story-only prefixes,
+   relevance, window-gap note, reconciliation, sets, budget) to the returned list exactly
+   as an interactive run would against a human-read file list. Build each eligible card's
+   public URL and **reference it directly in `<img src>`** — these reads are already
+   public and permanent, so the URL from the query is the final URL, no rehosting, no
+   upload step, nothing to rasterize. This is the one visual path in this skill that
+   involves no local file at all: **never save a real card under a `chart-<slug>.svg`
+   name or any name the delivery pipeline's chart step would match.** The unattended CI
+   run rasterizes and re-uploads every `chart-*.svg` it finds in the delivery folder on
+   the assumption that it's a locally-generated chart in need of hosting; a real card
+   already has a permanent public URL and doesn't need or want that treatment. Giving
+   one that filename would upload a duplicate copy to mailroom's own bucket for no
+   reason and rewrite a perfectly good URL into a different one.
+4. **Distinguish the three reasons this can come up empty — they are not the same, and
+   collapsing them hides real bugs.** Silently treating all three as "just use charts"
+   is how a broken query gets mistaken for an unconfigured runner and never fixed:
 
-The same fallback applies interactively whenever a week genuinely has no eligible card
-(every filename outside the window, or all of them story-only renders). It is the
-existing "so the issue is never image-less" rule below, made routine rather than
-exceptional.
+   | What happened | How you can tell | What to record in `run-notes.md` |
+   | --- | --- | --- |
+   | **No connector this run** | no Supabase MCP tool is available at all | "Supabase MCP connector not available in this runner; cards not attempted." Expected in a runner without `SUPABASE_ACCESS_TOKEN` |
+   | **Query errored** | the connector *is* there and the tool call returned an error (bad column, renamed table, permissions) | **Quote the actual error text.** This is a defect in the pinned query or the bucket's schema, not a config gap, and it needs fixing rather than absorbing |
+   | **Query fine, nothing eligible** | the query returned rows, but none pass the date/story-prefix/relevance filters | "N objects listed, none eligible for the 20-24 Jul window." Normal, not a fault |
 
-Two ways to get cards into an automated run, when the user wants to:
+   The schema itself is known-good: the query was verified live 2026-07-29 against the
+   real bucket (`storage.objects` with `bucket_id` / `name` / `created_at`, rows
+   returned). So a *query error* after that date means something actually changed, and
+   should be surfaced loudly, never quietly swallowed into the chart fallback.
 
-- **Manifest file (preferred, no credential).** Have the carousel pipeline write a small JSON
+   In all three cases, fall back to a generated chart for that finding so the issue is
+   never image-less:
+   - Render with `../../scripts/charts.mjs` instead. Pick the chart kind from the
+     finding's own shape, the same judgement the `dataviz` skill's form heuristic
+     describes: `moversChart` for a ranked signed list, `barChart` (with
+     `financial: true`) for a signed comparison, `sparkline`/`line` for a path over the
+     week, `donut` for a mix.
+   - Skip the Instagram/Threads credit line under a generated chart, it credits card
+     artwork that isn't there. Keep the follow-us block at the end of block 4, that one
+     is a standing CTA rather than an attribution.
+   - Note in `run-notes.md` (never inside the sent HTML, see SKILL.md's
+     **Running unattended** section) that this finding's visual was generated rather
+     than sourced from a card, and why, so a reviewer knows without having to guess.
+
+A mixed issue is normal and correct: one finding illustrated by a real card, another by
+a generated chart, because only one of them had an eligible card that week. Don't force
+consistency across findings at the expense of using a real card wherever one exists.
+
+Two other ways to get cards into an automated run exist, both now superseded by the
+fixed query above for the common case, kept here for when the MCP connector itself is
+unavailable and a different credential is preferred:
+
+- **Manifest file (no credential at all).** Have the carousel pipeline write a small JSON
   to a predictable public path as it renders, e.g.
   `.../social_media_generation/manifest_<YYYYMMDD>.json`, listing each render's filename,
   topic, tickers and data window. The skill then fetches one known URL and picks against the
-  criteria above. Keeps the bucket private-by-obscurity and needs no key in this skill.
-- **Supabase key.** Give the skill a storage credential so it can list by date prefix. More
+  criteria above. Keeps the bucket private-by-obscurity and needs no Supabase access at all.
+- **Direct Supabase storage key.** Give the skill its own storage credential so it can list
+  by date prefix via the Storage REST API directly, rather than through the MCP connector
+  and `storage.objects`. More
   power, more setup, and another secret to hold alongside `config.json`'s API key.
 
 > **Resolved 2026-07-27: default to the exchange definition (`idx_daily_data`) for weekly

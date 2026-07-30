@@ -47,9 +47,20 @@ jobs:
       # Don't set both: ANTHROPIC_API_KEY takes precedence over the OAuth token.
       CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
       ISSUE_TYPE: ${{ github.event.inputs.issue_type || 'weekly-insights-v2' }}
+      # Single source of truth for the PR branch name — computed once here, read by
+      # both the pre-flight guard (as $NEWSLETTER_BRANCH) and the PR step (as
+      # ${{ env.NEWSLETTER_BRANCH }}). Two independent constructions of this same
+      # string previously drifted apart by definition-site rather than by value, which
+      # would have made the guard check the wrong branch with no error if only one
+      # site were ever edited.
+      NEWSLETTER_BRANCH: newsletter/${{ github.event.inputs.issue_type || 'weekly-insights-v2' }}
       # Optional chart compression. Lifted to job level so the install step can test
       # for it with `env.` — the `secrets.` context is not dependable inside `if:`.
       STORING_API_KEY: ${{ secrets.STORING_API_KEY }}
+      # Optional Supabase MCP connector, for real social-card auto-selection and the
+      # exchange-definition foreign-flow query. Same env-indirection reasoning as
+      # STORING_API_KEY above.
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
@@ -67,7 +78,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.NEWSLETTER_PAT || secrets.GITHUB_TOKEN }}
         run: |
-          branch="newsletter/${ISSUE_TYPE}"
+          branch="$NEWSLETTER_BRANCH"
           # `.[0].url // empty` matters: on no match, `.[0]` alone is the JSON value
           # null, and `gh --jq` prints that as the 4-character string "null", not
           # nothing — piping that into `[ -n ... ]` would read as non-empty and block
@@ -117,11 +128,40 @@ jobs:
         if: ${{ github.event.inputs.skip_draft != 'true' }}
         run: npm install -g @anthropic-ai/claude-code
 
+      # Project-scoped .mcp.json is committed to the repo, so the real token never goes
+      # there — it would leak into git history the moment a real value landed in a
+      # tracked file. Instead this writes a config file to the runner's own temp
+      # directory (never checked out, never committed, gone when the job ends) and
+      # points --mcp-config at that path for this one invocation only. Skipped
+      # entirely when the secret isn't set, so the workflow still runs (falling back
+      # to generated charts and an omitted foreign-flow figure, exactly as documented
+      # in SKILL.md's unattended-defaults table) for anyone who hasn't wired this up.
+      - name: Write the Supabase MCP config
+        if: env.SUPABASE_ACCESS_TOKEN != ''
+        run: |
+          config_path="$RUNNER_TEMP/supabase-mcp.json"
+          # Built with jq's --arg, not string-interpolated into a heredoc: --arg
+          # JSON-escapes whatever the token contains, so a token holding a literal
+          # quote or backslash still produces valid JSON. A hand-interpolated `"...${TOKEN}..."`
+          # would silently corrupt the file for such a token (verified: a token
+          # containing `"` broke a plain heredoc version of this same file).
+          jq -n --arg token "$SUPABASE_ACCESS_TOKEN" '{
+            mcpServers: {
+              supabase: {
+                type: "http",
+                url: "https://mcp.supabase.com/mcp?project_ref=rfiycxgjbnkefczvbosm&read_only=true",
+                headers: { Authorization: ("Bearer " + $token) }
+              }
+            }
+          }' > "$config_path"
+          echo "SUPABASE_MCP_CONFIG=$config_path" >> "$GITHUB_ENV"
+
       - name: Draft the issue
         if: ${{ github.event.inputs.skip_draft != 'true' }}
         run: |
-          claude -p "Write this week's ${ISSUE_TYPE} newsletter issue using the sectors-newsletter-generator skill. Deliver to \$NEWSLETTER_HOME. This is an unattended CI run: do not ask any questions, apply the documented unattended defaults, and record every default you took in the issue's appendix." \
-            --permission-mode bypassPermissions
+          claude -p "Write this week's ${ISSUE_TYPE} newsletter issue using the sectors-newsletter-generator skill. Deliver to \$NEWSLETTER_HOME. This is an unattended CI run: do not ask any questions, apply the documented unattended defaults, and record every default you took in an HTML comment at the top of the file, never in the visible body or the reader-facing Appendix." \
+            --permission-mode bypassPermissions \
+            ${SUPABASE_MCP_CONFIG:+--mcp-config "$SUPABASE_MCP_CONFIG"}
 
       # Plumbing test: everything downstream of drafting (rasterize, compress, upload,
       # PR push, test email) exercised against a fixture, spending no Claude usage.
@@ -245,7 +285,7 @@ jobs:
           # Fixed per type, not per date — see the guard step above for why that's
           # safe. delete-branch removes it once merged with nothing left to diff, so
           # a stale branch never lingers between weeks.
-          branch: newsletter/${{ env.ISSUE_TYPE }}
+          branch: ${{ env.NEWSLETTER_BRANCH }}
           delete-branch: true
           title: "Newsletter: ${{ env.ISSUE_TYPE }} ${{ steps.issue.outputs.date }}"
           commit-message: "newsletter: ${{ env.ISSUE_TYPE }} ${{ steps.issue.outputs.date }}"

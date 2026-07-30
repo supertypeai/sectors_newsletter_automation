@@ -47,8 +47,16 @@ jobs:
           if [ -n "${{ github.event.inputs.issue_folder }}" ]; then
             folder="${{ github.event.inputs.issue_folder }}"
           else
-            # The issue folder whose newsletter.html this push added or changed.
-            folder=$(git diff --name-only HEAD^ HEAD \
+            # --diff-filter=A on purpose: only a newsletter.html appearing for the
+            # FIRST time can trigger a send. Without this filter, any later push that
+            # merely edits an already-delivered issue (a typo fix, a broken-link fix,
+            # weeks after the original send) would re-trigger this same workflow and
+            # create a second campaign. mailroom's Idempotency-Key would only catch
+            # that within its 24h replay window (IDEMPOTENCY_TTL_MS in mailroom's own
+            # constants.ts) — past that, the key has been purged and a genuine
+            # duplicate send goes to the full subscriber list with nothing left to
+            # stop it. A modify-only edit must never reach push-to-mailroom.mjs.
+            folder=$(git diff --name-only --diff-filter=A HEAD^ HEAD \
               | grep -E '^newsletter/newsletter_.*_weekly-insights-v2/newsletter\.html$' \
               | head -1 | xargs -r dirname)
           fi
