@@ -376,8 +376,56 @@ comes back empty; the whole board is free but slow.
 **Empty action types return `null`, not `[]`.** Guard before iterating or the poll throws.
 
 Split the output two ways: a **Mon-Fri week grid** for anything landing in the next five
-trading days, and a **"beyond the week" table** for everything further out. Close the block
-with the dividend calendar link.
+trading days, and a **"beyond the week" table** for everything further out.
+
+### 4b. Scheduled macro rows (ported from monthly-market-pulse §8.10)
+
+Corporate actions alone leave the block blind to the events that actually move the whole
+tape. Append a third compact table, columns **Date, Event, Why it matters**, two to four
+rows, placed after "beyond the week" and before the dividend-calendar link.
+
+Rows are real, scheduled, verifiable events with a published date: a BI RDG decision, a BPS
+CPI or trade-balance release, an FOMC decision, an index rebalance effective date, a named
+company's scheduled result date. Nothing here comes from the Sectors market endpoints; each
+row is sourced and cited like a Headlines item, and goes in **Sources**, not the Appendix.
+
+Two hard rules, both inherited from the monthly type:
+
+- **Mapped only.** Every row's "why" names a ticker or sector that already appears
+  somewhere in this issue's own tables. A rate decision with no bank, property or
+  rate-sensitive name anywhere in the issue is a wire feed line, cut it. This is what keeps
+  the addition to a few lines instead of turning block 7 into a macro digest.
+- **Dated and scheduled, never speculative.** A plausible-sounding but unscheduled item
+  ("earnings season should pick up") does not ship. If a window genuinely has no scheduled
+  macro event, run the table with one row or omit it, do not pad it.
+
+Close the block with the dividend calendar link, as before.
+
+## 4c. The Other Side
+
+The two-sided read, placed after What's Ahead and immediately before the CTA. Ported from
+`monthly-market-pulse.md` §8.9, compressed for a weekly.
+
+**No new fetches.** Every bullet is grounded in a number or citation that already appears
+earlier in this issue. If a bullet needs a figure the issue doesn't carry, that figure
+belongs in Key Data Bites first, and then the bullet may reference it.
+
+Shape:
+
+- **The bull read** — two or three bullets.
+- **The bear read** — two or three bullets. Give it genuine weight; a token bear block that
+  concedes nothing is worse than no block.
+- **What would settle it** — one closing line naming the specific dated print or event that
+  distinguishes the two reads. Normally this is one of block 7's own rows, corporate action
+  or macro, which is why the two blocks sit next to each other.
+
+Attribution follows §5b's causation policy without relaxation: a forward-looking bullet is
+either quoted and attributed to a named analyst, house or official with a date, or reframed
+as a condition ("if the 10y INDOGB holds below X"). The newsletter never predicts a price on
+its own authority. See `../compliance.md`.
+
+This is not a takeaway or a verdict. Do not reinstate v1's Takeaway section under a new
+name; the block's whole value is that it argues both ways and then names the tiebreaker.
 
 Types worth surfacing: `stock_split{date, split_ratio}`, `right_issue{ex_date, old_ratio,
 new_ratio, price, trading_period_start/end}`, `agm{agm_date, agm_time}`, and
@@ -398,6 +446,47 @@ a different, computed line instead (sub-sector valuation, a flow aggregate, a br
 Headlines carry **no category prefix** ("Dividends —", "Commodities —"). Just the fact and
 its source link. Close the block with the news link.
 
+## 5b. Writing rules applied throughout (ported from monthly-market-pulse)
+
+These two cost the issue almost no length and apply to every block, not to one section.
+
+### Claim subtitles
+
+Every block heading from Key Data Bites onward carries one italic sentence directly under
+it, stating what that block's own numbers argue. **The heading name itself never changes**,
+the heading names the data and the subtitle names the argument.
+
+```markdown
+## Top Weekly Movers
+
+*Both ends of the table are Basic Materials names, so the sector label says nothing about
+what actually happened.*
+```
+
+The subtitle must be falsifiable by that block's own figures. A restatement of the heading
+("Here are the week's movers", "The latest insider disclosures") is not a claim; cut it and
+write the real one. One sentence, never two.
+
+### Causation policy
+
+Replaces the older hedge-everything phrasing, which produced flat prose without being any
+more careful. The rule is **name the mechanism and label its status**:
+
+- **Preferred:** "the mechanism would be translation: coal names earn in USD, so a weaker
+  rupiah lifts reported revenue, consistent with what the tape did this week, though nothing
+  in the disclosures confirms it drove the move."
+- **Allowed, weaker link:** "consistent with", "the timing lines up with", "the same
+  session", "which would show up first in".
+- **Allowed, full causal claim, only when someone else said it:** quoted and attributed to a
+  named analyst, house or official, with a date. Attribution carries the claim.
+- **Still banned:** our own unattributed prediction, any price target we invented, any
+  "will" about future prices, any advice framing. See `../compliance.md`; this policy does
+  not relax the forward-looking-must-be-attributed rule.
+
+Practical test: a reader can see exactly who is asserting what and how confident they are.
+It fails if the newsletter itself is quietly predicting a price. Bites in block 4 and every
+bullet in The Other Side are where this bites hardest.
+
 ## 6. Standing links
 
 All `sectors.app` links carry UTMs, see `../newsletter-format.md`'s **UTM convention**.
@@ -414,6 +503,8 @@ right-hand column below.
 | Headlines, read more | `sectors.app/indonesia/news` | `headlines` |
 | What's Ahead tickers | `sectors.app/idx/<ticker>` | `whats-ahead` |
 | What's Ahead, calendar | `sectors.app/indonesia/calendars/dividend-calendar` | `whats-ahead` |
+| The Other Side tickers | `sectors.app/idx/<ticker>` | `other-side` |
+| Macro row citations | BI, BPS, wire coverage | **no UTM** |
 | CTA button | `sectors.app/watchlist` | `cta` |
 | CTA body, "workflow" | `sectors.app/workflow` | `cta` |
 | Footer citation | `sectors.app` | `footer` |
@@ -422,7 +513,19 @@ right-hand column below.
 
 ## 7. Self-review before delivery
 
-- Eight blocks, in order, nothing reinstated from v1's prose sections?
+- Nine blocks, in order, nothing reinstated from v1's prose sections? No thesis paragraph
+  added above Key Data Bites, that was considered and declined (2026-08-03).
+- Does every block from Key Data Bites onward carry a one-sentence italic claim subtitle,
+  with the heading name itself unchanged, and is each subtitle falsifiable by that block's
+  own numbers rather than a restatement of the heading?
+- Does every linking sentence pass §5b's test: the reader can see who asserts what and how
+  confident they are, and the newsletter itself never predicts a price?
+- What's Ahead: are the scheduled macro rows real, dated, cited, and each one mapped to a
+  ticker or sector that appears elsewhere in this issue? Unmapped rows cut?
+- The Other Side: two or three bullets per side, every one traceable to a figure already in
+  the issue with no new number introduced, the bear read given genuine weight, and **What
+  would settle it** a specific dated event rather than a vague "time will tell"? Every
+  forward-looking bullet attributed or reframed as a condition?
 - Key Data Bites: every line computed from an endpoint, none duplicated in Headlines?
 - Headlines: every line news-sourced and cited, no category prefixes, off-topic non-IDX
   stories dropped?

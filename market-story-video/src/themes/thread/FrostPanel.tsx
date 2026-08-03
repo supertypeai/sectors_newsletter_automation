@@ -1,10 +1,12 @@
 import React from "react";
 
-// A frosted-glass backdrop behind headline/stat text. The thread line and its logo markers
-// draw continuously through the whole video, including straight through the centered text
-// column (see ThreadLine's amplitude) — a translucent blurred panel fully occludes whatever
-// passes behind it, which is a more robust fix than a text-shadow/drop-shadow halo (which
-// only softens the collision, it doesn't hide it).
+// A frosted-glass backdrop behind headline/stat text, lifting it off the paper grid.
+//
+// It also used to be the only defence against the thread line, which drew through the centred
+// text column for the whole runtime. That is no longer its job: ThreadLine now runs in the
+// left gutter and cannot reach scene content, which fixes the collisions a panel could never
+// cover anyway (chart bars, axis labels, kickers). Keep the panel for the depth it gives the
+// type, not as collision insurance.
 export const ThreadFrostPanel: React.FC<{
   children: React.ReactNode;
   opacity?: number;

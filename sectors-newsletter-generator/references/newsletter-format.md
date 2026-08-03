@@ -9,7 +9,7 @@ The prose equivalent of the carousel skill's `deck-format.md`. Every issue is a 
 ---
 subject: <the email subject line>
 preview: <the inbox preview/preheader text>
-issue_type: weekly-insights-v2 | weekly-wrap | macro-reaction | three-stock-story | single-company-deep-dive | sector-spotlight | monthly-market-pulse | upcoming-event | new-release-feature | watchlist-performance-digest
+issue_type: weekly-insights-v2 | weekly-wrap | macro-reaction | three-stock-story | single-company-deep-dive | sector-spotlight | monthly-market-pulse | upcoming-event | new-release-feature | watchlist-performance-digest | did-you-catch-it
 date: <YYYY-MM-DD, the issue/send date>
 data_as_of: <YYYY-MM-DD, the API's as-of date>
 sample_recipient: <watchlist-performance-digest only: a scrubbed placeholder
@@ -304,7 +304,7 @@ no-dash/no-AI-tell rules, it constrains *shape*.
   one, and would be left as a data URI, which Gmail and Outlook drop. See **Charts in
   the HTML** below. Its
   colors are already fixed and validated to the shared palette above (green
-  `#568475` gain, red `#D53E50` loss, blue `#9E0142` ticker, see the file's own header
+  `#568475` gain, red `#D53E50` loss, accent `#9E0142` ticker, see the file's own header
   comment for the full role map), so don't re-derive a palette per issue, and see this
   doc's own **Color convention** section above for the `financial: true` requirement
   on `barChart`. A hand-rolled inline SVG or `ggplot2` (R) is a fallback only for a
@@ -431,7 +431,7 @@ concurrent, don't imply one caused the other.
 Markdown**, colored +/- cells, tables, CTA buttons and the hero chart don't survive
 plain Markdown the same way, and the point is a self-contained, data-backed email with
 no PDF attachment. Keep `newsletter.md` as the review draft; ship the `.html` alongside
-it, for all ten types, not only weekly-wrap and upcoming-event. See
+it, for all eleven types, not only weekly-wrap and upcoming-event. See
 `newsletter/samples/<type-slug>/newsletter.html` for each type's own worked HTML
 reference.
 
@@ -471,8 +471,15 @@ two-column mover cards and event banner are specific to that type's layout. Full
 ### Weekly Insights v2
 
 The successor to Weekly wrap, and the one to reach for on a Monday send unless the user
-asks for v1 by name. **Eight blocks, info-packed, no long-form reading anywhere.** Full
+asks for v1 by name. **Nine blocks, info-packed, no long-form reading anywhere.** Full
 recipe in `workflows/weekly-insights-v2.md`.
+
+Every content block, 2 through 8, carries a **claim subtitle** (the CTA and Upcoming Events
+blocks do not, they argue nothing): the heading name stays
+exactly as listed below, and one italic sentence sits directly under it stating what that
+block's own numbers argue. The heading names the data, the subtitle names the argument. A
+subtitle that only restates the heading ("Here are the week's movers") is not a subtitle,
+cut it and write the claim.
 
 1. **Masthead, no greeting line** (revised 2026-07-29, superseding both the original
    "Good morning!" and the later "Hi there," it was changed to) — issue number, send
@@ -506,15 +513,30 @@ recipe in `workflows/weekly-insights-v2.md`.
    an outbound citation. **No category prefix** on the bullets. Closes with a read-more link
    to `sectors.app/indonesia/news`.
 7. **What's Ahead** — a **Mon-Fri week-grid calendar** of corporate actions (stock splits,
-   dividend ex-dates, AGMs, rights issues) plus a "beyond the week" table for anything
-   further out. Built by polling `company/corporate-actions/{symbol}/` across a ticker list.
-   Closes with the dividend-calendar link.
-8. **CTA** — watchlist for exclusive reports, workflow for alerts, in a tinted panel with the
+   dividend ex-dates, AGMs, rights issues), a "beyond the week" table for anything further
+   out, and a third compact **scheduled macro** table (Date, Event, Why it matters) of two
+   to four dated prints and policy events: BI RDG, BPS CPI or trade balance, an FOMC
+   decision, an index rebalance effective date. Corporate actions are polled from
+   `company/corporate-actions/{symbol}/`; the macro rows are sourced and cited, not an API
+   pull. Every macro row's "why" names a ticker or sector that already appears in this
+   issue; an unmapped row is a wire feed line, cut it. Closes with the dividend-calendar
+   link.
+8. **The Other Side** — the two-sided read, built entirely from figures already in the
+   issue, no new fetches. Two short stacked blocks, **The bull read** and **The bear read**,
+   two or three bullets each. Then one closing line, **What would settle it**, naming the
+   specific dated print or event that distinguishes the two, normally one of block 7's own
+   rows. Every forward-looking bullet is attributed to a named source with a date, or
+   reframed as a condition ("if CPI prints above 3.2%"). Never the newsletter's own
+   unattributed prediction.
+9. **CTA** — watchlist for exclusive reports, workflow for alerts, in a tinted panel with the
    magenta button. Then appendix and the disclaimer footer.
 
 Blocks 2 and 6 must not overlap: computed facts in Bites, news-sourced facts in Headlines,
-never the same fact twice. This type has **no** takeaway section, no sector-pulse section and
-no separate chart-of-the-week; the social cards in block 4 are the issue's visuals.
+never the same fact twice. Block 8 introduces no new figure at all; if a bullet needs a
+number the issue doesn't already carry, the number belongs in Bites first. This type has
+**no** takeaway section (block 8 is a two-sided read, not a verdict), no thesis paragraph
+above Key Data Bites, no sector-pulse section and no separate chart-of-the-week; the social
+cards in block 4 are the issue's visuals.
 
 ### Macro-reaction
 1. **The news** — what happened in the last ~2 days, cited. Bulleted, stat-first
@@ -575,10 +597,18 @@ no separate chart-of-the-week; the social cards in block 4 are the issue's visua
 5. **Sources** list + disclaimer footer.
 
 ### Monthly market pulse
-Tightest type, tables first. Every section is a trailing-30-day aggregate, never a
-single day's snapshot; see `workflows/monthly-market-pulse.md` for exactly how each
-metric gets aggregated (most-traded and broker flow have no native range param, so both
-are summed client-side from repeated daily calls, the same way every run).
+An argument evidenced by data, not a data dump with news garnish. Every section is a
+trailing-30-day aggregate, never a single day's snapshot; see
+`workflows/monthly-market-pulse.md` for exactly how each metric gets aggregated
+(most-traded and broker flow have no native range param, so both are summed client-side
+from repeated daily calls, the same way every run).
+
+**Claim subtitles.** Every section heading below keeps its existing name (`## Top
+Movers`, `## Most traded`, `## Broker Flow`, ...) and gains one **italic
+single-sentence subtitle directly under the heading** stating that section's claim. The
+heading names the data; the subtitle names the argument. Never rename a heading into a
+claim.
+
 1. **Headline + trend paragraph, no separate "index in one line" heading.** The H1
    states this run's own actual finding (drafted fresh each run from that run's
    `idx-total` trend, a template headline is never reused verbatim run to run), and the
@@ -586,6 +616,13 @@ are summed client-side from repeated daily calls, the same way every run).
    start/end values and any notable trough/peak in the window. This replaces what used
    to be a separate "Index in one line" section, the same data now opens the issue
    instead of repeating it under its own heading.
+1b. **The month in four numbers** — a four-tile stat row under the trend paragraph:
+   index cap move, the window's single largest mover, the aggregate net of the dominant
+   broker side, and one macro anchor (rate level, rupiah move, or the commodity that
+   mattered). Number plus one-line label per tile, nothing else. Every tile's figure
+   must also appear somewhere else in the issue.
+1c. **The Read** — two to four sentences carrying the issue's single thesis, stated
+   as a falsifiable claim, before any table, defended by every section that follows.
 2. **Top Movers** — one heading, two small tables underneath (top gainers, top losers
    over the 30-day window, never a signed column), plus the issue's hero chart: a
    diverging bar per ticker (green gain / red loss, off a shared zero line) with every
@@ -605,8 +642,24 @@ are summed client-side from repeated daily calls, the same way every run).
    the actual shape of the flow and any real, dated news that plausibly relates, cited
    and stated as concurrent, never asserted as the proven cause. **Broker code links**
    (confirmed 2026-07-16): `https://sectors.app/idx/broker/<lowercase code>`, e.g.
-   `https://sectors.app/idx/broker/ak`, same bold ticker-blue (`#9E0142`) treatment as
+   `https://sectors.app/idx/broker/ak`, same bold accent (`#9E0142`) ticker treatment as
    a ticker link, every code cell in both tables gets one.
+4b. **Macro Backdrop** — after Broker Flow. Three to five macro items (BI rate, rupiah,
+   foreign flow, bond yields, global rates, IDX-relevant commodities, domestic prints,
+   policy/market-structure changes), each dated and cited, and each **mapped to names or
+   sectors that appear in this issue's own tables**. Unmapped macro items are cut; this
+   is not a general macro digest. Causal language follows the workflow's causation
+   policy: name the mechanism, label its status, attribute anything forward-looking.
+4c. **The Other Side** — **The bull read** and **The bear read**, three to four bullets
+   each, every bullet grounded in a number or citation already in this issue, then one
+   **What would settle it** line naming the specific dated print or event that
+   distinguishes them. Forward-looking bullets are quoted-and-attributed or reframed as
+   conditions ("if X prints above Y"), never the newsletter's own prediction.
+4d. **What to Watch, next 30 days** — compact table, columns Window / Event / Why it
+   matters, three to five rows, every row a real scheduled event (BI RDG, BPS release,
+   earnings window, index rebalance, cum-date) tied back to a name or sector in this
+   issue. Distinct from the Sectors in-house **Upcoming Events** block, which follows it
+   unchanged.
 5. **Appendix: Sectors API endpoints (fields used)**, after Sources and before the
    disclaimer. Always included for this type (see the generic Appendix section below
    for the format; this type doesn't treat it as optional the way a tight daily issue
@@ -615,12 +668,39 @@ are summed client-side from repeated daily calls, the same way every run).
 6. Disclaimer footer (Sources whenever either paragraph above cites something web-sourced).
 
 Color and ticker convention for this type's HTML delivery: every ticker mention
-renders in the shared ticker blue (`scripts/charts.mjs`'s `TICKER`, `#9E0142`), and
+renders in the shared ticker accent (`scripts/charts.mjs`'s `TICKER`, `#9E0142`), and
 every gain/loss reading renders in the shared brand green/red (`GAIN` `#568475` /
 `LOSS` `#D53E50`), consistently across every table, the chart, AND any inline prose
 mention (a bare `$TICKER` in a paragraph, not just table cells and bar labels, is the
-easy miss, same bold-linked-blue treatment applies there too, see the **Ticker-mention
+easy miss, the same bold linked accent treatment applies there too, see the **Ticker-mention
 convention** section above).
+
+### Did you catch it
+FOMO family, one type-slug (`did-you-catch-it`) off one screener and one fetch pass
+(`workflows/did-you-catch-it.md`). Single-ticker spotlight, not a screener dump, one
+broadcast piece, same copy for every reader, no assumed reader state (this skill has no
+account data, see the workflow doc §3). **Product goal**: prove a `sectors.app`
+workflow alert would have caught the moment, so the section order runs **signal first,
+payoff second**, matching the real sequence of events, not the reverse.
+1. **The signal** — H1 poses the issue's own question ("did you catch it" is the hook,
+   not a literal heading to paste in), one-line standfirst naming the trigger date and
+   price plainly (`overview.all_time_price`'s dated low, e.g. "hit a 90-day low of IDR
+   446 on July 24," workflow doc §1), past tense, no imperative.
+2. **What was already true at the low** — the fundamentals guard as a small table (P/E
+   vs sector median, ROE vs sector median, leverage trend, see workflow doc §1 for how
+   each is derived from documented fields), stated as conditions that already held on
+   the trigger date, valuation context only, never "still cheap, don't miss it twice."
+3. **What happened next** — the payoff: last close vs the trigger price as a plain
+   percentage, hero chart (daily close from the trigger date to today, trough visually
+   evident, the up-move following it).
+4. **What to watch** — objective, non-prescriptive close.
+5. **CTA** — name the actual conditions from step 2 as a settable alert, concrete, not
+   generic, then the behavioral ask: set up a workflow alert, or add the ticker to a
+   watchlist. Never "buy now," never a price target, no countdown/scarcity language
+   (workflow doc §4).
+6. **Appendix** — flag the two documented spec adaptations explicitly (fundamentals
+   guard read at report date, not literally priced on the trigger date; leverage
+   compared annually, not at the literal 90-day mark). Then Sources, disclaimer footer.
 
 ### Upcoming event
 Promo for a Sectors in-house workshop. Content is **user-supplied** (date/venue, agenda,

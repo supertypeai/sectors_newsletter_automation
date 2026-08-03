@@ -117,6 +117,30 @@ function lint(storyboard, storyboardPath) {
     if (s.chart && s.chart.kind !== "line" && s.chart.kind !== "bar") {
       errors.push(`scene[${i}].chart.kind must be "line" or "bar", got "${s.chart.kind}"`);
     }
+    // A chart's caption and body don't finish entering until ~2.4s past the scene start, so a
+    // short chart scene shows its so-what sentence for a fraction of a second. A caption is
+    // 3-5 words and survives that; a `body` sentence does not, hence the body-only check.
+    if (s.role === "chart" && s.body && s.duration < 3.6) {
+      warnings.push(
+        `scene[${i}] is a ${s.duration}s chart with a body line — the body isn't fully on screen until ~2.4s, leaving about a second to read it. Budget 3.8s, or move the so-what into the headline and drop the body`
+      );
+    }
+    // BarChart heights are value/max, so a wide spread renders the small bars as slivers.
+    if (s.chart?.kind === "bar") {
+      const values = (s.chart.bars ?? []).map((b) => b.value).filter((v) => typeof v === "number" && v > 0);
+      const spread = values.length > 1 ? Math.max(...values) / Math.min(...values) : 1;
+      if (spread > 8) {
+        warnings.push(
+          `scene[${i}].chart spans ${spread.toFixed(0)}x from smallest to largest bar — the small bars will draw as unreadable slivers. Use a breakdown list, or chart a metric whose values are comparable`
+        );
+      }
+    }
+    // thread's stat renderer draws value + label only; a compare would vanish with no error.
+    if (storyboard.theme === "thread" && s.role === "stat" && s.stat?.compare) {
+      warnings.push(
+        `scene[${i}].stat.compare is ignored by the thread theme's stat renderer — put the benchmark in a badges entry instead`
+      );
+    }
     if (s.breakdown?.kind === "ownership") {
       if (s.breakdown.nodes.length !== s.breakdown.links.length + 1) {
         errors.push(`scene[${i}].breakdown.ownership: nodes.length must be links.length + 1`);

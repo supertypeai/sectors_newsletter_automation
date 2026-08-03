@@ -1,6 +1,8 @@
 {
   "theme": "thread",
-  "tickers": ["BBRI"],
+  "tickers": [
+    "BBRI"
+  ],
   "sourceDate": "9 Jul 2026",
   "scenes": [
     {
@@ -12,10 +14,27 @@
     },
     {
       "role": "chart",
-      "duration": 3.4,
+      "duration": 3.8,
       "headline": "In two days, it vanished.",
       "emphasis": "vanished.",
-      "chart": { "kind": "line", "values": [100, 108, 121, 132, 126, 108, 91, 88, 90], "peakLabel": "ATH 9,174", "lowLabel": "88 · the low", "endLabel": "90 · now", "caption": "down ~31% this year" },
+      "chart": {
+        "kind": "line",
+        "values": [
+          100,
+          108,
+          121,
+          132,
+          126,
+          108,
+          91,
+          88,
+          90
+        ],
+        "peakLabel": "ATH 9,174",
+        "lowLabel": "88 · the low",
+        "endLabel": "90 · now",
+        "caption": "down ~31% this year"
+      },
       "body": "$80B erased. Worst rout in ~30 years."
     },
     {
@@ -23,15 +42,24 @@
       "duration": 2.8,
       "headline": "Sultan stocks.",
       "emphasis": "Sultan",
-      "stat": { "value": "96%", "label": "OWNED BY INSIDERS" },
+      "stat": {
+        "value": "96%",
+        "label": "OWNED BY INSIDERS"
+      },
       "badges": [
-        { "text": "Float rule 7.5% → 15%", "color": "pink" },
-        { "text": "vs India 25%", "color": "green" }
+        {
+          "text": "Float rule 7.5% → 15%",
+          "color": "pink"
+        },
+        {
+          "text": "vs India 25%",
+          "color": "green"
+        }
       ]
     },
     {
       "role": "takeaway",
-      "duration": 2.0,
+      "duration": 2,
       "headline": "Before you trust any stock, check who owns it.",
       "emphasis": "owns it."
     }

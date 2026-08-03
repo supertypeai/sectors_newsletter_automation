@@ -1,0 +1,420 @@
+{
+  "symbol": "G13",
+  "name": "Genting Singapore Ltd",
+  "overview": {
+    "market_cap": 7494604933,
+    "volume": 10600600,
+    "employee_num": null,
+    "sector": "Consumer Cyclicals",
+    "sub_sector": "Hotels, Resorts & Leisure",
+    "tags": [
+      "dividend-increase-5y",
+      "dividend-yield-ttm-above-5-percent",
+      "top-90d-transaction-value",
+      "top-90d-transaction-volume"
+    ],
+    "last_close_price": 0.62,
+    "change_1d": 0,
+    "change_7d": -0.015873015873015872,
+    "change_1m": 0.01639344262295082,
+    "change_1y": -0.1267605633802817,
+    "change_3y": -0.232135510752337,
+    "change_ytd": -0.1267605633802817,
+    "all_time_price": {
+      "ytd_low": {
+        "2026-05-19": 0.5849999785423279
+      },
+      "52_w_low": {
+        "2026-05-19": 0.5849999785423279
+      },
+      "90_d_low": {
+        "2026-05-19": 0.5849999785423279
+      },
+      "ytd_high": {
+        "2026-02-20": 0.787021279335022
+      },
+      "52_w_high": {
+        "2026-02-20": 0.787021279335022
+      },
+      "90_d_high": {
+        "2026-05-07": 0.6899999976158142
+      },
+      "all_time_low": {
+        "2000-12-22": 0.0986272543668747
+      },
+      "all_time_high": {
+        "2010-11-09": 1.5895837545394897
+      }
+    }
+  },
+  "valuation": {
+    "pe": 19.195046,
+    "beta": 0.557367,
+    "ps": 3.057169,
+    "pcf": 9.487666,
+    "pb": 0.913409
+  },
+  "financials": {
+    "historical_financials": {
+      "2021": {
+        "date": "2021-12-31",
+        "revenue": 1067296000,
+        "earnings": 183345000,
+        "updated_on": "2026-06-19T05:48:02.884828+00:00",
+        "cash_flow_metrics": {
+          "net_cash_flow": -671054000,
+          "free_cash_flow": -567055000,
+          "capital_expenditure": 944774000,
+          "financing_cash_flow": -127769000,
+          "investing_cash_flow": -921004000,
+          "operating_cash_flow": 377719000
+        },
+        "income_stmt_metrics": {
+          "income_taxes": 42965000,
+          "pretax_income": 226310000,
+          "interest_expense": 17536000,
+          "operating_income": 210289000,
+          "operating_expense": 116573000,
+          "diluted_shares_outstanding": 12112277000
+        },
+        "balance_sheet_metrics": {
+          "total_asset": 8791925000,
+          "total_equity": 7895137000,
+          "total_liabilities": 896788000
+        }
+      },
+      "2022": {
+        "date": "2022-12-31",
+        "revenue": 1725331000,
+        "earnings": 340100000,
+        "updated_on": "2026-06-19T05:48:02.884828+00:00",
+        "cash_flow_metrics": {
+          "net_cash_flow": 172696000,
+          "free_cash_flow": 619655000,
+          "capital_expenditure": 187029000,
+          "financing_cash_flow": -447220000,
+          "investing_cash_flow": -186768000,
+          "operating_cash_flow": 806684000
+        },
+        "income_stmt_metrics": {
+          "income_taxes": 116626000,
+          "pretax_income": 456726000,
+          "interest_expense": 50981000,
+          "operating_income": 405377000,
+          "operating_expense": 196469000,
+          "diluted_shares_outstanding": 12081382000
+        },
+        "balance_sheet_metrics": {
+          "total_asset": 8800265000,
+          "total_equity": 7998818000,
+          "total_liabilities": 801447000
+        }
+      },
+      "2023": {
+        "date": "2023-12-31",
+        "revenue": 2417628000,
+        "earnings": 611582000,
+        "updated_on": "2026-06-19T05:48:02.884828+00:00",
+        "cash_flow_metrics": {
+          "net_cash_flow": 143338000,
+          "free_cash_flow": 627129000,
+          "capital_expenditure": 331387000,
+          "financing_cash_flow": -425762000,
+          "investing_cash_flow": -389416000,
+          "operating_cash_flow": 958516000
+        },
+        "income_stmt_metrics": {
+          "income_taxes": 165272000,
+          "pretax_income": 776854000,
+          "interest_expense": 138504000,
+          "operating_income": 635451000,
+          "operating_expense": 247314000,
+          "diluted_shares_outstanding": 12074242000
+        },
+        "balance_sheet_metrics": {
+          "total_asset": 9146765000,
+          "total_equity": 8192146000,
+          "total_liabilities": 954619000
+        }
+      },
+      "2024": {
+        "date": "2024-12-31",
+        "revenue": 2529960000,
+        "earnings": 578869000,
+        "updated_on": "2026-06-19T05:48:02.884828+00:00",
+        "cash_flow_metrics": {
+          "net_cash_flow": -26560000,
+          "free_cash_flow": 430033000,
+          "capital_expenditure": 429656000,
+          "financing_cash_flow": -485158000,
+          "investing_cash_flow": -401091000,
+          "operating_cash_flow": 859689000
+        },
+        "income_stmt_metrics": {
+          "income_taxes": 152167000,
+          "pretax_income": 731036000,
+          "interest_expense": 138398000,
+          "operating_income": 592522000,
+          "operating_expense": 243573000,
+          "diluted_shares_outstanding": 12081344000
+        },
+        "balance_sheet_metrics": {
+          "total_asset": 9230564000,
+          "total_equity": 8297577000,
+          "total_liabilities": 932987000
+        }
+      },
+      "2025": {
+        "date": "2025-12-31",
+        "revenue": 2452053000,
+        "earnings": 390346000,
+        "updated_on": "2026-07-01T03:56:07.450539+00:00",
+        "cash_flow_metrics": {
+          "net_cash_flow": -372014000,
+          "free_cash_flow": 121015000,
+          "capital_expenditure": 668965000,
+          "financing_cash_flow": -485617000,
+          "investing_cash_flow": -676377000,
+          "operating_cash_flow": 789980000
+        },
+        "income_stmt_metrics": {
+          "income_taxes": 120919000,
+          "pretax_income": 511265000,
+          "interest_expense": 81747000,
+          "operating_income": 454805000,
+          "operating_expense": 292639000,
+          "diluted_shares_outstanding": 12091547000
+        },
+        "balance_sheet_metrics": {
+          "total_asset": 9185799000,
+          "total_equity": 8205416000,
+          "total_liabilities": 980383000
+        }
+      }
+    },
+    "eps": 0.033665,
+    "gross_margin": 0.30482,
+    "operating_margin": 0.185479,
+    "net_profit_margin": 0.165921,
+    "one_year_eps_growth": 0.1347,
+    "one_year_sales_growth": -0.030794,
+    "quick_ratio": 4.367922,
+    "current_ratio": 4.472212,
+    "debt_to_equity": 0.000045
+  },
+  "dividend": {
+    "dividend_yield_5y_avg": 0.0365,
+    "dividend_growth_rate": -0.5,
+    "payout_ratio": 1.2384,
+    "forward_dividend": 0.04,
+    "forward_dividend_yield": 0.0656,
+    "dividend_ttm": 0.04,
+    "historical_dividends": {
+      "2012": {
+        "breakdown": [
+          {
+            "date": "2012-05-09",
+            "total": 0.01,
+            "yield": 0.01612903213401739
+          }
+        ],
+        "total_yield": 0.01612903213401739,
+        "total_dividend": 0.01
+      },
+      "2013": {
+        "breakdown": [
+          {
+            "date": "2013-05-08",
+            "total": 0.01,
+            "yield": 0.01612903213401739
+          }
+        ],
+        "total_yield": 0.01612903213401739,
+        "total_dividend": 0.01
+      },
+      "2014": {
+        "breakdown": [
+          {
+            "date": "2014-05-05",
+            "total": 0.01,
+            "yield": 0.01612903213401739
+          }
+        ],
+        "total_yield": 0.01612903213401739,
+        "total_dividend": 0.01
+      },
+      "2015": {
+        "breakdown": [
+          {
+            "date": "2015-05-04",
+            "total": 0.01,
+            "yield": 0.01612903213401739
+          }
+        ],
+        "total_yield": 0.01612903213401739,
+        "total_dividend": 0.01
+      },
+      "2016": {
+        "breakdown": [
+          {
+            "date": "2016-05-05",
+            "total": 0.015,
+            "yield": 0.024193548201026083
+          },
+          {
+            "date": "2016-11-23",
+            "total": 0.015,
+            "yield": 0.024193548201026083
+          }
+        ],
+        "total_yield": 0.04838709640205217,
+        "total_dividend": 0.03
+      },
+      "2017": {
+        "breakdown": [
+          {
+            "date": "2017-05-04",
+            "total": 0.015,
+            "yield": 0.024193548201026083
+          },
+          {
+            "date": "2017-08-23",
+            "total": 0.015,
+            "yield": 0.024193548201026083
+          }
+        ],
+        "total_yield": 0.04838709640205217,
+        "total_dividend": 0.03
+      },
+      "2018": {
+        "breakdown": [
+          {
+            "date": "2018-04-30",
+            "total": 0.02,
+            "yield": 0.03225806426803478
+          },
+          {
+            "date": "2018-09-07",
+            "total": 0.015,
+            "yield": 0.024193548201026083
+          }
+        ],
+        "total_yield": 0.05645161246906087,
+        "total_dividend": 0.035
+      },
+      "2019": {
+        "breakdown": [
+          {
+            "date": "2019-05-02",
+            "total": 0.02,
+            "yield": 0.03225806426803478
+          },
+          {
+            "date": "2019-09-10",
+            "total": 0.015,
+            "yield": 0.024193548201026083
+          }
+        ],
+        "total_yield": 0.05645161246906087,
+        "total_dividend": 0.035
+      },
+      "2020": {
+        "breakdown": [
+          {
+            "date": "2020-06-10",
+            "total": 0.025,
+            "yield": 0.040322580335043476
+          }
+        ],
+        "total_yield": 0.040322580335043476,
+        "total_dividend": 0.025
+      },
+      "2021": {
+        "breakdown": [
+          {
+            "date": "2021-04-28",
+            "total": 0.01,
+            "yield": 0.01612903213401739
+          }
+        ],
+        "total_yield": 0.01612903213401739,
+        "total_dividend": 0.01
+      },
+      "2022": {
+        "breakdown": [
+          {
+            "date": "2022-05-06",
+            "total": 0.01,
+            "yield": 0.01612903213401739
+          },
+          {
+            "date": "2022-08-26",
+            "total": 0.01,
+            "yield": 0.01612903213401739
+          }
+        ],
+        "total_yield": 0.03225806426803478,
+        "total_dividend": 0.02
+      },
+      "2023": {
+        "breakdown": [
+          {
+            "date": "2023-05-03",
+            "total": 0.02,
+            "yield": 0.03225806426803478
+          },
+          {
+            "date": "2023-08-28",
+            "total": 0.015,
+            "yield": 0.024193548201026083
+          }
+        ],
+        "total_yield": 0.05645161246906087,
+        "total_dividend": 0.035
+      },
+      "2024": {
+        "breakdown": [
+          {
+            "date": "2024-05-02",
+            "total": 0.02,
+            "yield": 0.03225806426803478
+          },
+          {
+            "date": "2024-08-28",
+            "total": 0.02,
+            "yield": 0.03225806426803478
+          }
+        ],
+        "total_yield": 0.06451612853606956,
+        "total_dividend": 0.04
+      },
+      "2025": {
+        "breakdown": [
+          {
+            "date": "2025-05-02",
+            "total": 0.02,
+            "yield": 0.03225806426803478
+          },
+          {
+            "date": "2025-08-27",
+            "total": 0.02,
+            "yield": 0.03225806426803478
+          }
+        ],
+        "total_yield": 0.06451612853606956,
+        "total_dividend": 0.04
+      },
+      "2026": {
+        "breakdown": [
+          {
+            "date": "2026-04-30",
+            "total": 0.02,
+            "yield": 0.03225806426803478
+          }
+        ],
+        "total_yield": 0.03225806426803478,
+        "total_dividend": 0.02
+      }
+    }
+  }
+}

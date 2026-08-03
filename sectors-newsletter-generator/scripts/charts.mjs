@@ -11,7 +11,7 @@
 // list), not swapped freely. Running that list through dataviz's validate_palette.js
 // against surface #fcfcfb left only 6 hexes clearing BOTH the categorical lightness band
 // and >=3:1 contrast (the rest are pastels that read near-invisible on white): a rose
-// (#c14d94), a red (#D53E4F), a blue (#9E0142), and a purple (#5E4FA2, in use; #6D5FA6 is
+// (#c14d94), a red (#D53E4F), a crimson (#9E0142), and a purple (#5E4FA2, in use; #6D5FA6 is
 // a same-family spare for a 4th peer slot if one's ever needed), plus #8B004C which passes
 // contrast alone but fails the shared lightness band next to the others. That 22-hex list
 // has no green clearing 3:1 on white (a genuine green, #5BAA5A, sits at 2.79:1 and fails
@@ -515,7 +515,7 @@ export function donut(segments, { size = 360, centerLabel = "", centerSub = "" }
 // Palette for non-"self" series (peers in a comparison): peer0 stays neutral ink (a
 // baseline peer reads as "the reference," not a second identity), peer1/peer2 are the
 // two remaining validated hues from the approved list not already spent on SELF/GAIN/LOSS
-// (blue #9E0142, dark purple #5E4FA2), both pass >=3:1 contrast and clear the adjacent-CVD
+// (crimson #9E0142, dark purple #5E4FA2), both pass >=3:1 contrast and clear the adjacent-CVD
 // floor next to SELF (see the file header note). Exported so a caller can draw a matching
 // legend swatch.
 export const PEER_COLORS = ["#52514E", "#9E0142", "#5E4FA2"];

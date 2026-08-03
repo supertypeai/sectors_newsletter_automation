@@ -57,6 +57,17 @@
       "verified": "Surface confirmed in assets/brand/app-overview.png (Ownership Search toggle). The promise line is a description of the feature's purpose and needs a product owner's sign-off before it ships."
     },
 
+    "one-percent-search-engine": {
+      "name": "The 1% Search Engine",
+      "promise": "Search any name, a person or a company, and see every IDX company where they hold a stake down to 1%.",
+      "chips": ["Beneficial ownership", "Cross-company search", "IDX + KSEI data"],
+      "proof": "7,190 Indonesia public company ownership records, sourced from IDX and KSEI, updated monthly.",
+      "who": "Anyone tracing who actually stands behind an IDX company's shareholder list.",
+      "demo": { "kind": "clip", "src": "inputs/demo/one-percent-search-engine.mov", "device": "browser", "url": "sectors.app/indonesia/company-ownership" },
+      "cta": "sectors.app/indonesia/company-ownership",
+      "verified": "Wording and figures taken from a user-supplied screenshot of the live page (2026-07-28): page header states '7,190 Indonesia Public Company ownership records in compliance with Liquidity Thresholds under MSCI Market Classification Framework. Data sourced from IDX and KSEI, updated monthly.' Tab is labeled 'The 1% Search Engine', subtitle 'Beneficial ownership transparency'. Demo search for 'dr lo kheng ho' returned 13 companies with per-company shareholder breakdown (type, country, holdings, ownership%)."
+    },
+
     "watchlist": {
       "name": "Watchlist",
       "promise": "Keep the names you actually follow in one place, priced and updated without you asking.",

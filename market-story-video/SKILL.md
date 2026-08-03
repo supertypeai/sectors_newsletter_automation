@@ -116,6 +116,14 @@ Every beat still needs a benchmark (a number alone isn't a finding), and you sti
 before writing a word — the single most surprising number earns the `cover` or the first
 proof scene, never the middle.
 
+**If the story covers more than one company, decide the shared axis here, before anything
+else.** A multi-subject piece is one argument, not several profiles: name the one metric every
+subject will be measured on, give every subject the same slots proving the same things, and
+plan the comparison scene that puts them all on one frame before the takeaway. Read
+`references/scenes.md`'s multi-subject section and `references/length.md`'s budget table now —
+retrofitting parallel structure after the data is fetched means refetching, since each subject
+needs the same fields.
+
 ### 3. Fetch the data that proves the beats (Sectors API)
 
 Identical to the carousel skill. Open `references/sectors-api/README.md`, then
@@ -210,6 +218,13 @@ self-review asks, adapted for a moving story:
 - Does the `takeaway` read as a finding or as advice? Rewrite if the latter.
 - Read `references/motion.md`'s "reviewing your own timing" section — does the proof
   (chart/stat) finish its draw-on with enough hold time left to actually read it?
+- **Collision check**: does any decoration (a thread marker, a logo, a badge stack) sit on top
+  of a kicker, headline, chart bar or axis label? Nothing in the lint catches this; the stills
+  are the only place it surfaces before delivery.
+- **Slot-parity check** (multi-subject pieces only): tabulate the scenes by subject. Does every
+  subject have the same slots, the same benchmark treatment, and the same chart-or-text
+  decision? Is there a comparison frame showing all of them together before the takeaway, and
+  does the takeaway name the relationship that frame shows rather than just noting difference?
 
 **d.** Once the draft looks right, render the full MP4 and watch it (or extract frames with
 `ffmpeg -i <file>.mp4 -vf fps=1 frame%02d.png` if you need to inspect specific moments) —
@@ -244,8 +259,8 @@ copy FROM an entry there, never from memory. If the feature isn't catalogued, as
 its promise, proof, and destination, write the entry (with a `verified` note on what grounds it),
 then compose. Set the storyboard's top-level `feature` key to the catalog key for traceability.
 
-**2. Line up the footage.** Each demo scene needs a screen recording (`inputs/demo/*.mov`) or a
-screenshot (`inputs/shots/*.png`) of the app. Compose the storyboard pointing `media.src` at
+**2. Line up the footage.** Each demo scene needs a screen recording (`inputs/demo/*.mp4`,
+`.mov`, `.webm` or `.m4v`) or a screenshot (`inputs/shots/*.png`) of the app. Compose the storyboard pointing `media.src` at
 where the file will live; the lint and renderer error on a missing file, so you'll know exactly
 what to capture. For a first pass with nothing recorded, `assets/brand/app-overview.png` (a real
 sectors.app overview screenshot shipping with the skill) is a legitimate stand-in as a `shot`.
@@ -314,12 +329,23 @@ src/
   types.ts                   the Storyboard/Scene TypeScript contract (mirrors storyboard-format.md)
   tokens.ts, fonts.ts         design tokens (all three themes) and the font registry (Google Fonts)
   components/                GradientText, Logo, BrandMark, SceneShell, DeviceFrame, HumanSlot, charts/
-  themes/noir/, themes/thread/, themes/product/   each theme's Background/Chrome/scene renderers/Outro
+  themes/noir/, themes/thread/, themes/product/   each theme exports
+                             `{ Background, Chrome, scenes, Outro }` from its index.ts, with the
+                             scene renderers in its own scenes/. Two deliberate gaps: thread sets
+                             `Chrome: null` (StoryboardComposition draws its thread line instead,
+                             it needs total-frame context), and product adds the four reel roles
+                             (cover/feature/demo/cta) while reusing noir's stat/chart/breakdown/
+                             takeaway/Outro rather than copying them
 inputs/
   features.json               the product-reel facts catalog (what each sectors.app feature does)
-  demo/  shots/               your screen recordings and screenshots for reels (git-ignored)
+  demo/  shots/               your screen recordings and screenshots for reels (git-ignored;
+                              shots/ is created on demand, it may not exist yet)
+  *.storyboard.json           in-progress reels whose footage lives in demo/ (e.g.
+                              ai-search-console); finished pieces ship to the scs folder, not here
 assets/
   logos.json                  957 IDX ticker logos (base64), shared with the carousel skill
+  sgx-logos.json              6 SGX logos, same base64 map shape; both are resolved by
+                              src/components/Logo.tsx
   brand/                       sectors-mark.svg, app-overview.png (a real sectors.app screenshot for reel drafts)
 config.example.json           template for the optional local key file; SECTORS_API_KEY env is the primary source
 package.json                 remotion + @remotion/cli + @remotion/google-fonts
@@ -342,7 +368,9 @@ samples/  output/             three worked examples (noir, thread, product reel)
   player (scrub the timeline, hot-reload on save) — faster than re-rendering for a layout-only
   change.
 
-To extend the renderer or add a third theme, start from `src/themes/noir/` or
-`src/themes/thread/` as a template — both implement the same
-`{ Background, Chrome, scenes: {cover,stat,chart,breakdown,takeaway}, Outro }` shape consumed
-by `StoryboardComposition.tsx`.
+To extend the renderer or add a fourth theme, start from `src/themes/noir/` as the template —
+it is the complete implementation of the `{ Background, Chrome, scenes:
+{cover,stat,chart,breakdown,takeaway}, Outro }` shape consumed by
+`StoryboardComposition.tsx`. `thread/` shows how to opt out of `Chrome` (it returns `null` and
+lets the composition draw the thread line), and `product/` shows how to add new scene roles
+while reusing noir's renderers for the roles you don't restyle.

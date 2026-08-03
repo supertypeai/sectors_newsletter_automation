@@ -32,6 +32,14 @@ scene's moment, Lora serif headlines with italic-gradient emphasis, and stacked 
 badges for supporting facts, color-coded (pink = the headline figure, green = a rate/percentage,
 dark = a neutral fact).
 
+The thread runs down the **left gutter**, inside the margin left of `SAFE.x`, and its markers
+are sized to stay there. It used to wander through the centre of the frame at a much wider
+amplitude, which put dots and logos straight through kickers, headlines and chart bars for the
+whole runtime; the frosted panel behind a headline hid some of those collisions but nothing
+protected a chart or an eyebrow label. Composing a thread story therefore needs no layout
+allowance for the line — but if you change `ThreadLine`'s `centerX`/`amplitude`/marker size,
+re-check the widest element on screen (the 900px chart box starting at x=90) still clears it.
+
 **Use for**: a market-wide or news-driven story — an index reshuffle, a regulatory shift, a
 sector-wide move, anything framed as "here's what happened and why it matters" rather than one
 company's internal case. The dotted thread visually means "this is all one connected event."
@@ -73,6 +81,11 @@ The market-story roles (`cover`/`stat`/`chart`/`breakdown`/`takeaway`) render th
 breakdown all mean the same thing; only the DECORATION differs (background, kicker style,
 headline font, badge/pill treatment, persistent chrome). Composing a market story never
 requires deciding per-field which theme you're in, only the top-level `"theme"` key.
+
+One exception worth knowing before you author a benchmarked `stat`: thread's `stat` renderer
+draws `stat.value` and `stat.label` only, and **ignores `stat.compare`**. Under thread, put
+the benchmark in a `badges` entry ("Peer median: 17x") instead, or the comparison silently
+disappears from the render with no lint error to warn you.
 
 The product theme shares noir's palette, type ramp, and the `stat`/`chart`/`breakdown`/
 `takeaway` renderers (it reuses noir's components rather than copying them), and adds four new

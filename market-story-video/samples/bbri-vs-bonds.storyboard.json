@@ -1,30 +1,55 @@
 {
   "theme": "noir",
-  "tickers": ["BBRI"],
+  "tickers": [
+    "BBRI"
+  ],
   "sourceDate": "9 Jul 2026",
   "scenes": [
     {
       "role": "cover",
-      "duration": 3.0,
+      "duration": 3,
       "kicker": "IDX · DIVIDENDS",
       "headline": "A high yield, the hard way.",
       "emphasis": "hard way",
-      "tickers": ["BBRI"],
-      "stat": { "value": "12%", "label": "DIVIDEND YIELD", "compare": { "value": "6.8%", "label": "10Y BOND" } }
+      "tickers": [
+        "BBRI"
+      ],
+      "stat": {
+        "value": "12%",
+        "label": "DIVIDEND YIELD",
+        "compare": {
+          "value": "6.8%",
+          "label": "10Y BOND"
+        }
+      }
     },
     {
       "role": "chart",
-      "duration": 3.3,
+      "duration": 3.8,
       "kicker": "THE YIELD GAP",
       "headline": "Profit kept falling for three years",
       "emphasis": "falling",
-      "tickers": ["BBRI"],
+      "tickers": [
+        "BBRI"
+      ],
       "chart": {
         "kind": "bar",
         "bars": [
-          { "label": "2023", "value": 62.1, "display": "62.1" },
-          { "label": "2024", "value": 58.3, "display": "58.3" },
-          { "label": "2025", "value": 56.7, "display": "56.7" }
+          {
+            "label": "2023",
+            "value": 62.1,
+            "display": "62.1"
+          },
+          {
+            "label": "2024",
+            "value": 58.3,
+            "display": "58.3"
+          },
+          {
+            "label": "2025",
+            "value": 56.7,
+            "display": "56.7"
+          }
         ],
         "caption": "IDR T · net profit"
       },
@@ -34,7 +59,10 @@
       "role": "stat",
       "duration": 2.6,
       "kicker": "PAYOUT RATIO",
-      "stat": { "value": "85%", "label": "OF NET PROFIT PAID OUT" },
+      "stat": {
+        "value": "85%",
+        "label": "OF NET PROFIT PAID OUT"
+      },
       "headline": "The dividend isn't growing. It's being defended.",
       "emphasis": "defended."
     },
