@@ -5,13 +5,6 @@ name: Draft weekly insights
 # gate, and merging it triggers send-on-merge.yml.
 
 on:
-  schedule:
-    # 07:00 WIB Monday = 00:00 UTC Monday. The type's own date rule is simply "today's
-    # actual date" (see SKILL.md Hard rule 11), so this cron just needs to land on the
-    # intended send day; no date arithmetic happens here or in the skill. That also
-    # means a manual re-run via workflow_dispatch on any other day correctly dates
-    # itself to that day, rather than a stale computed Monday.
-    - cron: "0 0 * * 1"
   workflow_dispatch:
     inputs:
       issue_type:
