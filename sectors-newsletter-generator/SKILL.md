@@ -644,7 +644,10 @@ with this skill's own `scripts/charts.mjs` (import the chart-kind function you n
 `sparkline`/`line` for a price series, `barChart` for year-over-year (pass `financial:
 true` for a signed gain/loss series), `donut` for a mix, `moversChart` for a ranked
 gainers/losers list with per-row logos, etc. — and write its returned SVG string to a
-file, no Puppeteer, no build step). Still
+file, no Puppeteer, no build step). **`moversChart`'s per-row logos come from
+`../market-story-video/assets/logos.json`** (957 IDX tickers, keyed by bare symbol,
+raw base64 PNG); a row given no `logoBase64` renders no image without complaining, so
+pass them explicitly or the chart silently ships bare. Still
 consult the `dataviz` skill first for **which kind of chart fits the data** (its form
 heuristic and the "which Sectors field maps to which chart" table in the sibling
 carousel skill's `references/charts.md` both apply here unchanged); `charts.mjs` is the

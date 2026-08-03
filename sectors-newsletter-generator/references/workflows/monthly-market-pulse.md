@@ -110,6 +110,23 @@ Follow `../newsletter-format.md`'s skeleton exactly:
    (logos + full labels + green/red diverging bars, see `scripts/charts.mjs`). Caption
    states only what the chart shows, no interpretive commentary, that belongs in the
    surrounding prose instead.
+
+   **Where the logos come from** (added 2026-07-31 — a run shipped a logo-less chart
+   because this wasn't written down anywhere): `moversChart` takes a `logoBase64` per
+   item, and **a row without one silently renders no image while keeping its spacing**,
+   so a missing logo looks like a design choice rather than a bug. Load them from the
+   sibling skill's registry:
+
+   ```js
+   const logos = JSON.parse(fs.readFileSync('../market-story-video/assets/logos.json','utf8'));
+   const items = rows.map(([symbol, value]) => ({ symbol, value, logoBase64: logos[symbol] }));
+   ```
+
+   957 IDX tickers, keyed by **bare symbol** (`'BUMI'`, never `'BUMI.JK'` — the `.JK`
+   form returns nothing), values already raw base64 PNG with no `data:` prefix, exactly
+   the shape `moversChart` wants. The file is git-tracked, so it's present in a CI
+   checkout too. Log a warning naming any ticker with no logo rather than letting the
+   row quietly render bare.
 3. **Most traded** — the aggregated ranking from step 2's `most-traded` work, a short
    table, **followed by a short paragraph** naming one ticker from the list (usually
    the top one) and its real, dated, cited reason for running hot all month (from the
