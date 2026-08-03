@@ -35,10 +35,10 @@ PNG slides at 2160×2700 (2x retina; the renderer also does 1080×1350 with `--s
 ## Where things live
 
 - **`SKILL.md`** how Claude uses the skill (the pipeline). Start here to understand the flow.
-- **`CLAUDE.md`** how to maintain and extend it (add block kinds, refresh logos, tweak the style).
 - **`references/`** the house style, the deck.json contract, the writing craft, and the Sectors API + data-quality rules.
-- **`scripts/`** the renderer (`render.mjs` + `blocks.mjs` + `charts.mjs`).
-- **`assets/`** the frozen house style (CSS, fonts, logos, brand art).
+- **`docs/`** maintainer research behind the data layer (endpoint reference, data catalog, screener deep-dive, test report).
+- **`scripts/`** the renderer (`render.mjs` + `blocks.mjs` + `charts.mjs`), the lint, and the one-time asset builds.
+- **`assets/`** the frozen house style: `styles/` (CSS with the fonts embedded), `logos.json`, cover art, brand art.
 
 ## Non-negotiables
 

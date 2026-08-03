@@ -178,7 +178,10 @@ references/
   writing/                   writing.md is the runtime craft reference (story, hook, slide copy,
                              caption); viral-hooks/storytelling/dumbify/anti-ai-writing/brand-voice/
                              caption are the full-treatment originals it's distilled from (+ _source/)
-  sectors-api/               endpoints, data-quality, README (the data layer, v2)
+  sectors-api/               endpoints, data-quality, README (the data layer, v2; covers IDX
+                             plus the SGX endpoints and their logo caveat)
+  lookbook/lookbook.deck.json  a reference deck exercising every archetype and chart kind;
+                             render it to see the system, don't ship it
 scripts/
   render.mjs                 deck.json -> PNG slides (Puppeteer, one bundled Chromium)
   coverart.mjs               subject photo -> transparent cover-art PNG (background removal,
@@ -188,22 +191,34 @@ scripts/
   blocks.mjs, charts.mjs     renderer internals (free-HTML injection, chart/logo SVG, helper blocks)
   selftest.mjs               renderer/lint regression suite (maintainers; run after changing scripts/)
   build-fonts.mjs            one-time: embeds the woff2 fonts into assets/styles/fonts.css
+  build-logos.mjs            one-time: rebuilds assets/logos.json from a logo source folder
+  probe.py, screener_probe.py   maintainer-only: hit the live API and archive raw payloads
+                             into a local responses/ folder (created on demand, not shipped)
+  analyze.py, trim.py        maintainer-only: summarise those raw payloads, and slim them into
+                             the shipped examples/ fixtures. This is how docs/ and
+                             references/sectors-api/ get written; no normal run touches them
 assets/
-  styles/ (theme.css, fonts.css), fonts/   the house style, frozen as CSS
-  logos/                     957 IDX ticker logos (auto-used via chips / data-logo / rankings)
+  styles/ (theme.css, fonts.css)   the house style, frozen as CSS (fonts are already embedded
+                             as base64 inside fonts.css, there is no assets/fonts/ folder)
+  logos.json                 959 IDX ticker logos, base64, one JSON map (auto-used via chips /
+                             data-logo / rankings); rebuilt by scripts/build-logos.mjs
   coverart/                  prepared cover subject images, <TICKER>.png (auto-resolved by render.mjs)
   brand/                     sectors-mark.svg + app-overview.png (footer + outro art)
 config.json                  shared Sectors API key (sectorsApiKey); SECTORS_API_KEY env overrides
 package.json                 puppeteer dependency (run `npm install` once per machine)
-examples/  responses/        cached Sectors v2 shapes (structure reference; data is a snapshot)
+docs/                        maintainer research notes behind references/sectors-api/ (endpoint
+                             reference, data catalog, screener deep-dive, a live test report).
+                             references/sectors-api/ is the runtime source of truth; read docs/
+                             only when extending the data layer
+examples/                    cached Sectors v2 responses (structure reference; data is a snapshot)
 samples/   output/           a worked example deck, and where rendered slides land
 ```
 
 ## Setup (once per machine)
 
 - **Install**: run `npm install` in the skill directory once (downloads Puppeteer + its pinned Chromium, so rendering is identical on macOS/Windows with no system browser). Needs network for this one step.
-- **Fonts**: pre-bundled in `assets/styles/fonts.css`. Only re-run `node scripts/build-fonts.mjs` if you change `assets/fonts/*.woff2`.
+- **Fonts**: already embedded as base64 inside `assets/styles/fonts.css`, nothing to install. `scripts/build-fonts.mjs` is the one-time build that produced that file from `.woff2` sources; re-run it only if you replace the font files themselves (they aren't kept in the skill).
 - **API key**: a shared team key ships in `config.json`, so live data works out of the box. Override with `export SECTORS_API_KEY=<key>` if you have your own.
 - **Sanity check**: `node scripts/render.mjs samples/*.deck.json --out output/_sample`.
 
-To extend the renderer or the design system, see **`CLAUDE.md`**.
+To extend the renderer or the design system, read `scripts/render.mjs` and `scripts/blocks.mjs` alongside `references/visual-language.md`, and re-run `node scripts/selftest.mjs` after any change under `scripts/`. The maintainer notes in `docs/` cover the data layer.

@@ -6,7 +6,7 @@ description: >-
   to write, draft, or produce a Sectors subscriber newsletter issue. Handles eleven
   built issue types the user picks from on each run, across six families: MARKET
   PERFORMANCE ("weekly insights v2" / "weekly insights" / "Monday market wrap", the
-  current eight-block Monday digest and the default for a weekly send; "weekly wrap"
+  current nine-block Monday digest and the default for a weekly send; "weekly wrap"
   the superseded eleven-section v1, kept until the user retires it; "monthly market
   pulse" a trailing-30-day movers/volume/broker-flow read); MARKET INSIGHTS ("macro-reaction" / "macro newsletter" tying the
   last ~2 days of macro news to affected sectors and tickers); COMPANY INSIGHTS ("three
@@ -251,10 +251,16 @@ see their own workflow docs.
 ### Weekly Insights v2
 Open `references/workflows/weekly-insights-v2.md` for the exact API recipe and section
 order, and `newsletter/samples/weekly-insights-v2/` for the worked reference. In brief:
-settle the Mon-Fri window as v1 does, then build eight blocks, not eleven. Key Data Bites
+settle the Mon-Fri window as v1 does, then build nine blocks, not eleven. Key Data Bites
 carries every computed market-level fact; Other Major Headlines carries every news-sourced
 one; the two must never repeat a fact. The single analysis block joins two sources to find
 something the tables don't already say, illustrated with the carousel's social cards.
+What's Ahead closes with two to four dated, cited, mapped macro rows alongside the corporate
+actions, and **The Other Side** (bull read, bear read, what would settle it) sits between it
+and the CTA, built only from figures already in the issue. Every block from Key Data Bites
+onward carries a one-sentence italic claim subtitle under its unchanged heading, and every
+linking sentence follows the workflow doc's §5b causation policy: name the mechanism, label
+its status, never predict a price on our own authority.
 **Open decision: ask the user which foreign-flow definition the issue should use before
 drafting any flow figure** (the cards and `foreign-flow/{symbol}` use different methods that
 disagree on direction, see the workflow doc §3), then apply that one definition throughout.
@@ -396,8 +402,8 @@ dbquery skill's templates do.
    type-dependent: the endpoint/field trace block, after Sources, before the
    disclaimer, sized to how much was actually fetched. See
    `newsletter-format.md`'s **Appendix** section.
-9. **Every broker code links** to `sectors.app/idx/broker/<lower>`, same ticker-blue
-   styling, on any type that has a broker/flow table (confirmed 2026-07-16).
+9. **Every broker code links** to `sectors.app/idx/broker/<lower>`, same accent `#9E0142`
+   ticker styling, on any type that has a broker/flow table (confirmed 2026-07-16).
 10. **"Upcoming Events" closing block on every issue except `upcoming-event` itself**
     (confirmed 2026-07-20, revised same day to cover every still-upcoming row, not just
     the nearest): a small promo for Sectors workshops, live-fetched from a shared Google
@@ -465,10 +471,10 @@ Finished issues land at:
   layout, tickers linked to `sectors.app/idx/<lower>`), replacing the old
   PDF-attachment format, plus at least one generated `chart-<slug>.svg` per issue.
   This was originally weekly-wrap- and upcoming-event-only; the samples in
-  `newsletter/samples/` now cover ten of the eleven types with both (`did-you-catch-it`
-  currently only has `queries.md`, the documented recipe, no worked
-  `newsletter.md`/`.html` yet, see its sample folder), and any newly delivered
-  issue matches that standard regardless of type. **`weekly-insights-v2` satisfies the
+  `newsletter/samples/` now cover all eleven types with both a worked `newsletter.md` and
+  `newsletter.html` (ten of them also carry a `chart-<slug>.svg`, `weekly-insights-v2`
+  being the documented card-based exception), and any newly delivered issue matches that
+  standard regardless of type. **`weekly-insights-v2` satisfies the
   visual requirement with the social cards in its findings block instead of a generated
   `chart-<slug>.svg`**; if no suitable card exists for a given week, generate a chart so
   the issue is never image-less. This type is also the one exception to the
@@ -507,8 +513,9 @@ references/
                                    closing-block promo every issue but upcoming-event
                                    carries (Hard rule 10)
   workflows/                      one doc per built issue type (eleven)
-    weekly-insights-v2.md         the current Monday digest: eight blocks, social-card
-                                   findings block, corporate-action week calendar
+    weekly-insights-v2.md         the current Monday digest: nine blocks, social-card
+                                   findings block, corporate-action week calendar plus
+                                   scheduled macro rows, two-sided read before the CTA
     weekly-wrap.md                v1, superseded by the above, kept until retired
     monthly-market-pulse.md       30-day movers/volume/broker-flow recipe, table-first
     macro-reaction.md             macro sourcing + affected-ticker + valuation-context
@@ -543,7 +550,8 @@ scripts/
                                    geometry, own light-safe color constants (see the
                                    file's header comment for the validated role map;
                                    GAIN/LOSS is brand green/red `#568475`/`#D53E50`,
-                                   ticker mentions are blue `#9E0142`, see Hard rule 7)
+                                   ticker mentions and every other link carry the accent
+                                   `#9E0142`, see Hard rule 7)
 config.json                       own copy of the shared Sectors API key
                                    (sectorsApiKey); SECTORS_API_KEY env overrides
 ```

@@ -297,7 +297,7 @@ no-dash/no-AI-tell rules, it constrains *shape*.
   self-vs-peer, and so on, the same 13-kind grammar documented in the carousel skill's
   `references/charts.md`) and write its returned SVG string to `chart-<slug>.svg`. Its
   colors are already fixed and validated to the shared palette above (green
-  `#568475` gain, red `#D53E50` loss, blue `#9E0142` ticker, see the file's own header
+  `#568475` gain, red `#D53E50` loss, accent `#9E0142` ticker, see the file's own header
   comment for the full role map), so don't re-derive a palette per issue, and see this
   doc's own **Color convention** section above for the `financial: true` requirement
   on `barChart`. A hand-rolled inline SVG or `ggplot2` (R) is a fallback only for a
@@ -435,8 +435,15 @@ two-column mover cards and event banner are specific to that type's layout. Full
 ### Weekly Insights v2
 
 The successor to Weekly wrap, and the one to reach for on a Monday send unless the user
-asks for v1 by name. **Eight blocks, info-packed, no long-form reading anywhere.** Full
+asks for v1 by name. **Nine blocks, info-packed, no long-form reading anywhere.** Full
 recipe in `workflows/weekly-insights-v2.md`.
+
+Every content block, 2 through 8, carries a **claim subtitle** (the CTA and Upcoming Events
+blocks do not, they argue nothing): the heading name stays
+exactly as listed below, and one italic sentence sits directly under it stating what that
+block's own numbers argue. The heading names the data, the subtitle names the argument. A
+subtitle that only restates the heading ("Here are the week's movers") is not a subtitle,
+cut it and write the claim.
 
 1. **Masthead + greeting** — issue number, send date, window, data-as-of. Then a bare
    `Good morning!`. No opening hook paragraph, no table of contents.
@@ -457,15 +464,30 @@ recipe in `workflows/weekly-insights-v2.md`.
    an outbound citation. **No category prefix** on the bullets. Closes with a read-more link
    to `sectors.app/indonesia/news`.
 7. **What's Ahead** — a **Mon-Fri week-grid calendar** of corporate actions (stock splits,
-   dividend ex-dates, AGMs, rights issues) plus a "beyond the week" table for anything
-   further out. Built by polling `company/corporate-actions/{symbol}/` across a ticker list.
-   Closes with the dividend-calendar link.
-8. **CTA** — watchlist for exclusive reports, workflow for alerts, in a tinted panel with the
+   dividend ex-dates, AGMs, rights issues), a "beyond the week" table for anything further
+   out, and a third compact **scheduled macro** table (Date, Event, Why it matters) of two
+   to four dated prints and policy events: BI RDG, BPS CPI or trade balance, an FOMC
+   decision, an index rebalance effective date. Corporate actions are polled from
+   `company/corporate-actions/{symbol}/`; the macro rows are sourced and cited, not an API
+   pull. Every macro row's "why" names a ticker or sector that already appears in this
+   issue; an unmapped row is a wire feed line, cut it. Closes with the dividend-calendar
+   link.
+8. **The Other Side** — the two-sided read, built entirely from figures already in the
+   issue, no new fetches. Two short stacked blocks, **The bull read** and **The bear read**,
+   two or three bullets each. Then one closing line, **What would settle it**, naming the
+   specific dated print or event that distinguishes the two, normally one of block 7's own
+   rows. Every forward-looking bullet is attributed to a named source with a date, or
+   reframed as a condition ("if CPI prints above 3.2%"). Never the newsletter's own
+   unattributed prediction.
+9. **CTA** — watchlist for exclusive reports, workflow for alerts, in a tinted panel with the
    magenta button. Then appendix and the disclaimer footer.
 
 Blocks 2 and 6 must not overlap: computed facts in Bites, news-sourced facts in Headlines,
-never the same fact twice. This type has **no** takeaway section, no sector-pulse section and
-no separate chart-of-the-week; the social cards in block 4 are the issue's visuals.
+never the same fact twice. Block 8 introduces no new figure at all; if a bullet needs a
+number the issue doesn't already carry, the number belongs in Bites first. This type has
+**no** takeaway section (block 8 is a two-sided read, not a verdict), no thesis paragraph
+above Key Data Bites, no sector-pulse section and no separate chart-of-the-week; the social
+cards in block 4 are the issue's visuals.
 
 ### Macro-reaction
 1. **The news** — what happened in the last ~2 days, cited. Bulleted, stat-first
@@ -571,7 +593,7 @@ claim.
    the actual shape of the flow and any real, dated news that plausibly relates, cited
    and stated as concurrent, never asserted as the proven cause. **Broker code links**
    (confirmed 2026-07-16): `https://sectors.app/idx/broker/<lowercase code>`, e.g.
-   `https://sectors.app/idx/broker/ak`, same bold ticker-blue (`#9E0142`) treatment as
+   `https://sectors.app/idx/broker/ak`, same bold accent (`#9E0142`) ticker treatment as
    a ticker link, every code cell in both tables gets one.
 4b. **Macro Backdrop** — after Broker Flow. Three to five macro items (BI rate, rupiah,
    foreign flow, bond yields, global rates, IDX-relevant commodities, domestic prints,
@@ -597,11 +619,11 @@ claim.
 6. Disclaimer footer (Sources whenever either paragraph above cites something web-sourced).
 
 Color and ticker convention for this type's HTML delivery: every ticker mention
-renders in the shared ticker blue (`scripts/charts.mjs`'s `TICKER`, `#9E0142`), and
+renders in the shared ticker accent (`scripts/charts.mjs`'s `TICKER`, `#9E0142`), and
 every gain/loss reading renders in the shared brand green/red (`GAIN` `#568475` /
 `LOSS` `#D53E50`), consistently across every table, the chart, AND any inline prose
 mention (a bare `$TICKER` in a paragraph, not just table cells and bar labels, is the
-easy miss, same bold-linked-blue treatment applies there too, see the **Ticker-mention
+easy miss, the same bold linked accent treatment applies there too, see the **Ticker-mention
 convention** section above).
 
 ### Did you catch it

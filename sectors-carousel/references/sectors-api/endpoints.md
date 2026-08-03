@@ -1,6 +1,6 @@
 # Sectors API v2, Endpoint Reference (carousel skill)
 
-Scope: **IDX (Indonesia Stock Exchange) only.** Live-verified 2026-06-12, re-verified 2026-07-02 (20-call audit; every "verified live" note below with a July date comes from that run). This is
+Scope: **IDX (Indonesia Stock Exchange) primarily**, plus the SGX (Singapore) endpoints in section 4. Live-verified 2026-06-12, re-verified 2026-07-02 (20-call audit; every "verified live" note below with a July date comes from that run). This is
 the trimmed working reference for an IG-carousel generator. For the full response
 shape of any endpoint, open the named cached example file (`examples/<file>.json`,
 trimmed to 3-item arrays; full copies live in `responses/`).

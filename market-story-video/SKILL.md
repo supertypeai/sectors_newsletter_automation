@@ -259,8 +259,8 @@ copy FROM an entry there, never from memory. If the feature isn't catalogued, as
 its promise, proof, and destination, write the entry (with a `verified` note on what grounds it),
 then compose. Set the storyboard's top-level `feature` key to the catalog key for traceability.
 
-**2. Line up the footage.** Each demo scene needs a screen recording (`inputs/demo/*.mov`) or a
-screenshot (`inputs/shots/*.png`) of the app. Compose the storyboard pointing `media.src` at
+**2. Line up the footage.** Each demo scene needs a screen recording (`inputs/demo/*.mp4`,
+`.mov`, `.webm` or `.m4v`) or a screenshot (`inputs/shots/*.png`) of the app. Compose the storyboard pointing `media.src` at
 where the file will live; the lint and renderer error on a missing file, so you'll know exactly
 what to capture. For a first pass with nothing recorded, `assets/brand/app-overview.png` (a real
 sectors.app overview screenshot shipping with the skill) is a legitimate stand-in as a `shot`.
@@ -329,12 +329,23 @@ src/
   types.ts                   the Storyboard/Scene TypeScript contract (mirrors storyboard-format.md)
   tokens.ts, fonts.ts         design tokens (all three themes) and the font registry (Google Fonts)
   components/                GradientText, Logo, BrandMark, SceneShell, DeviceFrame, HumanSlot, charts/
-  themes/noir/, themes/thread/, themes/product/   each theme's Background/Chrome/scene renderers/Outro
+  themes/noir/, themes/thread/, themes/product/   each theme exports
+                             `{ Background, Chrome, scenes, Outro }` from its index.ts, with the
+                             scene renderers in its own scenes/. Two deliberate gaps: thread sets
+                             `Chrome: null` (StoryboardComposition draws its thread line instead,
+                             it needs total-frame context), and product adds the four reel roles
+                             (cover/feature/demo/cta) while reusing noir's stat/chart/breakdown/
+                             takeaway/Outro rather than copying them
 inputs/
   features.json               the product-reel facts catalog (what each sectors.app feature does)
-  demo/  shots/               your screen recordings and screenshots for reels (git-ignored)
+  demo/  shots/               your screen recordings and screenshots for reels (git-ignored;
+                              shots/ is created on demand, it may not exist yet)
+  *.storyboard.json           in-progress reels whose footage lives in demo/ (e.g.
+                              ai-search-console); finished pieces ship to the scs folder, not here
 assets/
   logos.json                  957 IDX ticker logos (base64), shared with the carousel skill
+  sgx-logos.json              6 SGX logos, same base64 map shape; both are resolved by
+                              src/components/Logo.tsx
   brand/                       sectors-mark.svg, app-overview.png (a real sectors.app screenshot for reel drafts)
 config.json                   shared Sectors API key (sectorsApiKey); SECTORS_API_KEY env overrides
 package.json                 remotion + @remotion/cli + @remotion/google-fonts
@@ -355,7 +366,9 @@ samples/  output/             three worked examples (noir, thread, product reel)
   player (scrub the timeline, hot-reload on save) — faster than re-rendering for a layout-only
   change.
 
-To extend the renderer or add a third theme, start from `src/themes/noir/` or
-`src/themes/thread/` as a template — both implement the same
-`{ Background, Chrome, scenes: {cover,stat,chart,breakdown,takeaway}, Outro }` shape consumed
-by `StoryboardComposition.tsx`.
+To extend the renderer or add a fourth theme, start from `src/themes/noir/` as the template —
+it is the complete implementation of the `{ Background, Chrome, scenes:
+{cover,stat,chart,breakdown,takeaway}, Outro }` shape consumed by
+`StoryboardComposition.tsx`. `thread/` shows how to opt out of `Chrome` (it returns `null` and
+lets the composition draw the thread line), and `product/` shows how to add new scene roles
+while reusing noir's renderers for the roles you don't restyle.

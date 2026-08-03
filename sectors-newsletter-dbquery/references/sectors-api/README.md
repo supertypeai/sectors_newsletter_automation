@@ -1,4 +1,6 @@
-# Sectors API reference (for the IDX carousel skill)
+# Sectors API reference
+
+**Synced copy.** Source of truth is `sectors-carousel/references/sectors-api/README.md`; re-sync from there rather than editing here. Wording that talks about carousels/slides applies to this skill's own output medium.
 
 The data layer for generating Instagram carousels about Southeast Asian stock markets
 from the Sectors Financial API v2. The bulk of this reference is **IDX (Indonesia)**,
