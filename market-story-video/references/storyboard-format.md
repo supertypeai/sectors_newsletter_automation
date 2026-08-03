@@ -85,6 +85,19 @@ low and current price, not just the line's general direction. Only these two cha
 in v1 — reach for `role: "breakdown"` with `kind: "ownership"` for a parent/child structure
 instead of forcing it into a chart.
 
+**Bar charts scale linearly off the largest bar** (`BarChart` sets every height to
+`value / max`), so a series whose top value is more than ~8x its bottom renders the small bars
+as unreadable slivers. A four-name P/E comparison of 7.5 / 31 / 33 / 188 would draw the first
+bar at 4% of the plot height, which reads as a rendering fault rather than as "much cheaper".
+Check the max/min ratio before choosing `bar`; past it, put the numbers in a `breakdown` list
+where each value is typeset rather than measured, or chart a companion metric whose values are
+genuinely comparable and carry the wide-range one as text.
+
+**A `chart` scene needs at least 3.6s.** Its `caption` and `body` are the last things to enter
+(the caption alone is delayed ~2s past the scene start), so a 3.0-3.4s chart scene shows them
+for well under a second. If the so-what line matters, budget 3.8s; if it doesn't, drop `body`
+rather than shortening the hold.
+
 ### `role: "breakdown"` — composition or structure
 
 ```jsonc

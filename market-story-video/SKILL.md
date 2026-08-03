@@ -116,6 +116,14 @@ Every beat still needs a benchmark (a number alone isn't a finding), and you sti
 before writing a word — the single most surprising number earns the `cover` or the first
 proof scene, never the middle.
 
+**If the story covers more than one company, decide the shared axis here, before anything
+else.** A multi-subject piece is one argument, not several profiles: name the one metric every
+subject will be measured on, give every subject the same slots proving the same things, and
+plan the comparison scene that puts them all on one frame before the takeaway. Read
+`references/scenes.md`'s multi-subject section and `references/length.md`'s budget table now —
+retrofitting parallel structure after the data is fetched means refetching, since each subject
+needs the same fields.
+
 ### 3. Fetch the data that proves the beats (Sectors API)
 
 Identical to the carousel skill. Open `references/sectors-api/README.md`, then
@@ -210,6 +218,13 @@ self-review asks, adapted for a moving story:
 - Does the `takeaway` read as a finding or as advice? Rewrite if the latter.
 - Read `references/motion.md`'s "reviewing your own timing" section — does the proof
   (chart/stat) finish its draw-on with enough hold time left to actually read it?
+- **Collision check**: does any decoration (a thread marker, a logo, a badge stack) sit on top
+  of a kicker, headline, chart bar or axis label? Nothing in the lint catches this; the stills
+  are the only place it surfaces before delivery.
+- **Slot-parity check** (multi-subject pieces only): tabulate the scenes by subject. Does every
+  subject have the same slots, the same benchmark treatment, and the same chart-or-text
+  decision? Is there a comparison frame showing all of them together before the takeaway, and
+  does the takeaway name the relationship that frame shows rather than just noting difference?
 
 **d.** Once the draft looks right, render the full MP4 and watch it (or extract frames with
 `ffmpeg -i <file>.mp4 -vf fps=1 frame%02d.png` if you need to inspect specific moments) —

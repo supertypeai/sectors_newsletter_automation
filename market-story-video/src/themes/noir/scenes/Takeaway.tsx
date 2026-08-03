@@ -18,24 +18,46 @@ export const NoirTakeaway: React.FC<{ scene: Scene }> = ({ scene }) => {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
+  const bodyDelay = MOTION.enterFrames + MOTION.staggerFrames * 2;
+  const bodyOpacity = interpolate(frame - bodyDelay, [0, MOTION.enterFrames], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
 
   return (
     <NoirSceneLayout kicker={scene.kicker ?? "THE TAKEAWAY"} justify="center">
-      <EmphasizedHeadline
-        text={scene.headline ?? ""}
-        emphasis={scene.emphasis}
-        style={{
-          fontFamily: fontFamilies.sans,
-          fontWeight: 700,
-          fontSize: 64,
-          lineHeight: 1.2,
-          letterSpacing: "-0.02em",
-          color: noir.text,
-          opacity,
-          transform: `translateY(${y}px)`,
-          maxWidth: 920,
-        }}
-      />
+      <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+        <EmphasizedHeadline
+          text={scene.headline ?? ""}
+          emphasis={scene.emphasis}
+          style={{
+            fontFamily: fontFamilies.sans,
+            fontWeight: 700,
+            fontSize: 64,
+            lineHeight: 1.2,
+            letterSpacing: "-0.02em",
+            color: noir.text,
+            opacity,
+            transform: `translateY(${y}px)`,
+            maxWidth: 920,
+          }}
+        />
+        {scene.body && (
+          <div
+            style={{
+              fontFamily: fontFamilies.sans,
+              fontSize: 32,
+              fontWeight: 500,
+              lineHeight: 1.4,
+              color: noir.muted,
+              maxWidth: 860,
+              opacity: bodyOpacity,
+            }}
+          >
+            {scene.body}
+          </div>
+        )}
+      </div>
     </NoirSceneLayout>
   );
 };

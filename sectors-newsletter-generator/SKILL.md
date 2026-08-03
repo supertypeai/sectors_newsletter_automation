@@ -3,8 +3,8 @@ name: sectors-newsletter-generator
 description: >-
   Generate an on-brand, data-backed Markdown newsletter about the Indonesian stock
   market (IDX) from live Sectors data and cited research. Use whenever the user wants
-  to write, draft, or produce a Sectors subscriber newsletter issue. Handles ten
-  built issue types the user picks from on each run, across five families: MARKET
+  to write, draft, or produce a Sectors subscriber newsletter issue. Handles eleven
+  built issue types the user picks from on each run, across six families: MARKET
   PERFORMANCE ("weekly insights v2" / "weekly insights" / "Monday market wrap", the
   current eight-block Monday digest and the default for a weekly send; "weekly wrap"
   the superseded eleven-section v1, kept until the user retires it; "monthly market
@@ -16,7 +16,10 @@ description: >-
   two-part release-summary-plus-feature-highlight piece built from a user-supplied
   release note (PDF or Markdown) and user-supplied feature detail, not a live fetch;
   "upcoming event" promo for a Sectors in-house workshop, built from user-supplied
-  event details, not market data);
+  event details, not market data); FOMO ("did you catch it" a single-ticker spotlight
+  proving a workflow alert would have caught a real dated low that cleared a
+  fundamentals screen and then rallied, signal-first narrative, one broadcast piece, no
+  per-recipient targeting since this skill has no account data);
   and PERSONALIZED ("watchlist/sector performance digest" — a fixed template, ranked
   performance + peer comparison table for each user's own tracked tickers/sectors,
   same presentation for every recipient, only the values change). The personalized
@@ -26,7 +29,8 @@ description: >-
   Trigger on phrases like "write the newsletter", "do this week's Saturday wrap", "monthly
   pulse", "macro piece on the rate cut", "deep dive on BBRI earnings", "sector spotlight
   on the banks", "three-stocks story", "write up the new release feature", "announce
-  the upcoming workshop", or "watchlist performance digest". Do NOT use it for Instagram
+  the upcoming workshop", "watchlist performance digest", or "did you catch it piece on
+  [ticker]". Do NOT use it for Instagram
   carousels or slides (use sectors-carousel), for video, or for non-IDX/non-SGX markets,
   and do NOT use it for lifecycle/CRM/transactional email (onboarding nudges, credit/plan
   reminders, upgrade/win-back) or for deciding recipients/frequency, those need live
@@ -74,7 +78,7 @@ cannot supply?**
 
 ## Pick the issue type (always first)
 
-This is **one issue per run**, never several at once. Ten issue types are built,
+This is **one issue per run**, never several at once. Eleven issue types are built,
 grouped by content family (mirroring the newsletter content plan's type catalog). Each
 maps to a workflow doc in `references/workflows/` and an issue-type slug:
 
@@ -117,8 +121,16 @@ maps to a workflow doc in `references/workflows/` and an issue-type slug:
    **user-supplied**: ask for date/time/venue, agenda/speaker/target audience,
    registration link, and marketing banner before drafting. Not market-data driven.
 
+**FOMO** (market content only, targeting is external, see the **FOMO** family note below)
+10. **Did you catch it** (`did-you-catch-it`) — a single ticker that hit a real, dated
+   low (`overview.all_time_price`), already cleared a fundamentals guard on that date
+   (P/E and ROE vs sector median, leverage trend), then rallied ≥10% off it. Told
+   signal-first to prove a workflow alert would have caught the moment. One broadcast
+   piece, no per-recipient framing split, this skill has no account data to target it
+   by who already holds the ticker.
+
 **Personalized**
-10. **Watchlist/sector performance digest** (`watchlist-performance-digest`) — a fixed
+11. **Watchlist/sector performance digest** (`watchlist-performance-digest`) — a fixed
    template, same structure for every recipient, ranked performance + peer comparison
    table for up to 5 of that user's own tracked tickers/sectors (from the sibling
    dbquery skill's `watchlist-tracked-interest` query), only the values differ per
@@ -130,7 +142,7 @@ maps to a workflow doc in `references/workflows/` and an issue-type slug:
 subject ("do the Saturday wrap," "deep dive on BBRI earnings," "spotlight the banks"), go
 straight into that pipeline. If they delegate the choice ("you pick this week's issue"),
 choose and state a one-line "why this, why now" as you proceed. Only a bare "write the
-newsletter" with no type named gets the menu, offer the nine above grouped by family.
+newsletter" with no type named gets the menu, offer the eleven above grouped by family.
 
 ### Not yet built (in scope, will be added iteratively)
 
@@ -142,8 +154,9 @@ template (don't fake it with an ad-hoc pipeline):
 - Market Insights: Regulatory / index event, Global spillover, Broker flow digest
 - Market Performance: Monthly recap
 - Company Insights: Insider activity signal
-- FOMO (market content only, targeting is external): Missed rally, Missed dividend,
-  Sector rotation miss, Caught it
+- FOMO (market content only, targeting is external): Missed dividend, Sector rotation
+  miss. (Did you catch it is now built, see the numbered list above and
+  `references/workflows/did-you-catch-it.md`.)
 - Educational: Concept explainer, How-to guide, Use-case walkthrough
 - Product Update: Feature enhancement, Deprecation notice
 
@@ -191,6 +204,7 @@ anything that doesn't serve the goal.
 | **Three-stock story** | Click through to each company's page on Sectors |
 | **Single company deep dive** | Open that company's report on Sectors and dig into the data |
 | **Sector spotlight** | Screen the sub-sector on Sectors and compare the peers themselves |
+| **Did you catch it** | Add the ticker to a watchlist, or set up a workflow alert, so the next move doesn't get missed |
 | **Watchlist/sector performance digest** | Open Sectors to check their own tracked tickers/sectors in full, now that the digest showed a real move on one |
 
 If an issue type isn't listed (a not-yet-built type), state its conversion goal in one
@@ -291,6 +305,21 @@ Supabase query over the 30-day window (no native `brokers/top` range param, so t
 replaces looping the API day by day), and `idx-total` start/end for the month's index
 read; write the headline off that month's own idx-total trend, a combined Top Movers
 table+chart, Most traded, and Broker Flow, table-first throughout.
+
+### Did you catch it
+Open `references/workflows/did-you-catch-it.md`, and open `references/compliance.md`
+before drafting, FOMO's loss/win tone directive sits right next to the imperative ban.
+In brief: discover an already-rallied ticker (`top-changes` top gainers), source its
+trigger date and price from `overview.all_time_price` (a real dated low field, not a
+scanned daily-close guess), clear that trigger against a fundamentals guard (P/E and
+ROE vs sector median, leverage trend, two of the content plan's screener legs adapted
+to what the API actually exposes, see the workflow doc §1), then draft one broadcast
+piece **signal first, payoff second**: the trigger and what was already true on it,
+then the rally that followed, proving a workflow alert would have caught it. Same copy
+for every reader, no per-recipient framing since this skill has no account data to tell
+who already holds the ticker (workflow doc §3). CTA names the actual conditions proved
+out as a settable alert, then the behavioral ask (watchlist/workflow alert), never "buy
+now," no countdown or scarcity language.
 
 ### New release feature
 Open `references/workflows/new-release-feature.md`. This type is **not** a live fetch,
@@ -414,10 +443,11 @@ Finished issues land at:
                                 contains PII, never copy elsewhere or commit)
 ```
 
-- `<type-slug>` is one of the ten built slugs: `weekly-insights-v2`, `weekly-wrap`,
+- `<type-slug>` is one of the eleven built slugs: `weekly-insights-v2`, `weekly-wrap`,
   `monthly-market-pulse`,
   `macro-reaction`, `three-stock-story`, `single-company-deep-dive`, `sector-spotlight`,
-  `new-release-feature`, `upcoming-event`, `watchlist-performance-digest`.
+  `new-release-feature`, `upcoming-event`, `did-you-catch-it`,
+  `watchlist-performance-digest`.
 - `<YYYY-MM-DD>` is the issue/send date.
 - Any generated chart file lands in this same folder, next to `newsletter.md`, and is
   referenced from it by a relative Markdown image link. For `upcoming-event`, a
@@ -430,12 +460,14 @@ Finished issues land at:
   tracked tickers/sectors), same discipline as the dbquery skill's own
   `references/supabase-access.md`: flag it to the user, it stays local, never leaves
   this machine.
-- **Every issue type ships as HTML, and every issue gets a hero chart.** All ten types
-  are delivered as a send-ready `newsletter.html` (email-safe inline styles, table
+- **Every issue type ships as HTML, and every issue gets a hero chart.** All eleven
+  types are delivered as a send-ready `newsletter.html` (email-safe inline styles, table
   layout, tickers linked to `sectors.app/idx/<lower>`), replacing the old
   PDF-attachment format, plus at least one generated `chart-<slug>.svg` per issue.
   This was originally weekly-wrap- and upcoming-event-only; the samples in
-  `newsletter/samples/` now cover all ten types with both, and any newly delivered
+  `newsletter/samples/` now cover ten of the eleven types with both (`did-you-catch-it`
+  currently only has `queries.md`, the documented recipe, no worked
+  `newsletter.md`/`.html` yet, see its sample folder), and any newly delivered
   issue matches that standard regardless of type. **`weekly-insights-v2` satisfies the
   visual requirement with the social cards in its findings block instead of a generated
   `chart-<slug>.svg`**; if no suitable card exists for a given week, generate a chart so
@@ -474,7 +506,7 @@ references/
   upcoming-events-source.md       Google Sheet fetch recipe + selection logic for the
                                    closing-block promo every issue but upcoming-event
                                    carries (Hard rule 10)
-  workflows/                      one doc per built issue type (ten)
+  workflows/                      one doc per built issue type (eleven)
     weekly-insights-v2.md         the current Monday digest: eight blocks, social-card
                                    findings block, corporate-action week calendar
     weekly-wrap.md                v1, superseded by the above, kept until retired
@@ -488,6 +520,9 @@ references/
     new-release-feature.md        user-supplied release note summary + one feature
                                    highlight, no live fetch
     upcoming-event.md             in-house workshop promo, user-supplied event details
+    did-you-catch-it.md           FOMO: one screener (dip-then-rally + P/E and ROE vs
+                                   sector median + leverage trend), one broadcast piece,
+                                   no account data, targeting stays external
     watchlist-performance-digest.md  personalized, per-recipient template; calls the
                                    dbquery skill for audience, ranks tracked
                                    tickers/sectors by 7-day move, top 5, peer

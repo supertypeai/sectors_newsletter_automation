@@ -46,3 +46,27 @@ beat-budget starting point for a company deep-dive (noir theme, storytelling app
 Adjust scene count/order to what the actual beats support — never insert a scene just to hit
 the 8-scene floor. If the researched story only sustains 5 solid beats, ship it as `"short"`
 instead of stretching thin ones to fill a long-form slot.
+
+## Budgeting a multi-subject long-form piece
+
+When the long-form story compares several companies rather than deep-diving one, the beat
+budget is arithmetic, not taste: **2 framing scenes + (N subjects x slots per subject) + 2
+closing scenes**. Read `scenes.md`'s multi-subject section for why the slots must be identical
+across subjects.
+
+| subjects | slots each | scenes | rough duration |
+|---|---|---|---|
+| 3 | 3 | 13 | ~44s |
+| 4 | 3 | 16 | ~52s |
+| 4 | 2 | 12 | ~40s |
+| 5 | 2 | 14 | ~46s |
+
+Four subjects at three slots each is the practical ceiling — 16 scenes is inside the 18-scene
+cap with the comparison and takeaway included. If the arithmetic overruns, cut a SLOT (drop
+the same beat from every subject) rather than cutting a subject's scene and breaking the
+parallel, or drop a subject entirely. Never leave one company with two beats while the others
+have three.
+
+Slot durations that work: per-subject `stat` 2.8s, per-subject `chart` 3.8s (a chart's caption
+and `body` don't finish entering until ~2s in, so 3.4s leaves under a second to read them),
+the comparison `breakdown` 4.0s since it carries the most rows of any frame, `takeaway` 2.2s.

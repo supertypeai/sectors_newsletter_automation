@@ -141,6 +141,51 @@ ownership) -> `takeaway`**. More scenes means more ROOM for a history-timeline b
 or `breakdown` scene dated years apart) and a fun-fact beat (usually a `stat` or `breakdown`
 scene) that a short piece has no room for — see `references/length.md`'s beat-budget table.
 
+## Sequencing a multi-subject story (2+ companies compared)
+
+A piece covering several companies is NOT several mini-stories concatenated. It is one
+argument, and it only reads as one if the scenes are built to compare. Three rules, all
+learned the hard way from a four-ticker piece that had to be re-cut:
+
+**1. Parallel slots.** Every subject gets the SAME beats, in the SAME order, proving the same
+things. If UNTR gets "who holds it / profit chart / multiple", so do AMMN, BYAN and BREN. A
+rotating cast of beats (owner for one, mines for another, a chart for a third) leaves the
+viewer with no shared axis and the piece reads as four unrelated posts stapled together. When
+a subject has a distinctive fact that doesn't fit a slot (what UNTR actually sells, AMMN's
+second deposit), fold it into that scene's `body` line rather than spending a scene on it and
+breaking the parallel.
+
+**2. A comparison scene before the takeaway.** The piece must put every subject on ONE frame,
+on the shared axis, before it concludes. A `breakdown` with `kind: "list"` is the workhorse
+here (label = ticker, sub = the two compared figures) because it holds four rows legibly and
+sidesteps the bar-chart scale problem below. Without this frame the closing line asserts a
+pattern the viewer was never shown, having watched the evidence arrive 40 seconds apart.
+
+**3. Sort the sequence by the axis.** Order the subject blocks by the comparison metric, and
+keep that order in the comparison scene and in any earlier ranking scene. The ladder then
+builds itself as the piece plays, and the takeaway is the thing the viewer already noticed.
+
+The resulting shape: **`cover` (tease the extreme value) -> an orienting `breakdown` (who
+these are, ranked) -> N identical per-subject blocks -> comparison `breakdown` -> `takeaway`
+naming the relationship**. A takeaway that only observes difference ("four different price
+tags") is a shrug; one that names the relationship the comparison scene just showed ("the
+tighter the float, the higher the multiple") is a finding someone can argue with.
+
+Two supporting rules:
+
+- **One benchmark per subject, same kind for all.** If one subject's multiple is shown against
+  its peer median, every subject's must be. An unanchored number in an otherwise benchmarked
+  set reads as the one you couldn't defend. In the thread theme, `badges` carry the benchmark
+  on a `stat` scene (that theme's `stat` renderer ignores `stat.compare`).
+- **Don't assert a number you have room to show.** If two subjects get profit charts and the
+  others get "profit fell 62%" as bare text, the text ones look like the numbers that wouldn't
+  survive a chart. Either chart them all or chart none.
+
+Honesty note: a real pattern usually has an exception, and naming it is stronger than hiding
+it. If one subject breaks the ladder, keep it in position and let its scene state the reason
+plainly. Silently reordering or dropping it to protect a tidy finding is the curation
+`sectors-api/data-quality.md` forbids.
+
 ## Marker and badge decoration (thread theme only)
 
 Every scene in a "thread" story rides a marker on the drawn thread line
