@@ -12,7 +12,7 @@ subject: <the email subject line, may itself contain merge tags>
 preview: <the inbox preview/preheader text>
 issue_type: onboarding-nudge | onboarding-unclaimed-reward |
   credit-plan-lifecycle-credits-expiring | credit-plan-lifecycle-quota-cycle-renewal |
-  notification-setup-nudge
+  insider-nudge | setup-nudge
 date: <YYYY-MM-DD, the template/draft date>
 data_as_of: <YYYY-MM-DD, the approved-query run date>
 sample_recipient: <a scrubbed placeholder identifier for the worked example, never a
@@ -25,7 +25,7 @@ sample_recipient: <a scrubbed placeholder identifier for the worked example, nev
   Update"). No hype, no advice framing.
 - **`preview`**: ~40-90 characters, re-angles the subject with a second real detail,
   never restates it verbatim.
-- **`issue_type`**: one of the five built slugs.
+- **`issue_type`**: one of the six built slugs.
 - **`date`**: when this template was drafted. **`data_as_of`**: when the underlying
   Supabase row was actually fetched, this can differ from the send date, which this
   skill doesn't control.
@@ -130,14 +130,28 @@ headings should get the gist without reading the body.
 3. **The one CTA** — review plan / manage billing, one link, stated plainly.
 4. Disclaimer footer + unsubscribe line.
 
-### Notification setup nudge
-1. **Greeting + the unused value** — `{{first_name}}`, then the real number
-   (`{{credits}}` credits or `{{monthly_quota}}` monthly quota, whichever is nonzero
-   for that row), stated plainly as sitting unused.
+### Insider nudge
+**INSIDER tier only** (corrected 2026-08-03) — watchlist/workflow are gated to that
+tier. `setup-nudge` shares this exact skeleton (see below), swap only what step 2
+and 3 point to.
+1. **Static greeting + the unused value** — `"Hi there,"` (fixed text, not a merge
+   tag — decided 2026-08-05: most rows have no usable name, and several of the ones
+   that exist aren't display-safe as-is, so a computed per-recipient greeting isn't
+   worth it), then `{{unused_value}}`, a *computed* tag resolved before the event is
+   posted (`{{credits}}` credits or `{{monthly_quota}}` monthly quota, whichever is
+   nonzero for that row, joined with "and" if both are), stated plainly as sitting
+   unused.
 2. **Why it matters to them** — one or two sentences on what a watchlist or
    workflow/alert does with that value once set up.
 3. **The one CTA** — set up a watchlist or workflow, one link, stated plainly.
 4. Disclaimer footer + unsubscribe line.
+
+### Setup nudge
+Non-INSIDER counterpart, added 2026-08-03. Same skeleton as Insider nudge
+above, two differences: step 1's `{{unused_value}}` only ever resolves from `{{credits}}`
+(this audience's approved query doesn't return `monthly_quota`), and step 2/3 point at
+making an API call, never at watchlist/workflow (this audience has no access to those,
+don't link to them).
 
 ## Standard disclaimer footer (fixed text, appended to every issue)
 

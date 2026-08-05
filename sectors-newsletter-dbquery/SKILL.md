@@ -5,18 +5,22 @@ description: >-
   live Supabase user-account data and cited market context. Use whenever the user wants
   to write, draft, or produce a Sectors lifecycle or transactional-adjacent email, the
   category the sibling `sectors-newsletter-generator` skill explicitly declines because
-  it has no user-account access. Handles five built issue types: ONBOARDING NUDGE
+  it has no user-account access. Handles six built issue types: ONBOARDING NUDGE
   (never started onboarding), ONBOARDING UNCLAIMED REWARD (started onboarding but
   hasn't claimed the completion credits), CREDIT-PLAN-LIFECYCLE CREDITS-EXPIRING
   (credit balance expiring soon), CREDIT-PLAN-LIFECYCLE QUOTA-CYCLE-RENEWAL
-  (25+ days into the current monthly quota cycle), and NOTIFICATION SETUP NUDGE (has
-  spendable credits or quota but never set up a watchlist or workflow/alert). Every
-  issue type pulls its audience and personalization fields through the Supabase MCP
-  connector using ONE individually-approved SQL query per type, living in
+  (25+ days into the current monthly quota cycle), INSIDER NUDGE
+  (INSIDER-tier only: has spendable credits or quota but never set up a watchlist or
+  workflow/alert, the only tier that can access those features), and SETUP NUDGE
+  (non-INSIDER tier: has spendable credits but has never called the API, the unused-
+  value nudge for the audience insider-nudge structurally can't reach).
+  Every issue type pulls its audience and personalization fields through the Supabase
+  MCP connector using ONE individually-approved SQL query per type, living in
   `scripts/approved-queries/`, the only folder this skill is ever allowed to run a
   query from, never an ad-hoc query written per run. Trigger on phrases like "write
   the onboarding nudge", "unclaimed-reward nudge", "credit-expiry reminder", "quota
-  renewal reminder", "notification setup nudge". This skill also supplies one
+  renewal reminder", "insider nudge", "setup nudge". This skill also
+  supplies one
   data-only query, `watchlist-tracked-interest`, that just returns each user's tracked
   tickers/sectors (no drafting, no delivery folder) for the sibling
   `sectors-newsletter-generator` skill's personalized ticker/sector performance +
@@ -51,7 +55,7 @@ adds two disciplines of its own:
 
 ## Pick the issue type (always first)
 
-**One issue per run.** Five issue types are built, across three families:
+**One issue per run.** Six issue types are built, across four families:
 
 1. **Onboarding nudge** (`onboarding-nudge`) — re-engage a user who has zero rows in
    both `onboarding_progress` and `onboarding_claims`, i.e. never started onboarding
@@ -65,14 +69,21 @@ adds two disciplines of its own:
 4. **Credit/plan lifecycle, quota-cycle-renewal** (`credit-plan-lifecycle-quota-cycle-renewal`)
    — a user on a real monthly quota (`monthly_quota > 0`) is 25+ days into their
    current cycle, renewal is coming up soon.
-5. **Notification setup nudge** (`notification-setup-nudge`) — a user has spendable
+5. **Insider nudge** (`insider-nudge`) — **INSIDER tier only**
+   (corrected 2026-08-03: watchlist, workflow, and screener are gated to that tier, a
+   non-INSIDER user can't set either up, see the query file's own header). Spendable
    credits or quota (`credits > 0` or `monthly_quota > 0`) but zero `user_watchlist`
    and zero `user_workflow` rows, i.e. nothing set up to actually use that value.
+6. **Setup nudge** (`setup-nudge`) — the non-INSIDER counterpart to #5. A
+   non-INSIDER user with spendable credits (`credits > 0`) who has never made a single
+   API call (zero rows in `api_apiresponsetime`). Credits spend on API calls
+   regardless of tier, so this is the correct unused-value story for an audience that
+   structurally can't be nudged toward watchlist/workflow setup.
 
 Each maps to a workflow doc in `references/workflows/`. **Skip the menu when the ask
 already resolves it**: if the user names the type ("write the credit-expiry email"), go
 straight into that pipeline. A bare "write a lifecycle email" with no type named gets
-the five-item menu.
+the six-item menu.
 
 ### Not yet built
 Other CRM-shaped content this skill's engine *could* produce but doesn't have an
@@ -98,9 +109,9 @@ ticker/sector performance + peer comparison newsletter, an issue type that skill
 and drafts, this skill only supplies the audience query. When invoked for this
 purpose: **run the approved query and return the raw rows, stop there.** No template,
 no `newsletter.md`, no delivery folder, none of the shared pipeline shape below
-applies, that shape is for this skill's own five lifecycle issue types only. The same
+applies, that shape is for this skill's own six lifecycle issue types only. The same
 approved-query-only discipline still applies in full, see
-`references/supabase-access.md`, this query is no less gated than the other five.
+`references/supabase-access.md`, this query is no less gated than the other six.
 
 ## Shared pipeline shape
 
@@ -140,11 +151,16 @@ quota-cycle trigger; template states their real numbers (credits remaining, expi
 renewal timing) plainly, no manufactured urgency beyond what the real date/number
 already implies.
 
-### Notification setup nudge
-Open `references/workflows/notification-setup-nudge.md`. In brief: approved query
-returns users with real spendable credits/quota but no watchlist and no
+### Insider nudge
+Open `references/workflows/insider-nudge.md`. In brief: approved query
+returns INSIDER-tier users with real spendable credits/quota but no watchlist and no
 workflow/alert set up; template names the real unused value and nudges toward setting
 one of those up.
+
+### Setup nudge
+Open `references/workflows/setup-nudge.md`. In brief: approved query returns
+non-INSIDER users with real spendable credits who have never made a single API call;
+template names the real credit balance and nudges toward making the first call.
 
 ## Hard rules (override style every time)
 
@@ -183,8 +199,8 @@ Finished issues land at:
 
 - `<type-slug>` is one of `onboarding-nudge`, `onboarding-unclaimed-reward`,
   `credit-plan-lifecycle-credits-expiring`, `credit-plan-lifecycle-quota-cycle-renewal`,
-  `notification-setup-nudge` — matching the filename (minus `.sql`) in
-  `scripts/approved-queries/`.
+  `insider-nudge`, `setup-nudge` — matching the filename (minus `.sql`)
+  in `scripts/approved-queries/`.
 - `sample-rows.csv` is scratch/working data, same spirit as the sibling skill's raw
   `sectors.mjs --save-dir` dumps: it exists to prove the query and template work
   against real data, it is not itself a deliverable to hand off to the send system.
@@ -208,7 +224,8 @@ references/
     onboarding-unclaimed-reward.md
     credit-plan-lifecycle.md      covers both approved sub-queries (credits-expiring,
                                    quota-cycle-renewal)
-    notification-setup-nudge.md
+    insider-nudge.md               INSIDER tier only, corrected 2026-08-03
+    setup-nudge.md                 non-INSIDER counterpart, added 2026-08-03
   sectors-api/                    endpoints, data-quality; shared reference synced with
                                    the sibling skills, not currently used by any built
                                    issue type in this skill
@@ -221,10 +238,11 @@ scripts/
     onboarding-unclaimed-reward.sql
     credit-plan-lifecycle-credits-expiring.sql
     credit-plan-lifecycle-quota-cycle-renewal.sql
-    notification-setup-nudge.sql
+    insider-nudge.sql                INSIDER tier only, corrected 2026-08-03
+    setup-nudge.sql                  non-INSIDER counterpart, added 2026-08-03
     watchlist-tracked-interest.sql   data-only, supports the sibling generator
                                       skill's personalized content, see "Data-only
-                                      queries" above, not one of the 5 lifecycle types
+                                      queries" above, not one of the 6 lifecycle types
   fixed-queries.sql                staging area for drafting a new/edited query before
                                     it earns a file in approved-queries/, never a run
                                     source itself

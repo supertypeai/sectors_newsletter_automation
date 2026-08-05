@@ -12,7 +12,13 @@
 --   onboarding-unclaimed-reward.sql
 --   credit-plan-lifecycle-credits-expiring.sql
 --   credit-plan-lifecycle-quota-cycle-renewal.sql
---   notification-setup-nudge.sql
+--   insider-nudge.sql (corrected 2026-08-03: now INSIDER-tier only, renamed from
+--     notification-setup-nudge.sql 2026-08-05, LIMIT dropped and
+--     subscription_cancellation filter added same date for the recurring monthly
+--     GitHub Actions automation — see the file's own header for why)
+--   setup-nudge.sql (added 2026-08-03, the non-INSIDER counterpart to
+--     insider-nudge, renamed from api-usage-nudge.sql 2026-08-05, same LIMIT/
+--     subscription_cancellation changes as insider-nudge.sql)
 --   watchlist-tracked-interest.sql (supports the sibling generator skill's
 --     personalized content, not a dbquery-drafted lifecycle email)
 --
@@ -21,6 +27,16 @@
 --   {{first_name}} as split_part(full_name, ' ', 1) rather than inventing a column.
 -- - credits_total has no literal column; monthly_quota is the closest real proxy
 --   (the recurring allotment), not a running total.
+-- - subscription_tier: confirmed real value 'INSIDER' gates watchlist/workflow/
+--   screener access. Can be null for a true free-tier account, so an exclusion
+--   filter needs "IS DISTINCT FROM", not "!=" (which silently drops NULL rows).
+-- - api_apiresponsetime: one row per real API call, columns id, endpoint,
+--   response_time, response_status, created_at, user_id, limit_consumption,
+--   key, source. NOT EXISTS against this table, keyed on user_id, is the
+--   "has this user ever called the API" signal.
+-- - subscription_cancellation: confirmed 2026-08-05 via information_schema.columns,
+--   boolean, NOT NULL on api_user. A plain "= false" is correct, no IS DISTINCT FROM
+--   needed (unlike subscription_tier, which is nullable).
 --
 -- To draft a new candidate query, write it below this line, get it approved, then
 -- move it out to scripts/approved-queries/<slug>.sql and clear this file back to

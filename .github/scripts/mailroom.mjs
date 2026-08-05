@@ -67,12 +67,27 @@ export function readIssue(folder) {
 }
 
 /**
+ * Shared tail for both postToMailroom and getFromMailroom: a non-2xx response
+ * is fatal rather than returned, since neither caller has a meaningful way to
+ * continue without it, and an unparseable body is treated the same way.
+ */
+async function parseMailroomResponse(res, what) {
+  const text = await res.text();
+  if (!res.ok) die(`${what} failed (${res.status}): ${text}`);
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    die(`${what} returned unparseable JSON: ${text}`);
+  }
+}
+
+/**
  * POST to mailroom and return the parsed JSON body.
  *
  * `body` may be a FormData (sent as multipart, boundary set by fetch) or a plain
  * object (sent as JSON). The Authorization header is added here so no caller has to
- * remember the Bearer prefix, and a non-2xx response is fatal rather than returned,
- * since neither caller has a meaningful way to continue without the response.
+ * remember the Bearer prefix.
  */
 export async function postToMailroom(url, { apiKey, body, headers = {}, what = "request" }) {
   const isForm = typeof FormData !== "undefined" && body instanceof FormData;
@@ -89,12 +104,19 @@ export async function postToMailroom(url, { apiKey, body, headers = {}, what = "
     body: isForm ? body : JSON.stringify(body),
   });
 
-  const text = await res.text();
-  if (!res.ok) die(`${what} failed (${res.status}): ${text}`);
+  return parseMailroomResponse(res, what);
+}
 
-  try {
-    return JSON.parse(text);
-  } catch {
-    die(`${what} returned unparseable JSON: ${text}`);
-  }
+/**
+ * GET from mailroom and return the parsed JSON body. Sibling to postToMailroom
+ * rather than a shared method-generic function: a GET has no body/FormData
+ * branch to share, and every existing POST call site has no reason to change.
+ */
+export async function getFromMailroom(url, { apiKey, headers = {}, what = "request" }) {
+  const res = await fetch(url, {
+    method: "GET",
+    headers: { authorization: `Bearer ${apiKey}`, ...headers },
+  });
+
+  return parseMailroomResponse(res, what);
 }

@@ -1,0 +1,66 @@
+name: Lifecycle nudge — monthly cancel check
+
+# Defensive safety check, run the first Wednesday of the month — the day
+# before the enroll run (lifecycle-nudge-enroll.yml, first Thursday) — not
+# weekly, since the +30-day walkthrough step only fires roughly once a month
+# per contact, so checking more often than monthly would spend GitHub Actions
+# quota for no real benefit here. Cancels any active enrollment whose contact
+# no longer appears in a fresh run of that nudge's approved eligibility query,
+# before their next drip step would fire.
+#
+# Cron can't express "first Wednesday of the month" directly — day-of-month
+# and day-of-week are OR'd, not AND'd. Instead this runs weekly on every
+# Wednesday and gates itself to only the first one via the day-of-month check
+# below (same pattern as lifecycle-nudge-enroll.yml).
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Print who would be cancelled without posting"
+        required: false
+        default: "true"
+
+permissions:
+  contents: read
+
+jobs:
+  cancel-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        nudge: [insider-nudge, setup-nudge]
+      # Sequential, not parallel: both nudges share the same mailroom API key's
+      # rate-limit buckets, and isolating one nudge's failure from the other
+      # (fail-fast: false) matters more here than wall-clock time at this volume.
+      max-parallel: 1
+      fail-fast: false
+
+    steps:
+      - name: Only proceed on the first Wednesday of the month
+        id: gate
+        run: |
+          day=$(date -u +%-d)
+          if [ "$day" -le 7 ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "day $day is not in the first 7 days — not the first Wednesday, skipping" >&2
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.run == 'true'
+
+      - uses: actions/setup-node@v4
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.run == 'true'
+        with:
+          node-version: "22"
+
+      - name: Run cancel check for ${{ matrix.nudge }}
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.run == 'true'
+        env:
+          MAILROOM_API_KEY: ${{ secrets.MAILROOM_API_KEY }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          DRY_RUN: ${{ github.event.inputs.dry_run == 'true' && '1' || '' }}
+        run: node .github/scripts/lifecycle-nudge.mjs cancel --nudge=${{ matrix.nudge }}

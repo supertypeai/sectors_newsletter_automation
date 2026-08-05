@@ -1,0 +1,69 @@
+name: Lifecycle nudge — monthly enroll
+
+# Re-evaluates all four lifecycle nudge types fresh from Supabase every run —
+# there is no persisted "group" of who's eligible, eligibility is live. Runs
+# on the first Thursday of the month, matching the send calendar's Week-1
+# Slot B placement for this content. See lifecycle-nudge-cancel.yml for the
+# companion safety check that runs the first Wednesday (the day before), to
+# catch anyone who's gone ineligible before their +30-day walkthrough step
+# would fire — that check only applies to insider-nudge/setup-nudge, the two
+# multi-step types; credits-expiring/quota-cycle-renewal are single-step, so
+# there's no later step that could go stale.
+#
+# One invocation, no matrix: credits-expiring, quota-cycle-renewal,
+# insider-nudge, and setup-nudge can all claim the same contact at once (none
+# of their approved queries excludes rows matching another's criteria), so
+# lifecycle-nudge.mjs resolves all 4 together in one process and enrolls each
+# contact in at most one (priority order: most urgent/time-boxed first) —
+# that cross-type visibility is exactly why this can't be split back into 4
+# independent jobs the way the cancel workflow is.
+#
+# Cron can't express "first Thursday of the month" directly — day-of-month and
+# day-of-week are OR'd, not AND'd, so "1-7 * 4" would fire on every Thursday
+# AND every day 1-7, not their intersection. Instead this runs weekly on every
+# Thursday and gates itself to only the first one via the day-of-month check
+# below.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Print who would be enrolled without posting"
+        required: false
+        default: "true"
+
+permissions:
+  contents: read
+
+jobs:
+  enroll:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Only proceed on the first Thursday of the month
+        id: gate
+        run: |
+          day=$(date -u +%-d)
+          if [ "$day" -le 7 ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "day $day is not in the first 7 days — not the first Thursday, skipping" >&2
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.run == 'true'
+
+      - uses: actions/setup-node@v4
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.run == 'true'
+        with:
+          node-version: "22"
+
+      - name: Run enroll (all 4 nudge types, priority-resolved)
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.run == 'true'
+        env:
+          MAILROOM_API_KEY: ${{ secrets.MAILROOM_API_KEY }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          DRY_RUN: ${{ github.event.inputs.dry_run == 'true' && '1' || '' }}
+        run: node .github/scripts/lifecycle-nudge.mjs enroll
