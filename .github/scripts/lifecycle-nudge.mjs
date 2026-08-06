@@ -45,19 +45,21 @@ function approvedQueryPath(file) {
  */
 function formatUnusedValue(row) {
   const parts = [];
-  if (row.credits > 0) parts.push(`${row.credits} credits`);
+  if (row.credits > 0) parts.push(`${row.credits} credit${row.credits === 1 ? "" : "s"}`);
   if (row.monthly_quota > 0) parts.push(`${row.monthly_quota} in monthly quota`);
   return parts.join(" and ");
 }
 
-/** `{{expiry_date}}`: credits_expire_at is a raw timestamp, not display-ready. */
+/**
+ * `{{expiry_date}}`: credits_expire_at is a raw timestamp, not display-ready.
+ * `timeZone: "UTC"` is required, not cosmetic: without it, toLocaleDateString
+ * falls back to the runner's local timezone, and a UTC-midnight timestamp
+ * rolls back to the previous calendar day on any negative-UTC-offset machine
+ * (verified: renders as "Aug 17" instead of "Aug 18" on US Pacific for the
+ * same input) — silently understating the real expiry date by a day.
+ */
 function formatExpiryDate(row) {
-  return new Date(row.credits_expire_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-}
-
-/** `{{days_into_cycle}}`: whole days since quota_cycle_start, not given directly by the query. */
-function formatDaysIntoCycle(row) {
-  return String(Math.floor((Date.now() - new Date(row.quota_cycle_start).getTime()) / 86400000));
+  return new Date(row.credits_expire_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
 }
 
 // Priority order = array order, most urgent first. insider-nudge/setup-nudge
@@ -74,8 +76,9 @@ const NUDGES = [
   {
     key: "quota-cycle-renewal",
     triggerEvent: "sectors_quota_renewal",
+    // days_into_cycle is computed in SQL now, not here — it's a plain returned
+    // column like monthly_quota/plan_tier, no extraVars hook needed.
     queryPath: approvedQueryPath("credit-plan-lifecycle-quota-cycle-renewal.sql"),
-    extraVars: (row) => ({ days_into_cycle: formatDaysIntoCycle(row) }),
   },
   {
     key: "insider-nudge",
