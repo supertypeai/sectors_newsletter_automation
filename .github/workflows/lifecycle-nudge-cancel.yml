@@ -8,18 +8,31 @@ name: Lifecycle nudge — monthly cancel check
 # no longer appears in a fresh run of that nudge's approved eligibility query,
 # before their next drip step would fire.
 #
-# Cron can't express "first Wednesday of the month" directly — day-of-month
-# and day-of-week are OR'd, not AND'd. Instead this runs weekly on every
-# Wednesday and gates itself to only the first one via the day-of-month check
-# below (same pattern as lifecycle-nudge-enroll.yml).
+# Triggered by an external scheduler (cron-job.org) calling workflow_dispatch
+# on this workflow's dispatches API with an empty request body — same setup
+# as lifecycle-nudge-enroll.yml, and the same two consequences follow:
+#   - The date gate below can't use `github.event_name == 'workflow_dispatch'`
+#     as a "this is a real scheduled run" signal — every firing, automated or
+#     a human testing by hand, looks identical as workflow_dispatch. The gate
+#     has to key off the real calendar date only.
+#   - dry_run defaults to "false", not "true" — cron-job.org's empty body
+#     means it always gets whichever value is the default here, and a "true"
+#     default would mean this safety check silently never actually cancels
+#     anyone, forever, while still showing green every run. The real
+#     tradeoff this accepts: triggering this by hand via the GitHub UI now
+#     cancels for real unless dry_run is explicitly set to "true" first.
 
 on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: "Print who would be cancelled without posting"
+        description: "Print who would be cancelled without posting (set to true to preview — defaults to a REAL run, see comment above)"
         required: false
-        default: "true"
+        default: "false"
+      force_run:
+        description: "Run regardless of today's date (for manual testing outside the first week)"
+        required: false
+        default: "false"
 
 permissions:
   contents: read
@@ -50,15 +63,15 @@ jobs:
           fi
 
       - uses: actions/checkout@v4
-        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.run == 'true'
+        if: steps.gate.outputs.run == 'true' || github.event.inputs.force_run == 'true'
 
       - uses: actions/setup-node@v4
-        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.run == 'true'
+        if: steps.gate.outputs.run == 'true' || github.event.inputs.force_run == 'true'
         with:
           node-version: "22"
 
       - name: Run cancel check for ${{ matrix.nudge }}
-        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.run == 'true'
+        if: steps.gate.outputs.run == 'true' || github.event.inputs.force_run == 'true'
         env:
           MAILROOM_API_KEY: ${{ secrets.MAILROOM_API_KEY }}
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}

@@ -1,36 +1,78 @@
-name: Lifecycle nudge — monthly enroll
+name: Lifecycle nudge — enroll
 
 # Re-evaluates all four lifecycle nudge types fresh from Supabase every run —
-# there is no persisted "group" of who's eligible, eligibility is live. Runs
-# on the first Thursday of the month, matching the send calendar's Week-1
-# Slot B placement for this content. See lifecycle-nudge-cancel.yml for the
-# companion safety check that runs the first Wednesday (the day before), to
-# catch anyone who's gone ineligible before their +30-day walkthrough step
-# would fire — that check only applies to insider-nudge/setup-nudge, the two
-# multi-step types; credits-expiring/quota-cycle-renewal are single-step, so
-# there's no later step that could go stale.
+# there is no persisted "group" of who's eligible, eligibility is live.
 #
-# One invocation, no matrix: credits-expiring, quota-cycle-renewal,
-# insider-nudge, and setup-nudge can all claim the same contact at once (none
-# of their approved queries excludes rows matching another's criteria), so
-# lifecycle-nudge.mjs resolves all 4 together in one process and enrolls each
-# contact in at most one (priority order: most urgent/time-boxed first) —
-# that cross-type visibility is exactly why this can't be split back into 4
-# independent jobs the way the cancel workflow is.
+# Two different cadences share this one workflow, triggered by an external
+# scheduler calling workflow_dispatch every Thursday (this repo has no native
+# `schedule:` trigger for this workflow — see below for why that matters):
+#   - quota-cycle-renewal runs EVERY time this fires (weekly). Its eligible
+#     window per contact is only ~5-7 days wide (25+ days into a ~30-31 day
+#     cycle), tied to each contact's own subscription_expiry day-of-month —
+#     a monthly-only cadence provably misses most billing days entirely,
+#     verified: a first-week-only run only ever captures subscription_expiry
+#     days 2-13 (12/31 possible days), permanently missing the other 19/31
+#     (61%). Weekly cuts that down to 4/31 permanently missed (days 8/15/22/29
+#     relative to a Thursday-anchored schedule) — not perfect, but the
+#     accepted tradeoff vs. the complexity of a tighter (~every 5 days)
+#     cadence.
+#   - credits-expiring/insider-nudge/setup-nudge stay first-week-of-month
+#     only, matching the send calendar's Week-1 Slot B placement — these
+#     don't have quota-cycle-renewal's day-of-month coverage problem, so
+#     there's no correctness reason to run them more often.
 #
-# Cron can't express "first Thursday of the month" directly — day-of-month and
-# day-of-week are OR'd, not AND'd, so "1-7 * 4" would fire on every Thursday
-# AND every day 1-7, not their intersection. Instead this runs weekly on every
-# Thursday and gates itself to only the first one via the day-of-month check
-# below.
+# Both cadences call the SAME lifecycle-nudge.mjs enroll invocation pattern,
+# via --only, not two different scripts. Priority is a strict tier order:
+# quota-cycle-renewal (tier 1, outranks everything) > credits-expiring
+# (tier 2) > insider-nudge/setup-nudge (tied at tier 3). Renewal ranking
+# ABOVE credits (not tied with it) is what lets the weekly renewal-only step
+# below skip credits-expiring's query entirely — nothing outranks tier 1, so
+# it never has to defer to anything. Verified live: an
+# --only=quota-cycle-renewal run queries only itself, 1 Supabase query
+# instead of 4.
+#
+# Mutual exclusion between tiers is deliberately SAME-DAY/SAME-RUN only, not
+# permanent: a contact winning quota-cycle-renewal this month and later
+# becoming eligible for credits-expiring next month is fine and expected —
+# only two DIFFERENT sequences both going active for the same contact at
+# once is what this prevents. That's covered by lifecycle-nudge.mjs's decide
+# phase checking who's currently active anywhere (real enrollment status,
+# not history) plus who a higher tier has already claimed within this same
+# script run — both of which stay accurate for same-day conflicts, since
+# quota-cycle-renewal's single-step enrollments are still genuinely "active"
+# for the short window between this run's own steps.
+#
+# Why the date gate below can't use `github.event_name == 'workflow_dispatch'`
+# as a bypass the way earlier drafts of this workflow did: that pattern
+# assumed a native `schedule:` trigger would produce a *different*
+# event_name than a manual click, letting the gate tell them apart. Since the
+# actual trigger here is an external scheduler calling workflow_dispatch on
+# a timer, every firing — the weekly automated one AND a human testing it by
+# hand — looks identical as `workflow_dispatch`. The gate has to key off the
+# real calendar date only; `force_monthly` below is the explicit override for
+# testing the first-week step outside its normal window instead.
+#
+# dry_run defaults to "false", NOT the safer-looking "true" — deliberately.
+# The real weekly trigger is cron-job.org calling this workflow's dispatches
+# API with an empty request body, no `inputs` at all, which means it always
+# gets whichever value is the default here. A "true" default (safe against an
+# accidental manual click) would mean the actual automation never sends
+# anything for real, silently, forever — confirmed this is exactly how
+# cron-job.org is configured for this workflow. The real tradeoff this
+# accepts: triggering this by hand via the GitHub UI now sends for real
+# unless dry_run is explicitly set to "true" first.
 
 on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: "Print who would be enrolled without posting"
+        description: "Print who would be enrolled without posting (set to true to preview — defaults to a REAL send, see comment above)"
         required: false
-        default: "true"
+        default: "false"
+      force_monthly:
+        description: "Also run the first-week-only step (credits-expiring/insider-nudge/setup-nudge) regardless of today's date"
+        required: false
+        default: "false"
 
 permissions:
   contents: read
@@ -41,29 +83,34 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - name: Only proceed on the first Thursday of the month
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Run enroll (quota-cycle-renewal only — every trigger)
+        env:
+          MAILROOM_API_KEY: ${{ secrets.MAILROOM_API_KEY }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          DRY_RUN: ${{ github.event.inputs.dry_run == 'true' && '1' || '' }}
+        run: node .github/scripts/lifecycle-nudge.mjs enroll --only=quota-cycle-renewal
+
+      - name: Check whether today is in the first week of the month
         id: gate
         run: |
           day=$(date -u +%-d)
           if [ "$day" -le 7 ]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
-            echo "day $day is not in the first 7 days — not the first Thursday, skipping" >&2
+            echo "day $day is not in the first 7 days — skipping the monthly step" >&2
             echo "run=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: actions/checkout@v4
-        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.run == 'true'
-
-      - uses: actions/setup-node@v4
-        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.run == 'true'
-        with:
-          node-version: "22"
-
-      - name: Run enroll (all 4 nudge types, priority-resolved)
-        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.run == 'true'
+      - name: Run enroll (credits-expiring/insider-nudge/setup-nudge — first week of month only)
+        if: steps.gate.outputs.run == 'true' || github.event.inputs.force_monthly == 'true'
         env:
           MAILROOM_API_KEY: ${{ secrets.MAILROOM_API_KEY }}
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           DRY_RUN: ${{ github.event.inputs.dry_run == 'true' && '1' || '' }}
-        run: node .github/scripts/lifecycle-nudge.mjs enroll
+        run: node .github/scripts/lifecycle-nudge.mjs enroll --only=credits-expiring,insider-nudge,setup-nudge
