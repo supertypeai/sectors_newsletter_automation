@@ -7,9 +7,9 @@
 // Usage: node send-test.mjs <issue-folder>
 //
 // Goes through POST /api/v1/emails (transactional), NOT /campaigns, so it cannot
-// touch the subscriber list no matter how the workflow is misconfigured: the only
-// recipient is MAILROOM_TEST_TO. That safety comes with one honest caveat, worth
-// remembering when reviewing:
+// touch the subscriber list no matter how the workflow is misconfigured: recipients
+// are only ever whoever is listed in MAILROOM_TEST_TO (comma-separated). That safety
+// comes with one honest caveat, worth remembering when reviewing:
 //
 //   A transactional send skips the campaign pipeline, so the test copy has no
 //   unsubscribe footer, no List-Unsubscribe header, and no click tracking. Those
@@ -36,20 +36,25 @@ const {
 
 if (!MAILROOM_API_KEY && DRY_RUN !== "1") die("MAILROOM_API_KEY is not set");
 if (!MAILROOM_FROM) die("MAILROOM_FROM is not set (must be a verified sender)");
-if (!MAILROOM_TEST_TO) die("MAILROOM_TEST_TO is not set (the reviewer's address)");
+if (!MAILROOM_TEST_TO) die("MAILROOM_TEST_TO is not set (comma-separated reviewer address(es))");
 
 const { fm, html, issueDate, issueType } = readIssue(folder);
 
+// Comma-separated so MAILROOM_TEST_TO can hold one reviewer or several — POST
+// /v1/emails already accepts `to` as a string or an array, so a single address
+// still round-trips exactly as before (array of one).
+const testTo = MAILROOM_TEST_TO.split(",").map((e) => e.trim()).filter(Boolean);
+
 const payload = {
   from: MAILROOM_FROM,
-  to: MAILROOM_TEST_TO,
+  to: testTo,
   subject: `[TEST] ${fm.subject}`,
   html,
   ...(MAILROOM_REPLY_TO ? { reply_to: MAILROOM_REPLY_TO } : {}),
 };
 
 console.log(`issue        : ${issueType} ${issueDate}`);
-console.log(`to           : ${payload.to}`);
+console.log(`to           : ${payload.to.join(", ")}`);
 console.log(`subject      : ${payload.subject}`);
 console.log(`html bytes   : ${html.length}`);
 
