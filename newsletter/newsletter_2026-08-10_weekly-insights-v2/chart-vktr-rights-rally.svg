@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="936" height="460" viewBox="0 0 936 460"><rect width="936" height="460" fill="#fcfcfb"/><defs>
+    <linearGradient id="sp0s" x1="0" y1="0" x2="936" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#C14D94"/><stop offset="100%" stop-color="#8B004C"/>
+    </linearGradient>
+    <linearGradient id="sp0f" x1="0" y1="0" x2="0" y2="460" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="rgba(193,77,148,0.18)"/><stop offset="100%" stop-color="rgba(193,77,148,0)"/>
+    </linearGradient>
+  </defs>
+    <path d="M10.0,303.3 L92.6,230.0 L175.2,303.3 L257.8,450.0 L340.4,425.6 L423.0,401.1 L505.6,450.0 L588.2,376.7 L670.8,10.0 L753.4,83.3 L836.0,22.2 L836.0,460 L10.0,460 Z" fill="url(#sp0f)"/><path d="M10.0,303.3 L92.6,230.0 L175.2,303.3 L257.8,450.0 L340.4,425.6 L423.0,401.1 L505.6,450.0 L588.2,376.7 L670.8,10.0 L753.4,83.3 L836.0,22.2" fill="none" stroke="url(#sp0s)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="836.0" cy="22.2" r="5" fill="#8B004C"/>
+    <text x="848.0" y="29.2" fill="#0B0B0B" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="24" font-weight="800" text-anchor="start">+14.9%</text><circle cx="10.0" cy="303.3" r="4" fill="#52514E"/>
+    <text x="10.0" y="289.3" fill="#52514E" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="22" font-weight="700" text-anchor="start">24 Jul: 770</text><circle cx="670.8" cy="10.0" r="3.5" fill="#52514E"/>
+      <text x="670.8" y="26.0" fill="#52514E" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="20" font-weight="600" text-anchor="middle">890</text><circle cx="257.8" cy="450.0" r="3.5" fill="#52514E"/>
+      <text x="257.8" y="452.0" fill="#52514E" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="20" font-weight="600" text-anchor="middle">710</text></svg>
