@@ -1,0 +1,57 @@
+name: Push to mailroom (manual)
+
+# Manual fallback only — draft-weekly-insights.yml already pushes each drafted
+# issue to mailroom itself (scheduled for 10am WIB) as its own last step, so
+# nothing triggers this automatically. Use this to re-push a specific issue folder
+# by hand: the automated push failed partway through, a campaign needs recreating
+# after being cancelled in mailroom's Review page, or a non-weekly issue type
+# needs pushing outside its own workflow.
+#
+# `issue_folder` is required (no push trigger to fall back to inferring one from,
+# unlike this workflow's prior form) — always name the exact folder to send.
+#
+# `schedule_time_wib` is left blank by default on purpose, not defaulted to "10:00"
+# the way draft-weekly-insights.yml defaults it: a manual re-push is usually "get
+# this out again soon," not "wait for next Monday's normal slot," so leaving it
+# blank falls through to push-to-mailroom.mjs's own relative-delay mode
+# (MAILROOM_SCHEDULE_DELAY_MINUTES, 60 by default) instead. Fill it in only when a
+# fixed wall-clock time is actually what's wanted here too.
+
+on:
+  workflow_dispatch:
+    inputs:
+      issue_folder:
+        description: "Path to the issue folder to push (relative to repo root)"
+        required: true
+      schedule_time_wib:
+        description: "Optional: schedule for this WIB time (HH:MM) instead of the default ~60min-from-now"
+        required: false
+      dry_run:
+        description: "Print the payload without posting"
+        required: false
+        default: "true"
+
+permissions:
+  contents: read
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Push to mailroom
+        env:
+          MAILROOM_API_KEY: ${{ secrets.MAILROOM_API_KEY }}
+          MAILROOM_FROM: ${{ vars.MAILROOM_FROM }}
+          MAILROOM_GROUP_ID: ${{ vars.MAILROOM_GROUP_ID }}
+          MAILROOM_REPLY_TO: ${{ vars.MAILROOM_REPLY_TO }}
+          MAILROOM_SCHEDULE_TIME_WIB: ${{ github.event.inputs.schedule_time_wib }}
+          DRY_RUN: ${{ github.event.inputs.dry_run == 'true' && '1' || '' }}
+        run: node .github/scripts/push-to-mailroom.mjs "${{ github.event.inputs.issue_folder }}"

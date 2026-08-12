@@ -3,9 +3,11 @@ name: Lifecycle nudge — enroll
 # Re-evaluates all four lifecycle nudge types fresh from Supabase every run —
 # there is no persisted "group" of who's eligible, eligibility is live.
 #
-# Two different cadences share this one workflow, triggered by an external
-# scheduler calling workflow_dispatch every Thursday (this repo has no native
-# `schedule:` trigger for this workflow — see below for why that matters):
+# Two different cadences share this one workflow, triggered by GitHub's own
+# `schedule:` cron below, every Thursday (moved here from an external scheduler —
+# cron-job.org — calling workflow_dispatch on a timer, which stopped working once
+# this repo went private; see the date-gate note below for what that migration
+# did and didn't change):
 #   - quota-cycle-renewal runs EVERY time this fires (weekly). Its eligible
 #     window per contact is only ~5-7 days wide (25+ days into a ~30-31 day
 #     cycle), tied to each contact's own subscription_expiry day-of-month —
@@ -42,27 +44,30 @@ name: Lifecycle nudge — enroll
 # quota-cycle-renewal's single-step enrollments are still genuinely "active"
 # for the short window between this run's own steps.
 #
-# Why the date gate below can't use `github.event_name == 'workflow_dispatch'`
-# as a bypass the way earlier drafts of this workflow did: that pattern
-# assumed a native `schedule:` trigger would produce a *different*
-# event_name than a manual click, letting the gate tell them apart. Since the
-# actual trigger here is an external scheduler calling workflow_dispatch on
-# a timer, every firing — the weekly automated one AND a human testing it by
-# hand — looks identical as `workflow_dispatch`. The gate has to key off the
-# real calendar date only; `force_monthly` below is the explicit override for
-# testing the first-week step outside its normal window instead.
+# The date gate below still keys off the real calendar date only, not
+# `github.event_name` — kept exactly as it was under the old cron-job.org
+# setup, even though a native `schedule:` trigger now genuinely could tell an
+# automated run (`event_name == 'schedule'`) apart from a manual one
+# (`'workflow_dispatch'`). Not worth the extra branch: the calendar-date gate
+# already gives the correct result either way, and it's one less thing that
+# could silently drift if the trigger mechanism ever changes again.
+# `force_monthly` below stays the explicit override for testing the
+# first-week step outside its normal window.
 #
-# dry_run defaults to "false", NOT the safer-looking "true" — deliberately.
-# The real weekly trigger is cron-job.org calling this workflow's dispatches
-# API with an empty request body, no `inputs` at all, which means it always
-# gets whichever value is the default here. A "true" default (safe against an
-# accidental manual click) would mean the actual automation never sends
-# anything for real, silently, forever — confirmed this is exactly how
-# cron-job.org is configured for this workflow. The real tradeoff this
-# accepts: triggering this by hand via the GitHub UI now sends for real
-# unless dry_run is explicitly set to "true" first.
+# dry_run still defaults to "false", NOT the safer-looking "true". Under the
+# old cron-job.org setup this mattered because its calls carried no `inputs`
+# at all, always falling through to this default. A native `schedule:` firing
+# has the same property for the same underlying reason — `github.event.inputs`
+# doesn't exist on a schedule event either — so the "a safe-looking default
+# would make the real automation silently never send" hazard is identical
+# under the new trigger, just from GitHub's own semantics instead of
+# cron-job.org's request shape. The tradeoff this accepts is unchanged too:
+# triggering this by hand via the GitHub UI sends for real unless dry_run is
+# explicitly set to "true" first.
 
 on:
+  schedule:
+    - cron: "0 0 * * 4" # Thursday 07:00 WIB = Thursday 00:00 UTC (WIB is fixed UTC+7, no DST)
   workflow_dispatch:
     inputs:
       dry_run:

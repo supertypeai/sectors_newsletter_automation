@@ -1,18 +1,21 @@
 # Newsletter automation
 
-Two workflows, in sequence. The PR merge between them is the only human gate.
+One workflow. There is no merge-triggered second stage anymore — reviewing and, if
+needed, stopping an issue both happen in mailroom directly, before it sends.
 
-```
-Monday 07:00 WIB                    human reviews         on merge
-draft-weekly-insights.yml ──> PR ─────> merge ──> send-on-merge.yml ──> mailroom
-     drafts the issue      └─> [TEST] email                creates the campaign
-                               to the reviewer
-```
+`draft-weekly-insights.yml` runs Monday 01:00 WIB and, in one run:
 
-**Review the test email, not the PR diff.** The PR carries the issue for the record and
-is the approval gate, but layout bugs only surface in a real client: a table that
-collapses in Outlook, a blocked image, a subject that truncates in the inbox list. The
-draft job emails a `[TEST]` copy so you review what subscribers will actually see.
+1. emails a `[TEST]` copy to the reviewer
+2. creates the real campaign in mailroom, `scheduled_at` 10:00 WIB that same day
+3. opens a PR — a record of what was sent, not a send trigger
+
+If nobody does anything, step 2 fires at 10:00 WIB. To stop or change it, cancel or
+reschedule the campaign from mailroom's Review page before then.
+
+**Review the test email, not the PR diff.** Layout bugs only surface in a real client: a
+table that collapses in Outlook, a blocked image, a subject that truncates in the inbox
+list. The draft job emails a `[TEST]` copy so you review what subscribers will actually
+see.
 
 That copy goes out transactionally via `POST /api/v1/emails`, so it can never reach the
 subscriber list however the workflow is configured — the only recipient is
@@ -20,9 +23,17 @@ subscriber list however the workflow is configured — the only recipient is
 test has **no unsubscribe footer, no `List-Unsubscribe` header, and no preview text**.
 Those are injected at real send time. Body, layout, images and subject are identical.
 
-Nothing reaches subscribers from stage 1. Stage 2 creates the campaign with a
-`schedule_at` a short way out rather than sending on the spot, so a mistake caught
-right after merge can still be cancelled in the mailroom UI.
+**If you do nothing, the issue ships.** The same run that emails the test copy also
+creates the real mailroom campaign, `scheduled_at` 10am WIB that same day — roughly nine
+hours after the 1am WIB draft, which is the actual review window now, not a merge click.
+To stop or change it, open the campaign's Review page in mailroom before 10am and cancel
+or reschedule it there. The PR still opens (git history of exactly what was sent), but
+merging it does nothing — send-gating moved off GitHub entirely.
+
+Need to re-push a specific issue by hand (a failed automated push, or recreating a
+campaign after cancelling it)? Run `push-to-mailroom.yml` (`workflow_dispatch` only,
+`issue_folder` required) — that's the entire remaining purpose of what used to be
+`send-on-merge.yml`.
 
 ### One branch, reused every week
 
@@ -51,7 +62,7 @@ Repo settings → Secrets and variables → Actions → **Secrets**:
 | --- | --- | --- |
 | `CLAUDE_CODE_OAUTH_TOKEN` | draft | Runs Claude Code. Uses your **existing Claude subscription**, no separate API plan needed. See below |
 | `SECTORS_API_KEY` | draft | Sectors market data. This is now the only source; no key ships in the repo |
-| `MAILROOM_API_KEY` | draft + send | Mailroom API key, sent as `Authorization: Bearer`. The draft job needs it too, to host chart images |
+| `MAILROOM_API_KEY` | draft, `push-to-mailroom.yml` | Mailroom API key, sent as `Authorization: Bearer`. The draft job uses it three times now: hosting chart images, sending the `[TEST]` copy, and creating the scheduled campaign itself. `push-to-mailroom.yml` needs it too, for manual re-pushes |
 | `NEWSLETTER_PAT` | draft | **Recommended.** PAT with `repo` + `workflow` scope for the PR push. `GITHUB_TOKEN` cannot push anything under `.github/workflows/`, and no `permissions:` key can grant it that |
 | `STORING_API_KEY` | draft | **Optional.** Compresses chart PNGs through [Storing](https://storing.app) before upload. Leave unset and charts upload at full size. Generate from Storing's Settings page |
 | `SUPABASE_ACCESS_TOKEN` | draft | **Optional.** Enables real social-card auto-selection (block 4 visuals) and the exchange-definition foreign-flow figure, both via the Supabase MCP connector. Leave unset and the run falls back to generated charts / an omitted flow figure, exactly as documented in SKILL.md. See **Supabase MCP setup** below before generating one |
@@ -94,23 +105,32 @@ Same page → **Variables** (not secrets, these are not sensitive):
 | `MAILROOM_TEST_TO` | `aurellia@supertype.ai` | Where the `[TEST]` review copy goes. Set this to change reviewer |
 | `MAILROOM_GROUP_ID` | *(unset → all contacts)* | Subscriber group to send to. **Leave unset only if you really mean every contact** |
 | `MAILROOM_REPLY_TO` | *(unset)* | Optional reply-to |
-| `MAILROOM_SCHEDULE_DELAY_MINUTES` | `60` | Cancellation window. `0` sends immediately |
+| `MAILROOM_SCHEDULE_TIME_WIB` | `10:00` | Wall-clock time in `Asia/Jakarta` the **draft** job schedules each issue for — the next future occurrence of this time on the day it runs. This is the actual review window now (draft time to this time), not a merge click. Only affects the automated draft job — see below for the manual tool |
+| `MAILROOM_SCHEDULE_DELAY_MINUTES` | `60` | Fallback used only when scheduling by relative delay rather than a fixed WIB time — currently only reachable via `push-to-mailroom.yml`'s `schedule_time_wib` input left blank (see below). `0` sends immediately |
 
 ## First run, safely
 
-Do these in order before letting the cron fire:
+The draft job now creates a real scheduled campaign as part of its own run — there's no
+separate dry-run gate before that happens the way `send-on-merge.yml`'s `dry_run: true`
+used to provide. Do these in order before letting the cron fire:
 
-1. **Draft only.** Run `draft-weekly-insights.yml` via *Run workflow*. Check the PR
-   it opens: `newsletter.md`, `newsletter.html`, and a chart should be there, and the
-   appendix should list which unattended defaults the run took. You should also get the
-   `[TEST]` copy in your inbox — open it and confirm the chart image loads, since a
-   broken upload shows up there and nowhere else.
-2. **Dry-run the send.** Run `send-on-merge.yml` via *Run workflow* with the issue
-   folder path and `dry_run: true`. It prints the payload and posts nothing.
-3. **Send to yourself.** Point `MAILROOM_GROUP_ID` at a throwaway group containing
-   only your own address, then merge the PR for real.
-4. **Prove the idempotency key.** Re-run `send-on-merge.yml` on the same folder.
-   Mailroom should not create a second campaign, because the key is
+1. **Point at a throwaway group first.** Set `MAILROOM_GROUP_ID` to a group containing
+   only your own address, before running anything for real below.
+2. **Test the plumbing with no campaign created.** Run `draft-weekly-insights.yml` via
+   *Run workflow* with `skip_draft: true`. This exercises rasterize/upload/PR/test-email
+   against a fixture issue and creates no campaign at all — the push step is skipped
+   under `skip_draft`, and push-to-mailroom.mjs also refuses any `[FIXTURE]`-subject
+   issue outright as a backstop.
+3. **Run it for real, still scoped to the throwaway group.** Run
+   `draft-weekly-insights.yml` normally (`skip_draft: false`). Check the PR:
+   `newsletter.md`, `newsletter.html`, and a chart should be there, and a `run-notes.md`
+   should list which unattended defaults the run took (a separate file, never sent — not
+   an appendix in the issue itself). You should also get the `[TEST]`
+   copy in your inbox — open it and confirm the chart image loads, since a broken upload
+   shows up there and nowhere else. Then check mailroom's Review page: the campaign
+   should show `scheduled`, 10am WIB today, and the throwaway group as its audience.
+4. **Prove the idempotency key.** Run `push-to-mailroom.yml` manually against that same
+   issue folder. Mailroom should not create a second campaign, because the key is
    `weekly-insights-v2_<issue-date>` and is stable across retries.
 5. Only then point `MAILROOM_GROUP_ID` at the real subscriber group.
 
@@ -207,10 +227,6 @@ Tunable via variables: `STORING_PROFILE` (`conservative` / `balanced` / `aggress
 default `balanced`) and `STORING_MAX_SIZE` (e.g. `200KB`, unset by default).
 
 ## Known gaps
-- **Social cards can't be fetched unattended.** The Supabase bucket needs a credential
-  to list. CI generates charts instead. To get real cards into automated runs, have the
-  carousel pipeline write a `manifest_<YYYYMMDD>.json` to the same public bucket; see
-  `references/workflows/weekly-insights-v2.md` §3.
 - **The old key is still in git history.** `config.json` is untracked as of this
   change, but earlier commits still contain the key. The repo is private, so it was
   never publicly exposed, and rewriting history is not worth it for a private repo.

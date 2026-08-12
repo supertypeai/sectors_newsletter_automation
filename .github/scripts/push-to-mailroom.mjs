@@ -9,11 +9,24 @@
 //
 // Three properties of that endpoint carry the safety of this step, see
 // mailroom/src/app/api/v1/campaigns/route.ts:
-//   - Idempotency-Key    a re-run of the merge workflow cannot double-send to the
-//                        list. Keyed on the issue date, so it is stable across retries.
+//   - Idempotency-Key    a re-run of this workflow cannot double-send to the list.
+//                        Keyed on the issue date, so it is stable across retries.
 //   - schedule_at        creates a `scheduled` campaign rather than sending on the
-//                        spot, leaving a cancellation window in the mailroom UI.
-//                        Set MAILROOM_SCHEDULE_DELAY_MINUTES=0 to send immediately.
+//                        spot, leaving a cancellation/edit window in the mailroom
+//                        Review page. Two ways to set it, in priority order:
+//                          MAILROOM_SCHEDULE_TIME_WIB="HH:MM" — the next future
+//                          occurrence of that wall-clock time in Asia/Jakarta
+//                          (fixed UTC+7, Indonesia has no DST, so a plain offset
+//                          is correct here — no IANA tz database needed). This is
+//                          what draft-weekly-insights.yml uses: drafted ~1am WIB,
+//                          scheduled for that same day's 10am WIB, so the ~9-hour
+//                          gap between draft and send doubles as the review
+//                          window — no extra relative delay needed on top.
+//                          MAILROOM_SCHEDULE_DELAY_MINUTES — the older relative
+//                          mode (send N minutes from whenever this script
+//                          happens to run), for callers with no fixed daily slot.
+//                          Set to 0 to send immediately. Ignored if
+//                          MAILROOM_SCHEDULE_TIME_WIB is set.
 //   - series             groups recurring issues into one newsletter for combined
 //                        stats; the endpoint documents this exact weekly case.
 // The campaign pipeline also skips unsubscribed contacts and injects the unsubscribe
@@ -30,9 +43,24 @@ const {
   MAILROOM_FROM,
   MAILROOM_GROUP_ID,
   MAILROOM_REPLY_TO,
+  MAILROOM_SCHEDULE_TIME_WIB,
   MAILROOM_SCHEDULE_DELAY_MINUTES = "60",
   DRY_RUN,
 } = process.env;
+
+/** Next future UTC instant matching "HH:MM" on a Jakarta (WIB, fixed UTC+7) wall clock. */
+function nextWIBOccurrence(hhmm) {
+  const m = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(hhmm);
+  if (!m) die(`MAILROOM_SCHEDULE_TIME_WIB must be "HH:MM" (24h), got "${hhmm}"`);
+  const [, hh, mm] = m;
+  const WIB_OFFSET_MS = 7 * 60 * 60 * 1000;
+  const now = Date.now();
+  const nowWIB = new Date(now + WIB_OFFSET_MS);
+  const todayAtTimeWIB = Date.UTC(nowWIB.getUTCFullYear(), nowWIB.getUTCMonth(), nowWIB.getUTCDate(), Number(hh), Number(mm));
+  let candidateUTC = todayAtTimeWIB - WIB_OFFSET_MS;
+  if (candidateUTC <= now) candidateUTC += 24 * 60 * 60 * 1000; // already passed today — use tomorrow
+  return new Date(candidateUTC).toISOString();
+}
 
 if (!MAILROOM_API_KEY) die("MAILROOM_API_KEY is not set");
 if (!MAILROOM_FROM) die("MAILROOM_FROM is not set (must be a verified sender)");
@@ -61,12 +89,16 @@ const payload = {
   ...(MAILROOM_GROUP_ID ? { group_id: MAILROOM_GROUP_ID } : { audience: "all" }),
 };
 
-const delay = Number(MAILROOM_SCHEDULE_DELAY_MINUTES);
-if (!Number.isFinite(delay) || delay < 0) {
-  die(`MAILROOM_SCHEDULE_DELAY_MINUTES must be a non-negative number, got "${MAILROOM_SCHEDULE_DELAY_MINUTES}"`);
-}
-if (delay > 0) {
-  payload.schedule_at = new Date(Date.now() + delay * 60_000).toISOString();
+if (MAILROOM_SCHEDULE_TIME_WIB) {
+  payload.schedule_at = nextWIBOccurrence(MAILROOM_SCHEDULE_TIME_WIB);
+} else {
+  const delay = Number(MAILROOM_SCHEDULE_DELAY_MINUTES);
+  if (!Number.isFinite(delay) || delay < 0) {
+    die(`MAILROOM_SCHEDULE_DELAY_MINUTES must be a non-negative number, got "${MAILROOM_SCHEDULE_DELAY_MINUTES}"`);
+  }
+  if (delay > 0) {
+    payload.schedule_at = new Date(Date.now() + delay * 60_000).toISOString();
+  }
 }
 
 const idempotencyKey = `${issueType}_${issueDate}`;

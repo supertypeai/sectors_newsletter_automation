@@ -1,10 +1,21 @@
 name: Draft weekly insights
 
-# Stage 1 of 2. Drafts the Monday weekly-insights-v2 issue and opens a PR.
-# Nothing reaches subscribers from this workflow; the PR review is the approval
-# gate, and merging it triggers send-on-merge.yml.
+# Drafts the weekly-insights-v2 issue, emails a [TEST] copy to the reviewer, pushes
+# it straight to mailroom as a `scheduled` campaign for that same day's 10am WIB
+# (MAILROOM_SCHEDULE_TIME_WIB below), and opens a PR recording exactly what was
+# sent. There is no separate merge-triggers-send stage anymore (that was
+# send-on-merge.yml's job; see push-to-mailroom.yml for what replaced it) —
+# **if nobody does anything, the drafted issue ships to subscribers on schedule.**
+# The PR is a record, not a gate; review before send happens in mailroom's own
+# Review page (cancel or reschedule the campaign there), not by leaving the PR
+# unmerged. Native `schedule:` below runs this every Monday 1am WIB — an hour
+# chosen to sit well ahead of both the drafting time this needs and the 10am WIB
+# send, with margin for GitHub Actions' own scheduling jitter (cron triggers are
+# best-effort and can run late, sometimes by tens of minutes).
 
 on:
+  schedule:
+    - cron: "0 18 * * 0" # Monday 01:00 WIB = Sunday 18:00 UTC (WIB is fixed UTC+7, no DST)
   workflow_dispatch:
     inputs:
       issue_type:
@@ -152,7 +163,7 @@ jobs:
       - name: Draft the issue
         if: ${{ github.event.inputs.skip_draft != 'true' }}
         run: |
-          claude -p "Write this week's ${ISSUE_TYPE} newsletter issue using the sectors-newsletter-generator skill. Deliver to \$NEWSLETTER_HOME. This is an unattended CI run: do not ask any questions, apply the documented unattended defaults, and record every default you took in an HTML comment at the top of the file, never in the visible body or the reader-facing Appendix." \
+          claude -p "Write this week's ${ISSUE_TYPE} newsletter issue using the sectors-newsletter-generator skill. Deliver to \$NEWSLETTER_HOME. This is an unattended CI run: do not ask any questions, apply the documented unattended defaults, and record every default you took in the separate run-notes.md file the skill documents for this — never as an HTML comment in newsletter.html, and never in the visible body or the reader-facing Appendix." \
             --permission-mode bypassPermissions \
             ${SUPABASE_MCP_CONFIG:+--mcp-config "$SUPABASE_MCP_CONFIG"}
 
@@ -244,13 +255,15 @@ jobs:
       - name: Drop scratch fetches
         run: rm -rf "${{ steps.issue.outputs.folder }}"/{data,_draft}
 
-      # Before the PR step, not after. peter-evans/create-pull-request commits the
-      # issue folder to the new branch, pushes, then runs `git checkout main` to leave
-      # the runner on the base branch. Since the issue folder exists only on that new
-      # branch, checking back out to main removes it from the working directory —
-      # any step reading the folder afterward finds it gone (surfaced 2026-07-27 as
-      # "missing newsletter.md" from the email step when it ran second). Sending the
-      # test email first means it reads the folder while it still exists on disk.
+      # This step and "Push to mailroom" below it both have to run before the PR step,
+      # not after. peter-evans/create-pull-request commits the issue folder to the new
+      # branch, pushes, then runs `git checkout main` to leave the runner on the base
+      # branch. Since the issue folder exists only on that new branch, checking back out
+      # to main removes it from the working directory — any step reading the folder
+      # afterward finds it gone (surfaced 2026-07-27 as "missing newsletter.md" from this
+      # email step when it ran second, before push-to-mailroom.mjs existed as a step
+      # here). Both steps read the folder directly, so both have to run while it still
+      # exists on disk.
       - name: Email the draft to the reviewer
         env:
           MAILROOM_API_KEY: ${{ secrets.MAILROOM_API_KEY }}
@@ -259,6 +272,24 @@ jobs:
           MAILROOM_TEST_TO: ${{ vars.MAILROOM_TEST_TO || 'aurellia@supertype.ai' }}
           MAILROOM_REPLY_TO: ${{ vars.MAILROOM_REPLY_TO }}
         run: node .github/scripts/send-test.mjs "${{ steps.issue.outputs.folder }}"
+
+      # This is the actual send-gating step now that merging the PR no longer sends
+      # anything: creates the real mailroom campaign, scheduled for 10am WIB the same
+      # day this runs (not sent on the spot), which is what makes "review the [TEST]
+      # email, then do nothing" the default outcome. Guarded by skip_draft the same
+      # way the drafting/Claude steps above are — a skip_draft plumbing-test run must
+      # never create a real campaign; push-to-mailroom.mjs's own [FIXTURE]-subject
+      # guard is a backstop for that, not the primary defense.
+      - name: Push to mailroom, scheduled for 10am WIB
+        if: ${{ github.event.inputs.skip_draft != 'true' }}
+        env:
+          MAILROOM_API_KEY: ${{ secrets.MAILROOM_API_KEY }}
+          MAILROOM_API_URL: ${{ vars.MAILROOM_API_URL || 'https://mailroom.supertype.ai/api/v1/campaigns' }}
+          MAILROOM_FROM: ${{ vars.MAILROOM_FROM }}
+          MAILROOM_GROUP_ID: ${{ vars.MAILROOM_GROUP_ID }}
+          MAILROOM_REPLY_TO: ${{ vars.MAILROOM_REPLY_TO }}
+          MAILROOM_SCHEDULE_TIME_WIB: ${{ vars.MAILROOM_SCHEDULE_TIME_WIB || '10:00' }}
+        run: node .github/scripts/push-to-mailroom.mjs "${{ steps.issue.outputs.folder }}"
 
       - name: Open the review PR
         id: pr
@@ -289,14 +320,17 @@ jobs:
             A `[TEST]` copy has been emailed to the reviewer — **review that, not this
             diff**. Layout bugs only show up in a real client.
 
-            **Merging this PR sends the issue to subscribers.** `send-on-merge.yml`
-            picks it up and creates the mailroom campaign, scheduled with a short
-            cancellation window rather than sent on the spot.
+            **This issue is already scheduled to send** — a `scheduled` campaign was
+            just created in mailroom for 10am WIB today. Merging this PR does nothing
+            further; it's a record of exactly what was sent, kept for git history and
+            future diffing, not a send trigger. **If you do nothing, it ships on
+            schedule.** To stop or change it, go to the campaign's **Review** page in
+            mailroom before 10am WIB and cancel or reschedule it there.
 
-            Before merging, check:
+            Before it sends, check:
             - [ ] Every figure traces to a real endpoint, nothing invented
             - [ ] No investment advice framing anywhere
-            - [ ] Appendix lists the unattended defaults this run took
+            - [ ] `run-notes.md` (a separate file beside the issue, never sent — not in this diff) lists the unattended defaults this run took
             - [ ] The test email renders correctly in your client
             - [ ] Subject reads well in the inbox list
 

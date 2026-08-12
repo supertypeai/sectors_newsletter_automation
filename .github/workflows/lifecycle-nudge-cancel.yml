@@ -8,21 +8,27 @@ name: Lifecycle nudge — monthly cancel check
 # no longer appears in a fresh run of that nudge's approved eligibility query,
 # before their next drip step would fire.
 #
-# Triggered by an external scheduler (cron-job.org) calling workflow_dispatch
-# on this workflow's dispatches API with an empty request body — same setup
-# as lifecycle-nudge-enroll.yml, and the same two consequences follow:
-#   - The date gate below can't use `github.event_name == 'workflow_dispatch'`
-#     as a "this is a real scheduled run" signal — every firing, automated or
-#     a human testing by hand, looks identical as workflow_dispatch. The gate
-#     has to key off the real calendar date only.
-#   - dry_run defaults to "false", not "true" — cron-job.org's empty body
-#     means it always gets whichever value is the default here, and a "true"
-#     default would mean this safety check silently never actually cancels
-#     anyone, forever, while still showing green every run. The real
-#     tradeoff this accepts: triggering this by hand via the GitHub UI now
-#     cancels for real unless dry_run is explicitly set to "true" first.
+# Triggered by GitHub's own `schedule:` cron below, every Wednesday — moved
+# here from an external scheduler (cron-job.org) calling workflow_dispatch on
+# a timer, which stopped working once this repo went private. Same setup as
+# lifecycle-nudge-enroll.yml, and the same two consequences carry over from
+# the old cron-job.org design, both still correct under the new trigger:
+#   - The date gate below keys off the real calendar date only, not
+#     `github.event_name` — a native `schedule:` firing genuinely could be
+#     told apart from a manual click now (`'schedule'` vs
+#     `'workflow_dispatch'`), but the calendar-date gate already gives the
+#     right answer either way, so there's no reason to add that branch.
+#   - dry_run still defaults to "false", not "true" — a `schedule` event has
+#     no `inputs` at all (same property cron-job.org's empty-body calls had),
+#     so it always falls through to this default. A "true" default would
+#     mean this safety check silently never actually cancels anyone, forever,
+#     while still showing green every run. The tradeoff this accepts is
+#     unchanged: triggering this by hand via the GitHub UI cancels for real
+#     unless dry_run is explicitly set to "true" first.
 
 on:
+  schedule:
+    - cron: "0 0 * * 3" # Wednesday 07:00 WIB = Wednesday 00:00 UTC (WIB is fixed UTC+7, no DST)
   workflow_dispatch:
     inputs:
       dry_run:
