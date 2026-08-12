@@ -63,7 +63,27 @@ export function readIssue(folder) {
     fm.date || (basename(folder).match(/newsletter_(\d{4}-\d{2}-\d{2})_/) || [])[1];
   if (!issueDate) die("could not determine the issue date from frontmatter or folder name");
 
-  return { fm, html, mdPath, htmlPath, issueDate, issueType: fm.issue_type || "weekly-insights-v2" };
+  // issueType anchors `series` on the campaign push — a wrong value here silently
+  // merges one content type's stats into another's. Same fallback-and-cross-check
+  // shape as issueDate just above, not a bare frontmatter trust: the delivery
+  // convention (SKILL.md's Delivery section) names every folder
+  // newsletter_<date>_<type-slug>, so the folder is an independent second source for
+  // the same fact, not a guess. A newsletter.md whose frontmatter disagrees with the
+  // folder it was delivered into is a real defect worth failing loudly on — most
+  // likely Claude writing the wrong type into frontmatter, easy to miss by eye and
+  // silent under the old hardcoded "weekly-insights-v2" fallback, which was only
+  // ever safe because that was the one type this pipeline ever pushed until now.
+  const folderType = (basename(folder).match(/newsletter_\d{4}-\d{2}-\d{2}_(.+)$/) || [])[1];
+  if (fm.issue_type && folderType && fm.issue_type !== folderType) {
+    die(
+      `frontmatter issue_type "${fm.issue_type}" does not match the delivery folder's type slug "${folderType}" (${folder}). ` +
+        "Fix the source (most likely a wrong issue_type written into newsletter.md) rather than picking one silently."
+    );
+  }
+  const issueType = fm.issue_type || folderType;
+  if (!issueType) die(`could not determine issue type from frontmatter or folder name (${folder})`);
+
+  return { fm, html, mdPath, htmlPath, issueDate, issueType };
 }
 
 /**
