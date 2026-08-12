@@ -77,7 +77,11 @@ jobs:
       matrix:
         include:
           - issue_type: three-stock-story
-            mailroom_group_id: ${{ vars.MAILROOM_NEWSLETTER_GROUP_ID }}
+            # Same group draft-weekly-insights.yml already sends to (the full
+            # newsletter list) — reusing MAILROOM_GROUP_ID rather than a second
+            # variable pointed at the same group, which would need updating in two
+            # places if that group is ever renamed or swapped.
+            mailroom_group_id: ${{ vars.MAILROOM_GROUP_ID }}
             mailroom_exclude_segment_ids: ${{ vars.MAILROOM_INSIDER_SEGMENT_ID }}
           - issue_type: single-company-deep-dive
             mailroom_segment_id: ${{ vars.MAILROOM_INSIDER_SEGMENT_ID }}
