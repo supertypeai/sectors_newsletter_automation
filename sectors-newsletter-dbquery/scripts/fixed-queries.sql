@@ -21,6 +21,10 @@
 --     subscription_cancellation changes as insider-nudge.sql)
 --   watchlist-tracked-interest.sql (supports the sibling generator skill's
 --     personalized content, not a dbquery-drafted lifecycle email)
+--   tier-sync.sql (added 2026-08, Week 2 calendar automation — feeds
+--     sync-tier-tags.mjs, keeps mailroom's STANDARD/INSIDER segments in sync with
+--     the real subscription tier. No live match count at approval time, see the
+--     file's own header for why; verify on the sync script's first real dry-run)
 --
 -- Schema notes (public schema, confirmed via information_schema.columns):
 -- - api_user has no first_name column, only full_name. Every approved query derives
@@ -30,6 +34,10 @@
 -- - subscription_tier: confirmed real value 'INSIDER' gates watchlist/workflow/
 --   screener access. Can be null for a true free-tier account, so an exclusion
 --   filter needs "IS DISTINCT FROM", not "!=" (which silently drops NULL rows).
+--   Confirmed 2026-08 (by the user, not schema introspection): the column holds
+--   three literal values in practice — 'FREE', 'STANDARD', 'INSIDER' — though it
+--   remains nullable at the schema level, hence still needing "IS DISTINCT FROM"
+--   for a null-safe INSIDER exclusion elsewhere in this file's approved queries.
 -- - api_apiresponsetime: one row per real API call, columns id, endpoint,
 --   response_time, response_status, created_at, user_id, limit_consumption,
 --   key, source. NOT EXISTS against this table, keyed on user_id, is the

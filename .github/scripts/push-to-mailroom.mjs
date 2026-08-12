@@ -31,6 +31,13 @@
 //                        stats; the endpoint documents this exact weekly case.
 // The campaign pipeline also skips unsubscribed contacts and injects the unsubscribe
 // footer and List-Unsubscribe header, so the newsletter HTML carries none of that.
+//
+// Audience: exactly one of MAILROOM_GROUP_ID / MAILROOM_SEGMENT_ID, or neither for
+// audience:"all" — mirrors the endpoint's own "exactly one of group_id | segment_id |
+// audience:all" rule. MAILROOM_EXCLUDE_SEGMENT_IDS (comma-separated) layers on top of
+// any of the three base modes — confirmed the endpoint applies exclusion the same way
+// regardless of base targeting, so "everyone in this group except this segment" is a
+// real, supported combination, not just "exclude within a segment."
 
 import { die, postToMailroom, readIssue } from "./mailroom.mjs";
 
@@ -42,6 +49,8 @@ const {
   MAILROOM_API_URL = "https://mailroom.supertype.ai/api/v1/campaigns",
   MAILROOM_FROM,
   MAILROOM_GROUP_ID,
+  MAILROOM_SEGMENT_ID,
+  MAILROOM_EXCLUDE_SEGMENT_IDS,
   MAILROOM_REPLY_TO,
   MAILROOM_SCHEDULE_TIME_WIB,
   MAILROOM_SCHEDULE_DELAY_MINUTES = "60",
@@ -77,6 +86,14 @@ if (/^\[FIXTURE\]/i.test(fm.subject)) {
   );
 }
 
+if (MAILROOM_GROUP_ID && MAILROOM_SEGMENT_ID) {
+  die("set at most one of MAILROOM_GROUP_ID / MAILROOM_SEGMENT_ID, not both");
+}
+
+const excludeSegmentIds = MAILROOM_EXCLUDE_SEGMENT_IDS
+  ? MAILROOM_EXCLUDE_SEGMENT_IDS.split(",").map((id) => id.trim()).filter(Boolean)
+  : [];
+
 const payload = {
   from: MAILROOM_FROM,
   subject: fm.subject,
@@ -85,8 +102,9 @@ const payload = {
   series: issueType,
   ...(fm.preview ? { preheader: fm.preview } : {}),
   ...(MAILROOM_REPLY_TO ? { reply_to: MAILROOM_REPLY_TO } : {}),
-  // Exactly one of group_id | audience:"all" is required by the endpoint.
-  ...(MAILROOM_GROUP_ID ? { group_id: MAILROOM_GROUP_ID } : { audience: "all" }),
+  // Exactly one of group_id | segment_id | audience:"all" is required by the endpoint.
+  ...(MAILROOM_GROUP_ID ? { group_id: MAILROOM_GROUP_ID } : MAILROOM_SEGMENT_ID ? { segment_id: MAILROOM_SEGMENT_ID } : { audience: "all" }),
+  ...(excludeSegmentIds.length ? { exclude_segment_ids: excludeSegmentIds } : {}),
 };
 
 if (MAILROOM_SCHEDULE_TIME_WIB) {
@@ -106,7 +124,7 @@ const idempotencyKey = `${issueType}_${issueDate}`;
 console.log(`issue folder : ${folder}`);
 console.log(`subject      : ${payload.subject}`);
 console.log(`series       : ${payload.series}`);
-console.log(`audience     : ${payload.group_id ? `group ${payload.group_id}` : "all contacts"}`);
+console.log(`audience     : ${payload.group_id ? `group ${payload.group_id}` : payload.segment_id ? `segment ${payload.segment_id}` : "all contacts"}${excludeSegmentIds.length ? `, excluding segment(s) ${excludeSegmentIds.join(", ")}` : ""}`);
 console.log(`schedule     : ${payload.schedule_at ?? "immediate"}`);
 console.log(`idempotency  : ${idempotencyKey}`);
 console.log(`html bytes   : ${html.length}`);

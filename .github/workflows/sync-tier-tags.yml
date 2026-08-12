@@ -1,0 +1,74 @@
+name: Sync tier tags
+
+# Keeps mailroom's STANDARD/INSIDER segments in sync with the real Sectors
+# subscription tier, ahead of the week-2 Thursday content sends
+# (draft-week2-content.yml) that target them. Runs the first Wednesday of week 2 —
+# the day before that Thursday send — not weekly: the user's explicit call, since
+# these segments only need to be fresh for that one send, not maintained
+# continuously for other uses. Same day-range gate as draft-week2-content.yml's own
+# `day >= 8 && day <= 14` check, one day earlier.
+#
+# dry_run defaults to "false", not "true" — a native `schedule:` firing has no
+# `inputs` at all (same property the lifecycle-nudge workflows' cron already relies
+# on), so it always falls through to this default. A "true" default would mean this
+# sync silently never actually corrects anything, forever, while still showing
+# green every run. Triggering this by hand via the GitHub UI syncs for real unless
+# dry_run is explicitly set to "true" first — same tradeoff already accepted
+# elsewhere in this repo's scheduled workflows.
+
+on:
+  schedule:
+    - cron: "0 20 * * 2" # Wednesday 03:00 WIB = Tuesday 20:00 UTC (WIB is fixed UTC+7, no DST)
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Print the computed diff without posting (set to true to preview — defaults to a REAL sync, see comment above)"
+        required: false
+        default: "false"
+      force_run:
+        description: "Run regardless of today's date (for manual testing outside week 2)"
+        required: false
+        default: "false"
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      # Asia/Jakarta, not UTC. This fires at 20:00 UTC, by which point the WIB
+      # calendar date is already the NEXT day — reading `date -u` here would test the
+      # wrong day, making "days 8-14" mean WIB days 9-15. WIB is what the schedule is
+      # expressed in, so WIB is what the gate has to measure.
+      - name: Only proceed in week 2 of the month (WIB)
+        id: gate
+        run: |
+          day=$(TZ=Asia/Jakarta date +%-d)
+          if [ "$day" -ge 8 ] && [ "$day" -le 14 ]; then
+            echo "WIB day $day is in week 2 — proceeding" >&2
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "WIB day $day is not in days 8-14 — not week 2, skipping" >&2
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.gate.outputs.run == 'true' || github.event.inputs.force_run == 'true'
+
+      - uses: actions/setup-node@v4
+        if: steps.gate.outputs.run == 'true' || github.event.inputs.force_run == 'true'
+        with:
+          node-version: "22"
+
+      - name: Sync STANDARD/INSIDER tags
+        if: steps.gate.outputs.run == 'true' || github.event.inputs.force_run == 'true'
+        env:
+          MAILROOM_API_KEY: ${{ secrets.MAILROOM_API_KEY }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          MAILROOM_STANDARD_SEGMENT_ID: ${{ vars.MAILROOM_STANDARD_SEGMENT_ID }}
+          MAILROOM_INSIDER_SEGMENT_ID: ${{ vars.MAILROOM_INSIDER_SEGMENT_ID }}
+          DRY_RUN: ${{ github.event.inputs.dry_run == 'true' && '1' || '' }}
+        run: node .github/scripts/sync-tier-tags.mjs

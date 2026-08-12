@@ -120,3 +120,19 @@ export async function getFromMailroom(url, { apiKey, headers = {}, what = "reque
 
   return parseMailroomResponse(res, what);
 }
+
+/**
+ * PATCH a plain JSON body to mailroom and return the parsed response. First
+ * caller is sync-tier-tags.mjs (PATCH /contacts/:id); no FormData branch since
+ * no PATCH endpoint here takes one — add it the same way postToMailroom does
+ * if that changes.
+ */
+export async function patchToMailroom(url, { apiKey, body, headers = {}, what = "request" }) {
+  const res = await fetch(url, {
+    method: "PATCH",
+    headers: { authorization: `Bearer ${apiKey}`, "content-type": "application/json", ...headers },
+    body: JSON.stringify(body),
+  });
+
+  return parseMailroomResponse(res, what);
+}
