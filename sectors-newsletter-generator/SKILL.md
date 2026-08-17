@@ -503,6 +503,15 @@ dbquery skill's templates do.
     Friday `data_as_of` date and not a window-derived Monday. See
     `workflows/weekly-insights-v2.md` and the **Header block** section of
     `newsletter-format.md`.
+    **"Today" means today in Asia/Jakarta (WIB), not the runner's system clock**
+    (added 2026-08-13, after an automated Wednesday run stamped 12 Aug instead of
+    the real WIB date, 13 Aug — a GitHub Actions runner's ambient clock is UTC,
+    and WIB is UTC+7, so for several hours after WIB midnight the runner's own
+    date is still the previous day). This applies to every type, not just
+    weekly-insights-v2 — the send calendar and its cron schedules are WIB-anchored
+    throughout, so WIB is the one timezone "today" can unambiguously mean here. An
+    unattended CI run receives the correct WIB date explicitly in its drafting
+    instructions; never infer "today" from the environment.
 12. **HTML disclaimer footer uses fixed markup, verbatim, every issue** (confirmed
     2026-07-24): the bordered `<tr>` block with the non-advice line, the `sectors.app`
     citation link, and the `Sectors | sectors.app | @sectorsapp` line. Fill only the

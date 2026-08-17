@@ -1,70 +1,83 @@
-name: Draft weekly insights
+name: Draft single company deep dive
 
-# Drafts the weekly-insights-v2 issue, emails a [TEST] copy to the reviewer, pushes
-# it straight to mailroom as a `scheduled` campaign for that same day's 10am WIB
-# (MAILROOM_SCHEDULE_TIME_WIB below), and commits the issue folder straight to
-# main as a plain record of what was sent. There is no separate
-# merge-triggers-send stage anymore (that was send-on-merge.yml's job; see
-# push-to-mailroom.yml for what replaced it) — **if nobody does anything, the
-# drafted issue ships to subscribers on schedule.** There is no PR to review or
-# merge: review before send happens in mailroom's own Review page (cancel or
-# reschedule the campaign there). Native `schedule:` below runs this every
-# Monday 1am WIB — an hour chosen to sit well ahead of both the drafting time
-# this needs and the 10am WIB send, with margin for GitHub Actions' own
-# scheduling jitter (cron triggers are best-effort and can run late, sometimes
-# by tens of minutes).
+# Drafts and schedules the Week 2 calendar's single-company-deep-dive issue on the
+# Wednesday of week 2 of the month. Audience: the INSIDER segment (per the
+# recipient column this type is scoped to). Already fully specified — SKILL.md's
+# built-type registry, a complete workflow doc, and a worked sample draft all
+# exist — so this workflow needs no new drafting logic, only scheduling and
+# audience targeting.
+#
+# A standalone file, not a matrix entry alongside three-stock-story: running both
+# types back to back (even sequentially, across separate matrix runners) draws on
+# the same Claude subscription usage window closely enough that one reliably fails
+# with insufficient token. Splitting them a day apart gives each its own window —
+# same reasoning this repo already applies by keeping lifecycle-nudge-enroll.yml
+# and lifecycle-nudge-cancel.yml as two files rather than one.
+#
+# Otherwise mirrors draft-weekly-insights.yml step for step: emails a [TEST] copy,
+# pushes straight to mailroom as a `scheduled` campaign for that day's 10am WIB, and
+# commits the issue straight to main as a plain record — if nobody does anything,
+# the drafted issue ships on schedule. Review before send happens in mailroom's own
+# Review page, not via a PR.
 
 on:
   schedule:
-    - cron: "0 18 * * 0" # Monday 01:00 WIB = Sunday 18:00 UTC (WIB is fixed UTC+7, no DST)
+    - cron: "0 18 * * 2" # Wednesday 01:00 WIB = Tuesday 18:00 UTC (WIB is fixed UTC+7, no DST)
   workflow_dispatch:
     inputs:
-      issue_type:
-        description: "Issue type slug to draft"
-        required: false
-        default: "weekly-insights-v2"
       skip_draft:
         description: "Skip Claude and use a fixture issue (tests charts/upload/email for free)"
         required: false
         type: boolean
         default: false
+      force_run:
+        description: "Run regardless of today's date (for manual testing outside week 2)"
+        required: false
+        default: "false"
 
 permissions:
   contents: write
 
 jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+    steps:
+      # Asia/Jakarta, not UTC. This workflow fires at 18:00 UTC, by which point the
+      # WIB calendar date is already the NEXT day — reading `date -u` here would test
+      # the wrong day entirely, making "days 8-14" mean WIB days 9-15. WIB is what
+      # the schedule is expressed in, so WIB is what the gate has to measure.
+      - name: Check whether today is in week 2 of the month (WIB)
+        id: check
+        run: |
+          day=$(TZ=Asia/Jakarta date +%-d)
+          if [ "$day" -ge 8 ] && [ "$day" -le 14 ]; then
+            echo "WIB day $day is in week 2 — proceeding" >&2
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "WIB day $day is not in days 8-14 — not week 2, skipping" >&2
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
   draft:
+    needs: gate
+    if: needs.gate.outputs.run == 'true' || github.event.inputs.force_run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
     env:
-      # Where the skill writes delivered issues and looks for samples/.
       NEWSLETTER_HOME: ${{ github.workspace }}/newsletter
-      # Tells the skill no human is reachable: never ask, never stall at a menu.
       NEWSLETTER_UNATTENDED: "1"
       SECTORS_API_KEY: ${{ secrets.SECTORS_API_KEY }}
-      # Authenticates against an existing Claude Pro/Max/Team/Enterprise subscription,
-      # so this needs no separate pay-per-token API plan. Generate the value by running
-      # `claude setup-token` locally (one-year OAuth token) and store it as a secret.
-      # To bill the API instead, swap this line for:
-      #   ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-      # Don't set both: ANTHROPIC_API_KEY takes precedence over the OAuth token.
       CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-      ISSUE_TYPE: ${{ github.event.inputs.issue_type || 'weekly-insights-v2' }}
-      # Optional chart compression. Lifted to job level so the install step can test
-      # for it with `env.` — the `secrets.` context is not dependable inside `if:`.
+      ISSUE_TYPE: single-company-deep-dive
       STORING_API_KEY: ${{ secrets.STORING_API_KEY }}
-      # Optional Supabase MCP connector, for real social-card auto-selection and the
-      # exchange-definition foreign-flow query. Same env-indirection reasoning as
-      # STORING_API_KEY above.
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
     steps:
-      # token: so the later "Commit the issue to main" step pushes as this
-      # identity rather than the implicit default. NEWSLETTER_PAT only matters
-      # if the diff ever touches .github/workflows/ — it never does here (only
-      # newsletter/ is committed) — but passing it through keeps this
-      # consistent with any future branch-protection rule on main.
+      # token: so the "Commit the issue to main" step later pushes as this
+      # identity rather than the implicit default.
       - uses: actions/checkout@v4
         with:
           token: ${{ secrets.NEWSLETTER_PAT || secrets.GITHUB_TOKEN }}
@@ -73,7 +86,6 @@ jobs:
         with:
           node-version: "22"
 
-      # Fail here with a readable message rather than deep inside the drafting step.
       - name: Check Claude credentials are present
         if: ${{ github.event.inputs.skip_draft != 'true' }}
         run: |
@@ -85,16 +97,12 @@ jobs:
             exit 1
           fi
 
-      # Claude Code discovers skills under .claude/skills/, so link the checkout
-      # into place.
       - name: Make the skill discoverable
         run: |
           mkdir -p .claude/skills
           ln -sfn "$GITHUB_WORKSPACE/sectors-newsletter-generator" .claude/skills/sectors-newsletter-generator
           mkdir -p "$NEWSLETTER_HOME"
 
-      # sectors.mjs and charts.mjs are dependency-free; this is only for
-      # rasterize.mjs, which needs Puppeteer to turn chart SVGs into email-safe PNGs.
       - name: Install the skill's render dependency
         run: npm ci --prefix sectors-newsletter-generator || npm install --prefix sectors-newsletter-generator
 
@@ -105,23 +113,10 @@ jobs:
         if: ${{ github.event.inputs.skip_draft != 'true' }}
         run: npm install -g @anthropic-ai/claude-code
 
-      # Project-scoped .mcp.json is committed to the repo, so the real token never goes
-      # there — it would leak into git history the moment a real value landed in a
-      # tracked file. Instead this writes a config file to the runner's own temp
-      # directory (never checked out, never committed, gone when the job ends) and
-      # points --mcp-config at that path for this one invocation only. Skipped
-      # entirely when the secret isn't set, so the workflow still runs (falling back
-      # to generated charts and an omitted foreign-flow figure, exactly as documented
-      # in SKILL.md's unattended-defaults table) for anyone who hasn't wired this up.
       - name: Write the Supabase MCP config
         if: env.SUPABASE_ACCESS_TOKEN != ''
         run: |
           config_path="$RUNNER_TEMP/supabase-mcp.json"
-          # Built with jq's --arg, not string-interpolated into a heredoc: --arg
-          # JSON-escapes whatever the token contains, so a token holding a literal
-          # quote or backslash still produces valid JSON. A hand-interpolated `"...${TOKEN}..."`
-          # would silently corrupt the file for such a token (verified: a token
-          # containing `"` broke a plain heredoc version of this same file).
           jq -n --arg token "$SUPABASE_ACCESS_TOKEN" '{
             mcpServers: {
               supabase: {
@@ -148,7 +143,7 @@ jobs:
 
       # Plumbing test: everything downstream of drafting (rasterize, compress, upload,
       # main-branch commit, test email) exercised against a fixture, spending no
-      # Claude usage. Use it to validate secrets before burning a real drafting run.
+      # Claude usage. Same purpose as draft-weekly-insights.yml's own fixture step.
       - name: Build a fixture issue (skip_draft)
         if: ${{ github.event.inputs.skip_draft == 'true' }}
         run: |
@@ -164,14 +159,12 @@ jobs:
               require('fs').writeFileSync('$d/chart-fixture.svg', svg);
             })
           "
-          # Unquoted heredoc so $today interpolates. Keep the body free of backticks
-          # and $ so nothing else gets expanded.
           today=$(TZ=Asia/Jakarta date +%F)
           cat > "$d/newsletter.md" <<MD
           ---
           subject: "[FIXTURE] pipeline test, not a real issue"
           preview: Generated without Claude to test the delivery plumbing.
-          issue_type: weekly-insights-v2
+          issue_type: $ISSUE_TYPE
           date: $today
           data_as_of: $today
           ---
@@ -209,13 +202,6 @@ jobs:
           echo "folder=$folder" >> "$GITHUB_OUTPUT"
           echo "date=$(basename "$folder" | sed -E 's/newsletter_([0-9-]+)_.*/\1/')" >> "$GITHUB_OUTPUT"
 
-      # Charts must be hosted PNGs by the time the campaign sends: Gmail and Outlook
-      # strip SVG and block data: URIs, so an SVG or inlined chart would silently
-      # vanish for most subscribers. Doing this here rather than at send time means
-      # both the [TEST] email and the committed record hold the real image URL.
-      # Fails the run if any inline data URI survives.
-      # Only needed when STORING_API_KEY is set; the publish step skips compression
-      # without it, so a missing key costs bytes rather than breaking the run.
       - name: Install the Storing CLI
         if: env.STORING_API_KEY != ''
         run: npm install -g @supertype.ai/storing
@@ -224,13 +210,10 @@ jobs:
         env:
           MAILROOM_API_KEY: ${{ secrets.MAILROOM_API_KEY }}
           MAILROOM_UPLOAD_URL: ${{ vars.MAILROOM_UPLOAD_URL || 'https://mailroom.supertype.ai/api/v1/uploads' }}
-          # STORING_API_KEY comes from the job env above. Unset it and the publish
-          # step skips compression, uploading charts at full size.
           STORING_PROFILE: ${{ vars.STORING_PROFILE || 'balanced' }}
           STORING_MAX_SIZE: ${{ vars.STORING_MAX_SIZE }}
         run: node .github/scripts/publish-charts.mjs "${{ steps.issue.outputs.folder }}"
 
-      # Raw API JSON from --save-dir is scratch, never part of the reviewed diff.
       - name: Drop scratch fetches
         run: rm -rf "${{ steps.issue.outputs.folder }}"/{data,_draft}
 
@@ -243,30 +226,22 @@ jobs:
           MAILROOM_REPLY_TO: ${{ vars.MAILROOM_REPLY_TO }}
         run: node .github/scripts/send-test.mjs "${{ steps.issue.outputs.folder }}"
 
-      # This is the actual send-gating step now that merging the PR no longer sends
-      # anything: creates the real mailroom campaign, scheduled for 10am WIB the same
-      # day this runs (not sent on the spot), which is what makes "review the [TEST]
-      # email, then do nothing" the default outcome. Guarded by skip_draft the same
-      # way the drafting/Claude steps above are — a skip_draft plumbing-test run must
-      # never create a real campaign; push-to-mailroom.mjs's own [FIXTURE]-subject
-      # guard is a backstop for that, not the primary defense.
+      # The actual send-gating step, same as draft-weekly-insights.yml's own: creates
+      # the real mailroom campaign, scheduled for 10am WIB the same day. Audience is
+      # the INSIDER segment.
       - name: Push to mailroom, scheduled for 10am WIB
         if: ${{ github.event.inputs.skip_draft != 'true' }}
         env:
           MAILROOM_API_KEY: ${{ secrets.MAILROOM_API_KEY }}
           MAILROOM_API_URL: ${{ vars.MAILROOM_API_URL || 'https://mailroom.supertype.ai/api/v1/campaigns' }}
           MAILROOM_FROM: ${{ vars.MAILROOM_FROM }}
-          MAILROOM_GROUP_ID: ${{ vars.MAILROOM_GROUP_ID }}
+          MAILROOM_SEGMENT_ID: ${{ vars.MAILROOM_INSIDER_SEGMENT_ID }}
           MAILROOM_REPLY_TO: ${{ vars.MAILROOM_REPLY_TO }}
           MAILROOM_SCHEDULE_TIME_WIB: ${{ vars.MAILROOM_SCHEDULE_TIME_WIB || '10:00' }}
         run: node .github/scripts/push-to-mailroom.mjs "${{ steps.issue.outputs.folder }}"
 
       # The campaign above already schedules the send — this step is a plain
       # git record of what shipped, kept for history/diffing, nothing more.
-      # Committed straight to main: there's no reviewer gate left for a PR to
-      # provide (that's push-to-mailroom.mjs's campaign + mailroom's Review
-      # page), so opening and closing one every run bought nothing but an
-      # extra step and the "still-open prior PR" hazard that came with it.
       - name: Commit the issue to main
         run: |
           git config user.name "github-actions[bot]"

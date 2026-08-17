@@ -1,30 +1,26 @@
-name: Draft week 2 content
+name: Draft three stock story
 
-# Drafts and schedules the two Week 2 calendar content types on the Thursday of
-# week 2 of the month: three-stock-story (audience: the "sectors id newsletter"
-# group, minus the INSIDER segment) and single-company-deep-dive (audience: the
-# INSIDER segment). Both types are already fully specified — SKILL.md's built-type
-# registry, complete workflow docs, and worked sample drafts already exist — so this
-# workflow needs no new drafting logic, only scheduling and audience targeting.
+# Drafts and schedules the Week 2 calendar's three-stock-story issue on the
+# Thursday of week 2 of the month. Audience: the full newsletter list, minus the
+# INSIDER segment (per the recipient column, this type covers everyone except who
+# single-company-deep-dive already reaches). Already fully specified — SKILL.md's
+# built-type registry, a complete workflow doc, and a worked sample draft all
+# exist — so this workflow needs no new drafting logic, only scheduling and
+# audience targeting.
 #
-# One file, not two, with a matrix over both types — this repo already has the
-# precedent for exactly this shape in lifecycle-nudge-cancel.yml (same cadence, per-
-# type params varying, `max-parallel: 1` since both share the mailroom API key's
-# rate-limit buckets, `fail-fast: false` since one type's failure shouldn't cancel
-# the other's run).
+# A standalone file, not a matrix entry alongside single-company-deep-dive:
+# running both types back to back (even sequentially, across separate matrix
+# runners) draws on the same Claude subscription usage window closely enough
+# that one reliably fails with insufficient token. Splitting them a day apart
+# gives each its own window — same reasoning this repo already applies by
+# keeping lifecycle-nudge-enroll.yml and lifecycle-nudge-cancel.yml as two files
+# rather than one.
 #
 # Otherwise mirrors draft-weekly-insights.yml step for step: emails a [TEST] copy,
 # pushes straight to mailroom as a `scheduled` campaign for that day's 10am WIB, and
-# opens a PR that's a record, not a send gate — if nobody does anything, the drafted
-# issue ships on schedule. Review before send happens in mailroom's own Review page.
-#
-# The week-2 gate is its own job rather than a repeated per-step `if:` (the shape
-# lifecycle-nudge-cancel.yml uses for its 3 steps). At this workflow's ~12 steps that
-# repetition would be twelve chances to forget one, and a single missed `if:` would
-# silently run that step outside week 2. As a separate job the condition is written
-# once, and the matrix job is skipped wholesale — GitHub never spins up the two
-# matrix runners at all on a non-week-2 Thursday, instead of starting both just to
-# no-op every step.
+# commits the issue straight to main as a plain record — if nobody does anything,
+# the drafted issue ships on schedule. Review before send happens in mailroom's own
+# Review page, not via a PR.
 
 on:
   schedule:
@@ -32,7 +28,7 @@ on:
   workflow_dispatch:
     inputs:
       skip_draft:
-        description: "Skip Claude and use a fixture issue (tests charts/upload/PR/email for free)"
+        description: "Skip Claude and use a fixture issue (tests charts/upload/email for free)"
         required: false
         type: boolean
         default: false
@@ -43,7 +39,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
   gate:
@@ -53,9 +48,8 @@ jobs:
     steps:
       # Asia/Jakarta, not UTC. This workflow fires at 18:00 UTC, by which point the
       # WIB calendar date is already the NEXT day — reading `date -u` here would test
-      # the wrong day entirely, making "days 8-14" mean WIB days 9-15: it would run on
-      # a week-3 Thursday and skip a week-2 one. WIB is what the schedule is expressed
-      # in, so WIB is what the gate has to measure.
+      # the wrong day entirely, making "days 8-14" mean WIB days 9-15. WIB is what
+      # the schedule is expressed in, so WIB is what the gate has to measure.
       - name: Check whether today is in week 2 of the month (WIB)
         id: check
         run: |
@@ -73,52 +67,22 @@ jobs:
     if: needs.gate.outputs.run == 'true' || github.event.inputs.force_run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    strategy:
-      matrix:
-        include:
-          - issue_type: three-stock-story
-            # Same group draft-weekly-insights.yml already sends to (the full
-            # newsletter list) — reusing MAILROOM_GROUP_ID rather than a second
-            # variable pointed at the same group, which would need updating in two
-            # places if that group is ever renamed or swapped.
-            mailroom_group_id: ${{ vars.MAILROOM_GROUP_ID }}
-            mailroom_exclude_segment_ids: ${{ vars.MAILROOM_INSIDER_SEGMENT_ID }}
-          - issue_type: single-company-deep-dive
-            mailroom_segment_id: ${{ vars.MAILROOM_INSIDER_SEGMENT_ID }}
-      # Sequential, not parallel: both types share the mailroom API key's rate-limit
-      # buckets, and isolating one type's failure from the other (fail-fast: false)
-      # matters more here than wall-clock time at this volume — same reasoning as
-      # lifecycle-nudge-cancel.yml's matrix.
-      max-parallel: 1
-      fail-fast: false
 
     env:
       NEWSLETTER_HOME: ${{ github.workspace }}/newsletter
       NEWSLETTER_UNATTENDED: "1"
       SECTORS_API_KEY: ${{ secrets.SECTORS_API_KEY }}
       CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-      ISSUE_TYPE: ${{ matrix.issue_type }}
-      NEWSLETTER_BRANCH: newsletter/${{ matrix.issue_type }}
+      ISSUE_TYPE: three-stock-story
       STORING_API_KEY: ${{ secrets.STORING_API_KEY }}
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
     steps:
+      # token: so the "Commit the issue to main" step later pushes as this
+      # identity rather than the implicit default.
       - uses: actions/checkout@v4
-
-      # Same hazard and same guard as draft-weekly-insights.yml: a still-open prior
-      # PR on this type's branch would otherwise get silently overwritten.
-      - name: Refuse to run over a still-open prior PR
-        env:
-          GH_TOKEN: ${{ secrets.NEWSLETTER_PAT || secrets.GITHUB_TOKEN }}
-        run: |
-          branch="$NEWSLETTER_BRANCH"
-          url=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$branch" --state open --json url --jq '.[0].url // empty')
-          if [ -n "$url" ]; then
-            echo "A newsletter PR is already open and unreviewed on branch '$branch': $url" >&2
-            echo "Merge or close it before this workflow can draft the next issue —" >&2
-            echo "pushing over it now would silently replace its content." >&2
-            exit 1
-          fi
+        with:
+          token: ${{ secrets.NEWSLETTER_PAT || secrets.GITHUB_TOKEN }}
 
       - uses: actions/setup-node@v4
         with:
@@ -144,6 +108,9 @@ jobs:
       - name: Install the skill's render dependency
         run: npm ci --prefix sectors-newsletter-generator || npm install --prefix sectors-newsletter-generator
 
+      - name: Sanity check the Sectors API
+        run: node sectors-newsletter-generator/scripts/sectors.mjs "idx-total/?start=2026-07-01&end=2026-07-02"
+
       - name: Install Claude Code
         if: ${{ github.event.inputs.skip_draft != 'true' }}
         run: npm install -g @anthropic-ai/claude-code
@@ -163,22 +130,27 @@ jobs:
           }' > "$config_path"
           echo "SUPABASE_MCP_CONFIG=$config_path" >> "$GITHUB_ENV"
 
+      # TODAY_WIB is computed here, not left for Claude to infer: the runner's
+      # ambient clock is UTC, and WIB is UTC+7, so for several hours after WIB
+      # midnight the runner's own "today" is still the previous day. This bit a
+      # real run on 2026-08-13 (stamped 12 Aug instead) — see SKILL.md Hard rule
+      # 11. Every draft workflow computes and passes this explicitly now.
       - name: Draft the issue
         if: ${{ github.event.inputs.skip_draft != 'true' }}
         run: |
-          claude -p "Write this week's ${ISSUE_TYPE} newsletter issue using the sectors-newsletter-generator skill. Deliver to \$NEWSLETTER_HOME. This is an unattended CI run: do not ask any questions, apply the documented unattended defaults, and record every default you took in the separate run-notes.md file the skill documents for this — never as an HTML comment in newsletter.html, and never in the visible body or the reader-facing Appendix." \
+          TODAY_WIB=$(TZ=Asia/Jakarta date +%F)
+          claude -p "Write this week's ${ISSUE_TYPE} newsletter issue using the sectors-newsletter-generator skill. Deliver to \$NEWSLETTER_HOME. Today's date in Asia/Jakarta (WIB) time is $TODAY_WIB — use this exact date as the issue date per Hard rule 11, not whatever date your own environment reports (which may be UTC and several hours behind WIB depending on when this run fires). This is an unattended CI run: do not ask any questions, apply the documented unattended defaults, and record every default you took in the separate run-notes.md file the skill documents for this — never as an HTML comment in newsletter.html, and never in the visible body or the reader-facing Appendix." \
             --permission-mode bypassPermissions \
             ${SUPABASE_MCP_CONFIG:+--mcp-config "$SUPABASE_MCP_CONFIG"}
 
-      # Plumbing test: everything downstream of drafting exercised against a fixture,
-      # spending no Claude usage. Same purpose as draft-weekly-insights.yml's own
-      # fixture step; issue_type comes from the matrix so the fixture lands in the
-      # folder this run's "Locate the delivered issue" step will actually look for.
+      # Plumbing test: everything downstream of drafting (rasterize, compress, upload,
+      # main-branch commit, test email) exercised against a fixture, spending no
+      # Claude usage. Same purpose as draft-weekly-insights.yml's own fixture step.
       - name: Build a fixture issue (skip_draft)
         if: ${{ github.event.inputs.skip_draft == 'true' }}
         run: |
           set -euo pipefail
-          d="$NEWSLETTER_HOME/newsletter_$(date -u +%F)_${ISSUE_TYPE}"
+          d="$NEWSLETTER_HOME/newsletter_$(TZ=Asia/Jakarta date +%F)_${ISSUE_TYPE}"
           mkdir -p "$d"
           node -e "
             import('./sectors-newsletter-generator/scripts/charts.mjs').then(m => {
@@ -189,7 +161,7 @@ jobs:
               require('fs').writeFileSync('$d/chart-fixture.svg', svg);
             })
           "
-          today=$(date -u +%F)
+          today=$(TZ=Asia/Jakarta date +%F)
           cat > "$d/newsletter.md" <<MD
           ---
           subject: "[FIXTURE] pipeline test, not a real issue"
@@ -202,7 +174,7 @@ jobs:
           # Fixture issue
 
           Not real market content. Generated by the skip_draft input to exercise the
-          chart, upload, PR and test-email path without spending Claude usage.
+          chart, upload, commit, and test-email path without spending Claude usage.
           MD
           cat > "$d/newsletter.html" <<'HTML'
           <div style="font-family:sans-serif;padding:24px;">
@@ -247,10 +219,6 @@ jobs:
       - name: Drop scratch fetches
         run: rm -rf "${{ steps.issue.outputs.folder }}"/{data,_draft}
 
-      # Same ordering requirement as draft-weekly-insights.yml: this step and "Push
-      # to mailroom" below both have to run before the PR step, since
-      # peter-evans/create-pull-request checks out main afterward and the issue
-      # folder only exists on the new branch.
       - name: Email the draft to the reviewer
         env:
           MAILROOM_API_KEY: ${{ secrets.MAILROOM_API_KEY }}
@@ -261,55 +229,34 @@ jobs:
         run: node .github/scripts/send-test.mjs "${{ steps.issue.outputs.folder }}"
 
       # The actual send-gating step, same as draft-weekly-insights.yml's own: creates
-      # the real mailroom campaign, scheduled for 10am WIB the same day. Audience
-      # comes from this matrix entry's group_id/segment_id/exclude_segment_ids, not
-      # a fixed value — three-stock-story targets the newsletter group minus
-      # INSIDER, single-company-deep-dive targets INSIDER directly.
+      # the real mailroom campaign, scheduled for 10am WIB the same day. Audience is
+      # the same group draft-weekly-insights.yml already sends to (the full
+      # newsletter list) — reusing MAILROOM_GROUP_ID rather than a second variable
+      # pointed at the same group — excluding the INSIDER segment, which
+      # single-company-deep-dive already reaches.
       - name: Push to mailroom, scheduled for 10am WIB
         if: ${{ github.event.inputs.skip_draft != 'true' }}
         env:
           MAILROOM_API_KEY: ${{ secrets.MAILROOM_API_KEY }}
           MAILROOM_API_URL: ${{ vars.MAILROOM_API_URL || 'https://mailroom.supertype.ai/api/v1/campaigns' }}
           MAILROOM_FROM: ${{ vars.MAILROOM_FROM }}
-          MAILROOM_GROUP_ID: ${{ matrix.mailroom_group_id }}
-          MAILROOM_SEGMENT_ID: ${{ matrix.mailroom_segment_id }}
-          MAILROOM_EXCLUDE_SEGMENT_IDS: ${{ matrix.mailroom_exclude_segment_ids }}
+          MAILROOM_GROUP_ID: ${{ vars.MAILROOM_GROUP_ID }}
+          MAILROOM_EXCLUDE_SEGMENT_IDS: ${{ vars.MAILROOM_INSIDER_SEGMENT_ID }}
           MAILROOM_REPLY_TO: ${{ vars.MAILROOM_REPLY_TO }}
           MAILROOM_SCHEDULE_TIME_WIB: ${{ vars.MAILROOM_SCHEDULE_TIME_WIB || '10:00' }}
         run: node .github/scripts/push-to-mailroom.mjs "${{ steps.issue.outputs.folder }}"
 
-      - name: Open the review PR
-        id: pr
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.NEWSLETTER_PAT || secrets.GITHUB_TOKEN }}
-          base: main
-          add-paths: newsletter
-          branch: ${{ env.NEWSLETTER_BRANCH }}
-          delete-branch: true
-          title: "Newsletter: ${{ env.ISSUE_TYPE }} ${{ steps.issue.outputs.date }}"
-          commit-message: "newsletter: ${{ env.ISSUE_TYPE }} ${{ steps.issue.outputs.date }}"
-          body: |
-            Automated draft of the **${{ env.ISSUE_TYPE }}** issue for
-            ${{ steps.issue.outputs.date }}.
-
-            A `[TEST]` copy has been emailed to the reviewer — **review that, not this
-            diff**. Layout bugs only show up in a real client.
-
-            **This issue is already scheduled to send** — a `scheduled` campaign was
-            just created in mailroom for 10am WIB today. Merging this PR does nothing
-            further; it's a record of exactly what was sent, kept for git history and
-            future diffing, not a send trigger. **If you do nothing, it ships on
-            schedule.** To stop or change it, go to the campaign's **Review** page in
-            mailroom before 10am WIB and cancel or reschedule it there.
-
-            Before it sends, check:
-            - [ ] Every figure traces to a real endpoint, nothing invented
-            - [ ] No investment advice framing anywhere
-            - [ ] `run-notes.md` (a separate file beside the issue, never sent — not in this diff) lists the unattended defaults this run took
-            - [ ] The test email renders correctly in your client
-            - [ ] Subject reads well in the inbox list
-
-            The test copy goes out transactionally, so it has no unsubscribe footer,
-            no `List-Unsubscribe` header, and no preview text. The campaign pipeline
-            adds all three at real send time; everything else is identical.
+      # The campaign above already schedules the send — this step is a plain
+      # git record of what shipped, kept for history/diffing, nothing more.
+      - name: Commit the issue to main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add newsletter
+          if git diff --cached --quiet; then
+            echo "Nothing new under newsletter/ to commit" >&2
+            exit 0
+          fi
+          git commit -m "newsletter: ${ISSUE_TYPE} ${{ steps.issue.outputs.date }}"
+          git pull --rebase origin main
+          git push origin HEAD:main

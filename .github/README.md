@@ -7,12 +7,13 @@ needed, stopping an issue both happen in mailroom directly, before it sends.
 
 1. emails a `[TEST]` copy to the reviewer
 2. creates the real campaign in mailroom, `scheduled_at` 10:00 WIB that same day
-3. opens a PR — a record of what was sent, not a send trigger
+3. commits the issue folder straight to `main` — a git record of what was sent, not a
+   review gate
 
 If nobody does anything, step 2 fires at 10:00 WIB. To stop or change it, cancel or
 reschedule the campaign from mailroom's Review page before then.
 
-**Review the test email, not the PR diff.** Layout bugs only surface in a real client: a
+**Review the test email, not a diff.** Layout bugs only surface in a real client: a
 table that collapses in Outlook, a blocked image, a subject that truncates in the inbox
 list. The draft job emails a `[TEST]` copy so you review what subscribers will actually
 see.
@@ -27,32 +28,13 @@ Those are injected at real send time. Body, layout, images and subject are ident
 creates the real mailroom campaign, `scheduled_at` 10am WIB that same day — roughly nine
 hours after the 1am WIB draft, which is the actual review window now, not a merge click.
 To stop or change it, open the campaign's Review page in mailroom before 10am and cancel
-or reschedule it there. The PR still opens (git history of exactly what was sent), but
-merging it does nothing — send-gating moved off GitHub entirely.
+or reschedule it there. Step 3's commit to `main` is just a record; there's nothing to
+merge or review there — it happens automatically either way.
 
 Need to re-push a specific issue by hand (a failed automated push, or recreating a
 campaign after cancelling it)? Run `push-to-mailroom.yml` (`workflow_dispatch` only,
 `issue_folder` required) — that's the entire remaining purpose of what used to be
 `send-on-merge.yml`.
-
-### One branch, reused every week
-
-The PR branch is `newsletter/weekly-insights-v2`, fixed rather than per-run — this is
-`create-pull-request`'s own default design, meant for exactly this: a scheduled job
-that reuses one branch instead of accumulating a new one every week.
-
-**That reuse has a real hazard if a week gets skipped.** If last week's PR is still
-open when this week's cron fires, a plain push to the same branch would silently
-*update that same PR*, replacing last week's still-unreviewed draft with this week's —
-no conflict, no warning, the old content just isn't in git anymore. The **first step**
-of the workflow guards against this: it checks for an open PR on the branch before
-doing anything else (before spending any Claude usage or Sectors API credits) and
-fails the run if one exists, with a link to the PR that needs attention.
-
-In practice this means **the cron goes quiet if you fall behind on review** — no new
-issue drafts until the pending one is merged or closed. That's the tradeoff for never
-losing an unreviewed issue silently. `delete-branch: true` on the PR step cleans the
-branch up once merged, so it doesn't linger.
 
 ## Required secrets
 
@@ -63,7 +45,7 @@ Repo settings → Secrets and variables → Actions → **Secrets**:
 | `CLAUDE_CODE_OAUTH_TOKEN` | draft | Runs Claude Code. Uses your **existing Claude subscription**, no separate API plan needed. See below |
 | `SECTORS_API_KEY` | draft | Sectors market data. This is now the only source; no key ships in the repo |
 | `MAILROOM_API_KEY` | draft, `push-to-mailroom.yml` | Mailroom API key, sent as `Authorization: Bearer`. The draft job uses it three times now: hosting chart images, sending the `[TEST]` copy, and creating the scheduled campaign itself. `push-to-mailroom.yml` needs it too, for manual re-pushes |
-| `NEWSLETTER_PAT` | draft | **Recommended.** PAT with `repo` + `workflow` scope for the PR push. `GITHUB_TOKEN` cannot push anything under `.github/workflows/`, and no `permissions:` key can grant it that |
+| `NEWSLETTER_PAT` | draft | **Optional.** PAT with `repo` scope, used for the final commit-to-main push instead of `GITHUB_TOKEN`. Only matters if branch protection on `main` requires it; the default token is otherwise sufficient since this commit only ever touches `newsletter/` |
 | `STORING_API_KEY` | draft | **Optional.** Compresses chart PNGs through [Storing](https://storing.app) before upload. Leave unset and charts upload at full size. Generate from Storing's Settings page |
 | `SUPABASE_ACCESS_TOKEN` | draft | **Optional.** Enables real social-card auto-selection (block 4 visuals) and the exchange-definition foreign-flow figure, both via the Supabase MCP connector. Leave unset and the run falls back to generated charts / an omitted flow figure, exactly as documented in SKILL.md. See **Supabase MCP setup** below before generating one |
 
@@ -117,15 +99,15 @@ used to provide. Do these in order before letting the cron fire:
 1. **Point at a throwaway group first.** Set `MAILROOM_GROUP_ID` to a group containing
    only your own address, before running anything for real below.
 2. **Test the plumbing with no campaign created.** Run `draft-weekly-insights.yml` via
-   *Run workflow* with `skip_draft: true`. This exercises rasterize/upload/PR/test-email
+   *Run workflow* with `skip_draft: true`. This exercises rasterize/upload/commit/test-email
    against a fixture issue and creates no campaign at all — the push step is skipped
    under `skip_draft`, and push-to-mailroom.mjs also refuses any `[FIXTURE]`-subject
    issue outright as a backstop.
 3. **Run it for real, still scoped to the throwaway group.** Run
-   `draft-weekly-insights.yml` normally (`skip_draft: false`). Check the PR:
-   `newsletter.md`, `newsletter.html`, and a chart should be there, and a `run-notes.md`
-   should list which unattended defaults the run took (a separate file, never sent — not
-   an appendix in the issue itself). You should also get the `[TEST]`
+   `draft-weekly-insights.yml` normally (`skip_draft: false`). Check the commit on
+   `main`: `newsletter.md`, `newsletter.html`, and a chart should be there, and a
+   `run-notes.md` should list which unattended defaults the run took (a separate file,
+   never sent — not an appendix in the issue itself). You should also get the `[TEST]`
    copy in your inbox — open it and confirm the chart image loads, since a broken upload
    shows up there and nowhere else. Then check mailroom's Review page: the campaign
    should show `scheduled`, 10am WIB today, and the throwaway group as its audience.
@@ -193,10 +175,10 @@ block `data:` URIs in `<img src>`. So the draft job rasterizes each `chart-*.svg
 with Puppeteer, uploads it to `POST /api/v1/uploads`, and rewrites `newsletter.html` to point
 at the returned `https://storage.googleapis.com/…` URL.
 
-This happens in the **draft** job on purpose, so the PR you review contains the real
-hosted image and the preview matches what subscribers receive. The job fails if any
-inline `data:` URI survives the rewrite, rather than shipping an issue whose chart is
-invisible to most of the list.
+This happens in the **draft** job on purpose, so both the `[TEST]` email and the
+committed record hold the real hosted image, matching what subscribers receive. The job
+fails if any inline `data:` URI survives the rewrite, rather than shipping an issue
+whose chart is invisible to most of the list.
 
 `POST /api/v1/uploads` is the API-key twin of the dashboard's session-authenticated
 `/api/uploads`. It accepts PNG only, 1MB max, and returns a permanent public URL.
