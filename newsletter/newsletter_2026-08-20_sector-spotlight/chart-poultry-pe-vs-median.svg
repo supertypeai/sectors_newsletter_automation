@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="936" height="460" viewBox="0 0 936 460"><rect width="936" height="460" fill="#fcfcfb"/><defs>
+    <linearGradient id="bar0s" x1="0" y1="0" x2="936" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#C14D94"/><stop offset="100%" stop-color="#8B004C"/>
+    </linearGradient>
+    <linearGradient id="bar0f" x1="0" y1="0" x2="0" y2="460" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="rgba(193,77,148,0.18)"/><stop offset="100%" stop-color="rgba(193,77,148,0)"/>
+    </linearGradient>
+  </defs>
+    <line x1="0" y1="348.0" x2="936" y2="348.0" stroke="rgba(11,11,11,0.12)" stroke-width="2"/><rect x="77.2" y="125.9" width="171.0" height="222.1" rx="8" fill="url(#bar0s)"/><text x="162.7" y="111.9" fill="#0B0B0B" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="28" font-weight="700" text-anchor="middle">6.5x</text><text x="162.7" y="424" fill="#52514E" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="24" text-anchor="middle">CPIN</text><rect x="382.5" y="173.3" width="171.0" height="174.7" rx="8" fill="url(#bar0s)"/><text x="468.0" y="159.3" fill="#0B0B0B" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="28" font-weight="700" text-anchor="middle">5.1x</text><text x="468.0" y="424" fill="#52514E" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="24" text-anchor="middle">JPFA</text><rect x="687.8" y="238.9" width="171.0" height="109.1" rx="8" fill="url(#bar0s)"/><text x="773.3" y="224.9" fill="#0B0B0B" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="28" font-weight="700" text-anchor="middle">3.2x</text><text x="773.3" y="424" fill="#52514E" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="24" text-anchor="middle">MAIN</text><line x1="0" y1="40.0" x2="936" y2="40.0" stroke="#52514E" stroke-width="2" stroke-dasharray="8 6" opacity="0.85"/>
+    <text x="926" y="56.0" fill="#52514E" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="22" font-weight="700" text-anchor="end">F&amp;B group median · 9.0x</text></svg>
