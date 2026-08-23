@@ -82,19 +82,17 @@ cheap or dear *versus what* (its own 5-year P/E band, the peer average). A numbe
 a benchmark is not a finding. Write the one-line verdict first, then fill the sections
 that prove it.
 
-**Check the Supabase social-card bucket before generating a chart — always, same
-priority order as `weekly-insights-v2.md`'s "Auto-selecting cards, unattended"
-section, not a first choice taken for convenience.** Run
-`scripts/fixed-queries/social-media-bucket-listing.sql` through the Supabase MCP
-connector, then look for a real card about *this issue's ticker specifically*
-(not merely IDX-relevant) whose filename date falls within a reasonable recency
-window of the trigger event. A real card beats a generated chart whenever one is
-eligible; `charts.mjs` is the fallback for when the connector genuinely isn't
-available or nothing eligible exists, not a default taken without checking.
-Record which of the three cases applied in `run-notes.md`, same distinction
-`weekly-insights-v2.md` documents (no connector / query errored / nothing
-eligible) — collapsing them all into "used a chart" hides a real query defect
-behind what looks like an unconfigured runner.
+**Check the GCP social-card bucket before generating a chart — always, same priority
+order as `weekly-insights-v2.md`'s "Auto-selecting cards, unattended" section, not a
+first choice taken for convenience.** List it per that section's "Where the filenames
+come from" (a plain public HTTP call, no connector or credential needed), then look for
+a real card about *this issue's ticker specifically* (not merely IDX-relevant) whose
+filename date falls within a reasonable recency window of the trigger event. A real
+card beats a generated chart whenever one is eligible; `charts.mjs` is the fallback for
+when nothing eligible exists, not a default taken without checking. Record which of the
+two cases applied in `run-notes.md`, same distinction `weekly-insights-v2.md` documents
+(listing call errored / nothing eligible) — collapsing them into "used a chart" hides a
+real defect behind what looks like a genuinely quiet week.
 
 If nothing eligible exists, the hero chart falls back to `charts.mjs`: usually the
 price series over 90 days with the trigger date marked, or an earnings/revenue bar
@@ -102,10 +100,9 @@ series. Non-zero-based y-axis for price (`../newsletter-format.md`).
 
 ## 5. Self-review before delivery
 
-- Was the Supabase bucket actually checked for a real card before generating a
-  chart — not skipped as a shortcut — and is which of the three outcomes (no
-  connector / query errored / nothing eligible for this ticker) recorded in
-  `run-notes.md`?
+- Was the GCP bucket actually checked for a real card before generating a chart —
+  not skipped as a shortcut — and is which of the two outcomes (listing call
+  errored / nothing eligible for this ticker) recorded in `run-notes.md`?
 - If the issue shipped a generated hero chart, is it wrapped in an explicit opaque background rect
   (`charts.mjs` never draws one itself), and does every label, especially a series'
   endpoint value, land inside the canvas rather than past its right edge

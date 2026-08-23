@@ -47,7 +47,7 @@ Repo settings → Secrets and variables → Actions → **Secrets**:
 | `MAILROOM_API_KEY` | draft, `push-to-mailroom.yml` | Mailroom API key, sent as `Authorization: Bearer`. The draft job uses it three times now: hosting chart images, sending the `[TEST]` copy, and creating the scheduled campaign itself. `push-to-mailroom.yml` needs it too, for manual re-pushes |
 | `NEWSLETTER_PAT` | draft | **Optional.** PAT with `repo` scope, used for the final commit-to-main push instead of `GITHUB_TOKEN`. Only matters if branch protection on `main` requires it; the default token is otherwise sufficient since this commit only ever touches `newsletter/` |
 | `STORING_API_KEY` | draft | **Optional.** Compresses chart PNGs through [Storing](https://storing.app) before upload. Leave unset and charts upload at full size. Generate from Storing's Settings page |
-| `SUPABASE_ACCESS_TOKEN` | draft | **Optional.** Enables real social-card auto-selection (block 4 visuals) and the exchange-definition foreign-flow figure, both via the Supabase MCP connector. Leave unset and the run falls back to generated charts / an omitted flow figure, exactly as documented in SKILL.md. See **Supabase MCP setup** below before generating one |
+| `SUPABASE_ACCESS_TOKEN` | draft | **Optional.** Enables the exchange-definition foreign-flow figure via the Supabase MCP connector. Leave unset and the run falls back to an omitted flow figure, exactly as documented in SKILL.md. Block 4's social-card auto-selection needs no credential at all (it lists our own GCP bucket over plain HTTP) — this token no longer affects it. See **Supabase MCP setup** below before generating one |
 
 ### Claude auth: subscription, not a second subscription
 
@@ -129,24 +129,24 @@ Two things still fail the run loudly, because the alternative is publishing some
 false: a required block whose data comes back empty, and any figure that would have to
 be invented to fill a gap.
 
-### Foreign flow, and real social cards, both need Supabase
+### Foreign flow needs Supabase; block 4's social cards no longer do
 
-Two things in the skill are better with real Supabase access than without it:
+The weekly **foreign-flow figure** uses the exchange definition, which lives in the
+`idx_daily_data` table and is pulled by the pinned query
+`scripts/fixed-queries/foreign-flow-range.sql`. No Sectors API endpoint exposes it:
+`daily/{symbol}` carries close/volume/market-cap only, and `foreign-flow/{symbol}`
+returns the broker-domicile measure, forbidden for this figure since the two disagree
+on direction, not just magnitude. This one genuinely needs the Supabase MCP connector;
+without it, the skill degrades gracefully rather than failing — the foreign-flow line
+is omitted and noted.
 
-- The weekly **foreign-flow figure** uses the exchange definition, which lives in the
-  `idx_daily_data` table and is pulled by the pinned query
-  `scripts/fixed-queries/foreign-flow-range.sql`. No Sectors API endpoint exposes it:
-  `daily/{symbol}` carries close/volume/market-cap only, and `foreign-flow/{symbol}`
-  returns the broker-domicile measure, forbidden for this figure since the two
-  disagree on direction, not just magnitude.
-- Block 4's **visuals** default to a real social card over a generated chart whenever
-  one is eligible, via `scripts/fixed-queries/social-media-bucket-listing.sql`, which
-  lists the carousel pipeline's Supabase storage bucket.
-
-Both fixed queries run through the same Supabase MCP connector. Without it, the skill
-degrades gracefully rather than failing: the foreign-flow line is omitted and noted,
-and block 4 falls back to generated charts — exactly the behavior from before this was
-wired up.
+Block 4's **visuals** default to a real social card over a generated chart whenever one
+is eligible — but this now lists our own GCP bucket (`sectorsapp-sea`) directly over
+plain public HTTP (see `references/workflows/weekly-insights-v2.md`'s "Where the
+filenames come from"), not Supabase's storage table. **No credential, no MCP connector,
+and no setup needed for this one** (changed 2026-08-24 — was through the Supabase MCP
+connector, same as foreign flow; the carousel pipeline's Supabase bucket still exists
+but the skill no longer reads it).
 
 #### Supabase MCP setup
 
@@ -155,8 +155,9 @@ wired up.
    **This token is account-wide**, not scoped to one project — Supabase's own docs warn
    against connecting it to production data for exactly that reason. It's your call
    whether that risk is acceptable for this project; a narrower read-only Postgres role
-   scoped to just `storage.objects` and `idx_daily_data` is the safer alternative if not
-   (ask if you want that path instead, it needs a different wiring).
+   scoped to just `idx_daily_data` (all this token is used for now that social cards
+   list our own GCP bucket instead) is the safer alternative if not (ask if you want
+   that path instead, it needs a different wiring).
 2. Add it as the repo secret `SUPABASE_ACCESS_TOKEN`.
 3. That's it — the workflow does the rest. It writes a temporary MCP config to the
    runner's own temp directory (never committed, gone when the job ends) pointing at

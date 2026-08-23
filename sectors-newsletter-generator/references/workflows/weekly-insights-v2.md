@@ -150,14 +150,13 @@ and three to five short bullets. Never paragraphs.
 
 ### Visuals: the social cards
 
-Block 4's images come from the carousel pipeline's Supabase bucket:
+Block 4's images come from the carousel pipeline, hosted on our own GCP bucket (see
+**Where the filenames come from**, below, for the listing mechanism and the exact URL
+shape). There's no separate publish/rehost step in the draft workflow for these —
+unlike a generated chart, a real card already has a permanent public URL by the time
+it's selected, so whatever gets written into `<img src>` during drafting is final.
 
-```
-https://rfiycxgjbnkefczvbosm.supabase.co/storage/v1/object/public/social_media_generation/<filename>
-```
-
-Public, unauthenticated, no signed-URL expiry, so email clients load them directly with no
-mirroring step. Filenames follow `<topic>_<YYYYMMDD>_<n>.jpg`, sometimes with a slide index
+Filenames follow `<topic>_<YYYYMMDD>_<n>.jpg`, sometimes with a slide index
 (`foreign-flow-1_20260718_1.jpg`). **The date is the generation date, not the data window**,
 so read the window off the image itself and state it in copy. The worked sample's CUAN card
 is dated 10 July and covers 19 Jan to 9 Jul, which is why its bullets say so explicitly.
@@ -169,7 +168,7 @@ the two-column size just because it happens to be alone.
 
 **Credit every social image to `instagram.com/sectorsapp`, always, whatever the actual
 source.** That is the public home of this content and the only attribution a reader should
-see. The Supabase bucket is internal plumbing: it may appear in an `<img src>` because that is
+see. The GCP bucket is internal plumbing: it may appear in an `<img src>` because that is
 how the image loads, and nowhere else. Never name the bucket, a filename, or a storage path in
 the appendix or in body copy, and never credit a different origin even when the asset came
 from somewhere else.
@@ -223,62 +222,93 @@ Selection criteria, applied in order:
    counts as **one** finding and renders side by side in two columns.
 7. **Budget.** Two or three findings, so at most about four images. Cut the weakest.
 
-**Where the filenames come from.** The bucket lives at
-`supabase.com/dashboard/project/rfiycxgjbnkefczvbosm/storage/files/buckets/social_media_generation`.
-A human can read the file list there directly, take the names whose `YYYYMMDD` falls in
-the window, and build the public URLs from them.
+**Where the filenames come from.** The carousel pipeline writes every card to a GCP
+bucket we own, `sectorsapp-sea`, under `social_media/<filename>` (changed 2026-08-24 —
+was the carousel's Supabase bucket; that copy still exists but is no longer where this
+skill looks). **List it directly, unattended, no MCP connector and no credential at
+all** — this bucket allows anonymous listing over its plain public HTTP API, unlike the
+Supabase one (which never did; see the retired approach below):
 
-The bucket cannot be listed through its own public HTTP API without a credential:
-`POST /storage/v1/object/list/<bucket>` returns `headers must have required property
-'authorization'`, and public reads only resolve for an exactly-known filename (a guessed name
-404s/400s, and the trailing `_<n>` is not predictable). **This skill already carries a
-working path around that**, though: `scripts/fixed-queries/social-media-bucket-listing.sql`
-lists the same bucket's contents through the Supabase MCP connector, by querying the
-`storage.objects` Postgres table Supabase Storage keeps this metadata in — the same
-connector already used for the foreign-flow fixed query, no new credential. Run that
-query first (see **Auto-selecting cards, unattended** below); asking the user for URLs is
-the fallback for an interactive session with no MCP connector attached, not the default.
+```bash
+curl -s "https://storage.googleapis.com/storage/v1/b/sectorsapp-sea/o?prefix=social_media/&fields=items(name,timeCreated)"
+```
 
-### Auto-selecting cards, unattended (or whenever the MCP connector is available)
+Verified live 2026-08-24: 547 objects, one page, no `nextPageToken` (the JSON API pages
+past ~1000 results — if a future run's response includes one, follow it with
+`&pageToken=<token>` rather than assuming the list is complete). **Ignore `timeCreated`
+entirely for both filtering and ordering** — it's the date this bucket was backfilled
+from Supabase (every object clustered around 2026-08-19 regardless of the card's actual
+content date), not when the card was generated. The filename's own `YYYYMMDD` is the
+only date that means anything here; that's already the selection criteria's date filter
+below, unchanged.
+
+Build each eligible name's public URL as:
+
+```
+https://storage.googleapis.com/sectorsapp-sea/social_media/<filename>
+```
+
+and **reference it directly in `<img src>`** — public, unauthenticated, no signed-URL
+expiry, so email clients load it with no rehosting step. A human can also browse the
+bucket directly at
+[console.cloud.google.com/storage/browser/sectorsapp-sea/social_media](https://console.cloud.google.com/storage/browser/sectorsapp-sea/social_media)
+for the same file list.
+
+<details>
+<summary>Retired approach (through 2026-08-24): Supabase MCP connector</summary>
+
+The carousel pipeline's Supabase bucket (`social_media_generation`) held the same files
+under the same filenames, but Supabase's own public HTTP API refuses to list a bucket
+without a credential (`POST /storage/v1/object/list/<bucket>` returns `headers must have
+required property 'authorization'`), so this skill queried `storage.objects` — the
+Postgres table Supabase Storage keeps that metadata in — through the Supabase MCP
+connector instead (`scripts/fixed-queries/social-media-bucket-listing.sql`, now deleted).
+That worked, but made card selection depend on a connector/credential
+(`SUPABASE_ACCESS_TOKEN`) that the GCP bucket's own public listing API doesn't need at
+all. Kept here only in case the GCP bucket's public listing is ever locked down and this
+has to be resurrected.
+
+</details>
+
+### Auto-selecting cards, unattended (always — no connector, no credential)
 
 **Prefer this over generating a chart, always — a real social card beats a generated
-one whenever one is actually eligible.** Chart generation is the fallback for when the
-Supabase MCP connector genuinely isn't available this run, not a first choice taken for
-convenience:
+one whenever one is actually eligible.** Chart generation is the fallback for when
+nothing eligible exists that week, not a first choice taken for convenience. Unlike the
+retired Supabase-based approach, there's no "connector unavailable" branch to consider
+here at all — the GCP bucket's listing endpoint is a plain public HTTP call, always
+reachable from any runner with internet access:
 
 1. Derive the week's two or three findings from the API exactly as always ("Findings
    first, images second," above — this doesn't change).
-2. Run `scripts/fixed-queries/social-media-bucket-listing.sql` through the Supabase MCP
-   connector to list the bucket's filenames.
+2. List the bucket per **Where the filenames come from**, above.
 3. Apply the existing selection criteria above (date filter, drop story-only prefixes,
    relevance, window-gap note, reconciliation, sets, budget) to the returned list exactly
-   as an interactive run would against a human-read file list. Build each eligible card's
-   public URL and **reference it directly in `<img src>`** — these reads are already
-   public and permanent, so the URL from the query is the final URL, no rehosting, no
-   upload step, nothing to rasterize. This is the one visual path in this skill that
-   involves no local file at all: **never save a real card under a `chart-<slug>.svg`
-   name or any name the delivery pipeline's chart step would match.** The unattended CI
-   run rasterizes and re-uploads every `chart-*.svg` it finds in the delivery folder on
-   the assumption that it's a locally-generated chart in need of hosting; a real card
-   already has a permanent public URL and doesn't need or want that treatment. Giving
-   one that filename would upload a duplicate copy to mailroom's own bucket for no
-   reason and rewrite a perfectly good URL into a different one.
-4. **Distinguish the three reasons this can come up empty — they are not the same, and
-   collapsing them hides real bugs.** Silently treating all three as "just use charts"
-   is how a broken query gets mistaken for an unconfigured runner and never fixed:
+   as an interactive run would against a human-read file list, then build each eligible
+   card's URL per **Where the filenames come from**, above. This is the one visual path
+   in this skill that involves no local file at all: **never save a real card under a
+   `chart-<slug>.svg` name or any name the delivery pipeline's chart step would match.**
+   The unattended CI run rasterizes and re-uploads every `chart-*.svg` it finds in the
+   delivery folder on the assumption that it's a locally-generated chart in need of
+   hosting; a real card already has a permanent public URL and doesn't need or want that
+   treatment. Giving one that filename would upload a duplicate copy to mailroom's own
+   bucket for no reason and rewrite a perfectly good URL into a different one.
+4. **Distinguish the two reasons this can come up empty — they are not the same, and
+   collapsing them hides real bugs.** Silently treating both as "just use charts" is
+   how a broken listing call gets mistaken for a genuinely quiet week and never fixed:
 
    | What happened | How you can tell | What to record in `run-notes.md` |
    | --- | --- | --- |
-   | **No connector this run** | no Supabase MCP tool is available at all | "Supabase MCP connector not available in this runner; cards not attempted." Expected in a runner without `SUPABASE_ACCESS_TOKEN` |
-   | **Query errored** | the connector *is* there and the tool call returned an error (bad column, renamed table, permissions) | **Quote the actual error text.** This is a defect in the pinned query or the bucket's schema, not a config gap, and it needs fixing rather than absorbing |
-   | **Query fine, nothing eligible** | the query returned rows, but none pass the date/story-prefix/relevance filters | "N objects listed, none eligible for the 20-24 Jul window." Normal, not a fault |
+   | **Listing call errored** | the HTTP request itself failed (network error, non-200 status, bucket renamed/moved) | **Quote the actual error text.** This is a defect (a real outage, or the bucket path changed), not a config gap, and needs fixing rather than absorbing |
+   | **Listing fine, nothing eligible** | the call returned objects, but none pass the date/story-prefix/relevance filters | "N objects listed, none eligible for the 20-24 Jul window." Normal, not a fault |
 
-   The schema itself is known-good: the query was verified live 2026-07-29 against the
-   real bucket (`storage.objects` with `bucket_id` / `name` / `created_at`, rows
-   returned). So a *query error* after that date means something actually changed, and
-   should be surfaced loudly, never quietly swallowed into the chart fallback.
+   The endpoint itself is known-good: verified live 2026-08-24 against the real bucket
+   (547 objects returned via the JSON API's `items(name,timeCreated)` fields, no auth).
+   So an error after that date means something actually changed (the bucket went
+   private, moved, or renamed), and should be surfaced loudly, never quietly swallowed
+   into the chart fallback.
 
-   In all three cases, fall back to a generated chart for that finding so the issue is
+   In both cases, fall back to a generated chart for that finding so the issue is
    never image-less:
    - Render with `../../scripts/charts.mjs` instead. Pick the chart kind from the
      finding's own shape, the same judgement the `dataviz` skill's form heuristic
@@ -295,20 +325,6 @@ convenience:
 A mixed issue is normal and correct: one finding illustrated by a real card, another by
 a generated chart, because only one of them had an eligible card that week. Don't force
 consistency across findings at the expense of using a real card wherever one exists.
-
-Two other ways to get cards into an automated run exist, both now superseded by the
-fixed query above for the common case, kept here for when the MCP connector itself is
-unavailable and a different credential is preferred:
-
-- **Manifest file (no credential at all).** Have the carousel pipeline write a small JSON
-  to a predictable public path as it renders, e.g.
-  `.../social_media_generation/manifest_<YYYYMMDD>.json`, listing each render's filename,
-  topic, tickers and data window. The skill then fetches one known URL and picks against the
-  criteria above. Keeps the bucket private-by-obscurity and needs no Supabase access at all.
-- **Direct Supabase storage key.** Give the skill its own storage credential so it can list
-  by date prefix via the Storage REST API directly, rather than through the MCP connector
-  and `storage.objects`. More
-  power, more setup, and another secret to hold alongside `config.json`'s API key.
 
 > **Resolved 2026-07-27: default to the exchange definition (`idx_daily_data`) for weekly
 > aggregated foreign flow. Never use the broker-domicile aggregation (`idx_broker_summary_daily`

@@ -81,26 +81,27 @@ Per stock: *the story* → *the people* → *the numbers* → *the outlook* (att
 Open with the thread tying the three together (or the honest absence of one); close with
 a short line, not a summary restatement.
 
-## 6. Visuals: check Supabase first
+## 6. Visuals: check the GCP bucket first
 
 This type had no visuals guidance of its own before — it was silently inheriting
 SKILL.md's generic "every issue gets a generated chart" default and always
 running `charts.mjs`, never checking for a real card. Fix, same priority order as
 `weekly-insights-v2.md`'s "Auto-selecting cards, unattended" section: **a real
-Supabase social card beats a generated chart whenever one is eligible; `charts.mjs`
-is the fallback for when the connector genuinely isn't available or nothing
-eligible exists, not a first choice taken for convenience.**
+social card beats a generated chart whenever one is eligible; `charts.mjs` is the
+fallback for when nothing eligible exists, not a first choice taken for
+convenience.**
 
-Run `scripts/fixed-queries/social-media-bucket-listing.sql` through the Supabase
-MCP connector, then check each of this issue's three tickers for a real, eligible
-card (apply the date/story-prefix/relevance criteria `weekly-insights-v2.md`
-documents in full). A card covering one of the three is enough to illustrate that
-stock's section; there's no requirement that all three have one — mix real cards
-and a generated fallback per-stock as the bucket actually supports. Record which
-of the three outcomes applied (no connector / query errored / nothing eligible)
-in `run-notes.md` for each ticker checked, same distinction
-`weekly-insights-v2.md` documents — collapsing them into "used charts" hides a
-real query defect behind what looks like an unconfigured runner.
+List the GCP bucket per that section's "Where the filenames come from" (a plain
+public HTTP call, no connector or credential needed), then check each of this
+issue's three tickers for a real, eligible card (apply the
+date/story-prefix/relevance criteria `weekly-insights-v2.md` documents in full).
+A card covering one of the three is enough to illustrate that stock's section;
+there's no requirement that all three have one — mix real cards and a generated
+fallback per-stock as the bucket actually supports. Record which of the two
+outcomes applied (listing call errored / nothing eligible) in `run-notes.md` for
+each ticker checked, same distinction `weekly-insights-v2.md` documents —
+collapsing them into "used charts" hides a
+real defect behind what looks like a genuinely quiet week.
 
 ## 7. Self-review before delivery
 
