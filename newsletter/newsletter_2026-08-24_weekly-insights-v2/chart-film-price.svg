@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="852" height="150" viewBox="0 0 852 150"><rect width="852" height="150" fill="#fcfcfb"/><defs>
+    <linearGradient id="sp0s" x1="0" y1="0" x2="852" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#C14D94"/><stop offset="100%" stop-color="#8B004C"/>
+    </linearGradient>
+    <linearGradient id="sp0f" x1="0" y1="0" x2="0" y2="150" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="rgba(193,77,148,0.18)"/><stop offset="100%" stop-color="rgba(193,77,148,0)"/>
+    </linearGradient>
+  </defs>
+    <path d="M10.0,10.0 L195.5,94.5 L381.0,140.0 L566.5,120.5 L752.0,127.0 L752.0,150 L10.0,150 Z" fill="url(#sp0f)"/><path d="M10.0,10.0 L195.5,94.5 L381.0,140.0 L566.5,120.5 L752.0,127.0" fill="none" stroke="url(#sp0s)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="752.0" cy="127.0" r="5" fill="#8B004C"/>
+    <text x="764.0" y="134.0" fill="#0B0B0B" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="24" font-weight="800" text-anchor="start">-10.0%</text><circle cx="10.0" cy="10.0" r="4" fill="#52514E"/>
+    <text x="10.0" y="40.0" fill="#52514E" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="22" font-weight="700" text-anchor="start">900</text></svg>
