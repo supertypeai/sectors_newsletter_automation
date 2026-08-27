@@ -114,4 +114,6 @@ for this type is `newsletter/newsletter_2026-07-13_upcoming-event/newsletter.htm
   (`#9E0142`) (`../newsletter-format.md`'s Color convention, applies to every issue)?
 - Is the Appendix (endpoint/field trace) present, after Sources and before the
   disclaimer? Just the teaser's one endpoint if that's all that was fetched, still
-  required.
+  required. **Endpoints and field names only**, one bullet per endpoint, with no
+  section label, chart name, table name, derivation or usage note attached to any
+  bullet (`../newsletter-format.md`'s Appendix section)?

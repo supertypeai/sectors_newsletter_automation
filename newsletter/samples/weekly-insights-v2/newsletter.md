@@ -85,7 +85,7 @@ the appendix on why this window uses the index universe rather than the whole ex
 
 ### Four insiders bought CUAN, and the January buyers are 63% underwater
 
-![CUAN insider cluster buy, 19 January to 9 July 2026: three insiders bought, Prajogo Pangestu 24.30M shares for IDR 41.89B across 5 filings, Erwin Ciputra 1.00M shares for IDR 540.81M, Kartika Hendrawan 200K shares for IDR 124.00M, average IDR 1,669 per share against a market price of IDR 620, 63 percent below filing price](https://rfiycxgjbnkefczvbosm.supabase.co/storage/v1/object/public/social_media_generation/insider_cluster_cuan_20260710_2.jpg)
+![CUAN insider cluster buy, 19 January to 9 July 2026: three insiders bought, Prajogo Pangestu 24.30M shares for IDR 41.89B across 5 filings, Erwin Ciputra 1.00M shares for IDR 540.81M, Kartika Hendrawan 200K shares for IDR 124.00M, average IDR 1,669 per share against a market price of IDR 620, 63 percent below filing price](https://storage.googleapis.com/sectorsapp-sea/social_media/insider_cluster_cuan_20260710_2.jpg)
 
 - Petrindo Jaya Kreasi ([$CUAN](https://sectors.app/idx/cuan?utm_source=newsletter&utm_medium=email&utm_campaign=weekly-insights-v2_2026-07-13&utm_content=data-unearthed&utm_term=cuan)) closed the week at
   **IDR 620**, unchanged across Thursday and Friday.

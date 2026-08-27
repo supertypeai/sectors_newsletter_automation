@@ -186,5 +186,7 @@ as the audience source, not just the market-data calls).
 - Worked example rendered against one real sample user, PII scrubbed per dbquery's
   `references/supabase-access.md`, before this file is shared outside the session?
 - Is the Appendix (endpoint/field trace, including the dbquery audience query) present,
-  after Sources and before the disclaimer?
+  after Sources and before the disclaimer? **Endpoints and field names only**, one
+  bullet per endpoint, with no section label, chart name, table name, derivation or
+  usage note attached to any bullet (`../newsletter-format.md`'s Appendix section)?
 - Disclaimer footer present, unmodified (`../newsletter-format.md`)?

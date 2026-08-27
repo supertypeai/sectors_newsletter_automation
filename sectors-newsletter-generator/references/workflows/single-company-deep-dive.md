@@ -124,4 +124,6 @@ series. Non-zero-based y-axis for price (`../newsletter-format.md`).
   passed (it doesn't default to green)? (`../newsletter-format.md`'s Color
   convention, applies to every issue.)
 - Is the Appendix (endpoint/field trace) present, after Sources and before the
-  disclaimer?
+  disclaimer? **Endpoints and field names only**, one bullet per endpoint, with no
+  section label, chart name, table name, derivation or usage note attached to any
+  bullet (`../newsletter-format.md`'s Appendix section)?

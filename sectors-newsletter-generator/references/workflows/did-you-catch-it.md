@@ -204,4 +204,6 @@ factually, carry the emotional weight, the copy doesn't need to push:
   (`../newsletter-format.md`'s Color convention)?
 - Appendix present, after Sources, before the disclaimer, and does it note the two
   documented spec adaptations (fundamentals guard at report date not literally at T0,
-  leverage compared annually not at 90 days)?
+  leverage compared annually not at 90 days)? **Endpoints and field names only**, one
+  bullet per endpoint, with no section label, chart name, table name, derivation or
+  usage note attached to any bullet (`../newsletter-format.md`'s Appendix section)?

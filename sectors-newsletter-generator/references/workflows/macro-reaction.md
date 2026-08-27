@@ -122,4 +122,6 @@ it.
   linked, and ticker-blue (`#9E0142`)? Gains/losses green/red (`#568475`/`#D53E50`)?
   (`../newsletter-format.md`'s Color convention, applies to every issue.)
 - Is the Appendix (endpoint/field trace) present, after Sources and before the
-  disclaimer?
+  disclaimer? **Endpoints and field names only**, one bullet per endpoint, with no
+  section label, chart name, table name, derivation or usage note attached to any
+  bullet (`../newsletter-format.md`'s Appendix section)?

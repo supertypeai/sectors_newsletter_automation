@@ -195,3 +195,5 @@ prove it (mirrors the carousel skill's "write the payoff slide first").
   `sectors.app/idx/broker/<lower>`?
 - Is the Appendix (endpoint/field trace) present, after Sources and before the
   disclaimer (`../newsletter-format.md`'s Appendix section, mandatory for every issue)?
+  **Endpoints and field names only**, one bullet per endpoint, with no section label,
+  chart name, table name, derivation or usage note attached to any bullet.

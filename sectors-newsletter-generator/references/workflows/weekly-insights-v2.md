@@ -561,6 +561,10 @@ right-hand column below.
 - Ticker style: bare linked `$TICKER` everywhere, **never** `Company Name ($TICKER)`, in
   tables and prose alike, including the movers tables?
 - Every figure restated as text under its image, alt text complete?
+- Is the Appendix (endpoint/field trace) present, after Sources and before the
+  disclaimer? **Endpoints and field names only**, one bullet per endpoint, with no
+  section label, chart name, table name, derivation or usage note attached to any
+  bullet (`../newsletter-format.md`'s Appendix section)?
 - Appendix credits `instagram.com/sectorsapp` for every social image, with no bucket name,
   filename or storage path anywhere in reader-facing copy?
 - No story-only render used (`filings-plain`, `filings_daily`, `broker-bandar`,

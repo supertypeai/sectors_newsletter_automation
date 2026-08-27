@@ -121,4 +121,6 @@ capability from memory or assumption.
   (`../newsletter-format.md`'s Color convention, applies to every issue)?
 - Is the Appendix (endpoint/field trace, or "sourced from the user-supplied release
   note, no live endpoint fetched" if no fresh API call was made) present, after Sources
-  and before the disclaimer?
+  and before the disclaimer? **Endpoints and field names only**, one bullet per
+  endpoint, with no section label, chart name, table name, derivation or usage note
+  attached to any bullet (`../newsletter-format.md`'s Appendix section)?
