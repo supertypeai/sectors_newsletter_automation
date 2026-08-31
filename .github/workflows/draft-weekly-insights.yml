@@ -28,6 +28,11 @@ on:
         required: false
         type: boolean
         default: false
+      dry_run:
+        description: "Real Sectors data, real Claude, real humanizing — but no mailroom and no commit. Issue is uploaded as an artifact instead"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -58,6 +63,15 @@ jobs:
       # exchange-definition foreign-flow query. Same env-indirection reasoning as
       # STORING_API_KEY above.
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      # Optional prose humanizing pass. Same env-indirection reasoning as STORING_API_KEY:
+      # these exist at job level only so the step's `if:` can test them. The OpenAI and
+      # Anthropic keys are deliberately NOT named ANTHROPIC_API_KEY / OPENAI_API_KEY here —
+      # a job-level ANTHROPIC_API_KEY would be visible to `claude -p` above and, per the
+      # note on CLAUDE_CODE_OAUTH_TOKEN, would silently move drafting off the subscription
+      # onto pay-per-token billing. The humanize step maps them to their real names.
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      HUMANIZE_OPENAI_KEY: ${{ secrets.OPENAI_API_KEY }}
+      HUMANIZE_ANTHROPIC_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
     steps:
       # token: so the later "Commit the issue to main" step pushes as this
@@ -209,6 +223,17 @@ jobs:
           echo "folder=$folder" >> "$GITHUB_OUTPUT"
           echo "date=$(basename "$folder" | sed -E 's/newsletter_([0-9-]+)_.*/\1/')" >> "$GITHUB_OUTPUT"
 
+      # Only the prose between tags is rewritten, so charts and layout are untouched, and
+      # it runs before the [TEST] email so the reviewed copy is the one that ships.
+      # Exits 0 on any Gemini failure: an outage costs polish, never the send.
+      - name: Humanize the prose
+        if: env.GEMINI_API_KEY != '' || env.HUMANIZE_OPENAI_KEY != '' || env.HUMANIZE_ANTHROPIC_KEY != ''
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          HUMANIZE_MODELS: ${{ vars.HUMANIZE_MODELS }}
+        run: node sectors-humanizer/scripts/humanize.mjs "${{ steps.issue.outputs.folder }}"
+
       # Charts must be hosted PNGs by the time the campaign sends: Gmail and Outlook
       # strip SVG and block data: URIs, so an SVG or inlined chart would silently
       # vanish for most subscribers. Doing this here rather than at send time means
@@ -221,6 +246,7 @@ jobs:
         run: npm install -g @supertype.ai/storing
 
       - name: Rasterize charts and host them on mailroom
+        if: inputs.dry_run != true
         env:
           MAILROOM_API_KEY: ${{ secrets.MAILROOM_API_KEY }}
           MAILROOM_UPLOAD_URL: ${{ vars.MAILROOM_UPLOAD_URL || 'https://mailroom.supertype.ai/api/v1/uploads' }}
@@ -235,6 +261,7 @@ jobs:
         run: rm -rf "${{ steps.issue.outputs.folder }}"/{data,_draft}
 
       - name: Email the draft to the reviewer
+        if: inputs.dry_run != true
         env:
           MAILROOM_API_KEY: ${{ secrets.MAILROOM_API_KEY }}
           MAILROOM_EMAIL_URL: ${{ vars.MAILROOM_EMAIL_URL || 'https://mailroom.supertype.ai/api/v1/emails' }}
@@ -251,7 +278,7 @@ jobs:
       # never create a real campaign; push-to-mailroom.mjs's own [FIXTURE]-subject
       # guard is a backstop for that, not the primary defense.
       - name: Push to mailroom, scheduled for 10am WIB
-        if: ${{ github.event.inputs.skip_draft != 'true' }}
+        if: ${{ github.event.inputs.skip_draft != 'true' && inputs.dry_run != true }}
         env:
           MAILROOM_API_KEY: ${{ secrets.MAILROOM_API_KEY }}
           MAILROOM_API_URL: ${{ vars.MAILROOM_API_URL || 'https://mailroom.supertype.ai/api/v1/campaigns' }}
@@ -267,7 +294,18 @@ jobs:
       # provide (that's push-to-mailroom.mjs's campaign + mailroom's Review
       # page), so opening and closing one every run bought nothing but an
       # extra step and the "still-open prior PR" hazard that came with it.
+      # A dry run's output leaves as a downloadable artifact rather than a commit, so a
+      # test issue never lands in the newsletter/ record.
+      - name: Upload the issue as an artifact (dry_run)
+        if: inputs.dry_run == true
+        uses: actions/upload-artifact@v4
+        with:
+          name: dryrun-${{ env.ISSUE_TYPE }}-${{ steps.issue.outputs.date }}
+          path: ${{ steps.issue.outputs.folder }}
+          retention-days: 14
+
       - name: Commit the issue to main
+        if: inputs.dry_run != true
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"

@@ -30,6 +30,11 @@ on:
         required: false
         type: boolean
         default: false
+      dry_run:
+        description: "Real Sectors data, real Claude, real humanizing — but no mailroom and no commit. Issue is uploaded as an artifact instead"
+        required: false
+        type: boolean
+        default: false
       force_run:
         description: "Run regardless of today's date (for manual testing outside week 3)"
         required: false
@@ -75,6 +80,13 @@ jobs:
       ISSUE_TYPE: sector-spotlight
       STORING_API_KEY: ${{ secrets.STORING_API_KEY }}
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      # Optional prose humanizing pass. Same env-indirection reasoning as STORING_API_KEY.
+      # The OpenAI/Anthropic keys are deliberately renamed here: a job-level
+      # ANTHROPIC_API_KEY would move `claude -p` drafting off the subscription onto
+      # pay-per-token billing. The humanize step maps them back to their real names.
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      HUMANIZE_OPENAI_KEY: ${{ secrets.OPENAI_API_KEY }}
+      HUMANIZE_ANTHROPIC_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
     steps:
       # token: so the "Commit the issue to main" step later pushes as this
@@ -207,7 +219,19 @@ jobs:
         if: env.STORING_API_KEY != ''
         run: npm install -g @supertype.ai/storing
 
+      # Only the prose between tags is rewritten, so charts and layout are untouched, and
+      # it runs before the [TEST] email so the reviewed copy is the one that ships.
+      # Exits 0 on any Gemini failure: an outage costs polish, never the send.
+      - name: Humanize the prose
+        if: env.GEMINI_API_KEY != '' || env.HUMANIZE_OPENAI_KEY != '' || env.HUMANIZE_ANTHROPIC_KEY != ''
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          HUMANIZE_MODELS: ${{ vars.HUMANIZE_MODELS }}
+        run: node sectors-humanizer/scripts/humanize.mjs "${{ steps.issue.outputs.folder }}"
+
       - name: Rasterize charts and host them on mailroom
+        if: inputs.dry_run != true
         env:
           MAILROOM_API_KEY: ${{ secrets.MAILROOM_API_KEY }}
           MAILROOM_UPLOAD_URL: ${{ vars.MAILROOM_UPLOAD_URL || 'https://mailroom.supertype.ai/api/v1/uploads' }}
@@ -219,6 +243,7 @@ jobs:
         run: rm -rf "${{ steps.issue.outputs.folder }}"/{data,_draft}
 
       - name: Email the draft to the reviewer
+        if: inputs.dry_run != true
         env:
           MAILROOM_API_KEY: ${{ secrets.MAILROOM_API_KEY }}
           MAILROOM_EMAIL_URL: ${{ vars.MAILROOM_EMAIL_URL || 'https://mailroom.supertype.ai/api/v1/emails' }}
@@ -233,7 +258,7 @@ jobs:
       # MAILROOM_GROUP_ID rather than a second variable pointed at the same
       # group — excluding the INSIDER segment, same as three-stock-story.
       - name: Push to mailroom, scheduled for 10am WIB
-        if: ${{ github.event.inputs.skip_draft != 'true' }}
+        if: ${{ github.event.inputs.skip_draft != 'true' && inputs.dry_run != true }}
         env:
           MAILROOM_API_KEY: ${{ secrets.MAILROOM_API_KEY }}
           MAILROOM_API_URL: ${{ vars.MAILROOM_API_URL || 'https://mailroom.supertype.ai/api/v1/campaigns' }}
@@ -246,7 +271,18 @@ jobs:
 
       # The campaign above already schedules the send — this step is a plain
       # git record of what shipped, kept for history/diffing, nothing more.
+      # A dry run's output leaves as a downloadable artifact rather than a commit, so a
+      # test issue never lands in the newsletter/ record.
+      - name: Upload the issue as an artifact (dry_run)
+        if: inputs.dry_run == true
+        uses: actions/upload-artifact@v4
+        with:
+          name: dryrun-${{ env.ISSUE_TYPE }}-${{ steps.issue.outputs.date }}
+          path: ${{ steps.issue.outputs.folder }}
+          retention-days: 14
+
       - name: Commit the issue to main
+        if: inputs.dry_run != true
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
