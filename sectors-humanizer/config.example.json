@@ -1,0 +1,6 @@
+{
+  "geminiApiKey": "",
+  "openaiApiKey": "",
+  "anthropicApiKey": "",
+  "_note": "Optional local fallback. GEMINI_API_KEY / OPENAI_API_KEY / ANTHROPIC_API_KEY in the environment take precedence. Fill in only the providers your model chain uses — a model whose key is missing is skipped, not fatal. Copy to config.json; that path is gitignored, so never commit a real key."
+}
