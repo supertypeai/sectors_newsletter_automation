@@ -17,3 +17,7 @@ newsletter/**/sample-rows.csv
 
 # Claude Code skill discovery symlink, created by CI at runtime.
 .claude/skills/
+
+# Local end-to-end dry runs: real Sectors data, real Claude, real humanizing, no
+# mailroom and no commit. Point NEWSLETTER_HOME here and the output stays yours.
+newsletter-dryrun/
