@@ -5,15 +5,20 @@
 //   node scripts/humanize.mjs <folder> --dry-run
 //   node scripts/humanize.mjs <folder> --model claude-opus-5
 //
-// Only the text between tags is sent, as a JSON array, and only strings come back, so
-// markup cannot change. Sending the whole document instead was measured and does not
-// work: given 20KB of HTML, Flash returns an abridged 3KB document with finishReason
-// STOP — it rewrites the page rather than echoing it.
+// Only prose is sent, as a JSON array, and only strings come back, so block structure,
+// images, links and styles cannot change. Sending the whole document instead was measured
+// and is unsafe: it produces better prose but dropped a figure and moved a gain/loss
+// colour onto a different number in the one run that was checked.
 //
-// Every text node above a low floor goes up, including headlines; which ones to leave
-// alone is the model's judgement, not a heuristic here. A rewrite whose numbers or
-// $TICKERs moved, or that grew, is dropped and that fragment keeps its original wording.
-// On total failure the original ships and the process exits 0; HUMANIZE_STRICT=1 exits 1.
+// Default mode is "block": a fragment spans a run of text joined by inline tags (<b>, <a>),
+// so the model sees whole sentences and can restructure across them. "--mode node" is the
+// older one-text-node-per-fragment split, kept as a fallback — it cannot restructure a
+// sentence, and asking for 89 exact strings failed arity on all three models where the 28
+// block fragments succeeded first try.
+//
+// A rewrite is dropped, keeping the original wording, if its numbers or $TICKERs moved, if
+// it grew, or (block mode) if its inline tags changed. On total failure the original ships
+// and the process exits 0; HUMANIZE_STRICT=1 exits 1.
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join, resolve } from "node:path";
@@ -253,7 +258,7 @@ export async function callModel({ model, apiKey, prompt, segments, fetchImpl = f
   return parsed;
 }
 
-export async function humanize({ html, prompt, models = DEFAULT_MODELS, keyFor, fetchImpl = fetch, log = () => {}, mode = "node" }) {
+export async function humanize({ html, prompt, models = DEFAULT_MODELS, keyFor, fetchImpl = fetch, log = () => {}, mode = "block" }) {
   const chunks = splitHtml(html);
   const block = mode === "block";
   const picked = block ? collectBlocks(chunks) : collectSegments(chunks);
@@ -336,7 +341,7 @@ async function main(argv) {
 
   let result;
   try {
-    const mode = valueOf("--mode") || process.env.HUMANIZE_MODE || "node";
+    const mode = valueOf("--mode") || process.env.HUMANIZE_MODE || "block";
     result = await humanize({ html, prompt: prompt.body, models, mode, log: (m) => console.error(`humanize: ${m}`) });
   } catch (err) {
     return bail(err.message);

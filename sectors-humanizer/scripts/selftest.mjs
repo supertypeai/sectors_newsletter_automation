@@ -6,7 +6,9 @@ import {
   splitHtml,
   joinChunks,
   collectSegments,
+  collectBlocks,
   applySegments,
+  applyBlocks,
   isProse,
   stripCitations,
   fingerprintMatches,
@@ -101,6 +103,36 @@ test("real newsletters round-trip byte for byte", () => {
     const html = readFileSync(new URL(`../../../mailroom-human/${f}.html`, import.meta.url), "utf8");
     assert.equal(joinChunks(splitHtml(html)), html, `${f} must round-trip`);
   }
+});
+
+test("block is the default mode, and groups across inline tags", async () => {
+  const html = '<p>Trisula listed in <b>2012</b> and stayed there</p>';
+  const chunks = splitHtml(html);
+  assert.equal(collectSegments(chunks).segments.length, 2, "node mode splits at the <b>");
+  const blocks = collectBlocks(chunks);
+  assert.equal(blocks.segments.length, 1, "block mode keeps the sentence whole");
+  assert.ok(blocks.segments[0].includes("<b>2012</b>"), "inline tags travel inside the fragment");
+
+  let sent;
+  await humanize({
+    html,
+    prompt: "p",
+    models: ["gemini-3.6-flash"],
+    keyFor: () => "k",
+    fetchImpl: async (url, opts) => {
+      sent = JSON.parse(JSON.parse(opts.body).contents[0].parts[0].text);
+      return replyFor("gemini-3.6-flash", ["Trisula listed in <b>2012</b> and stayed"]);
+    },
+  });
+  assert.equal(sent.length, 1, "default mode sent one block, not two nodes");
+});
+
+test("block mode rejects a rewrite that drops an inline tag", () => {
+  const chunks = splitHtml('<p>Trisula listed in <b>2012</b> and stayed there</p>');
+  const { spans } = collectBlocks(chunks);
+  const { rejected } = applyBlocks(chunks, spans, ["Trisula listed in 2012 and stayed"]);
+  assert.equal(rejected.length, 1);
+  assert.equal(rejected[0].reason, "inline markup changed");
 });
 
 test("models route to the right provider", () => {
