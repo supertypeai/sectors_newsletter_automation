@@ -47,11 +47,17 @@ id, so a chain can mix them freely:
 HUMANIZE_MODELS="claude-opus-5,gpt-5.6,gemini-3.7-flash"
 ```
 
-| Prefix | Provider | Key |
+| Model id | Provider | Key |
 | --- | --- | --- |
 | `gemini-*` | Google | `GEMINI_API_KEY` / `geminiApiKey` |
 | `gpt-*`, `o*` | OpenAI | `OPENAI_API_KEY` / `openaiApiKey` |
 | `claude-*` | Anthropic | `ANTHROPIC_API_KEY` / `anthropicApiKey` |
+| anything with a `/` | OpenRouter | `OPENROUTER_API_KEY` / `openrouterApiKey` |
+
+An OpenRouter key covers GPT and Claude with one credential — use vendor-prefixed ids
+(`anthropic/claude-sonnet-4`, `openai/gpt-5.6`). Requests pin `require_parameters` so they
+only route to endpoints that honour the JSON schema, since support varies per endpoint for
+the same model. The direct providers stay available if you would rather not add a hop.
 
 Default chain is `gemini-3.7-flash,gemini-3.6-flash,gemini-3.5-flash`. It moves to the
 next model on a 429, a 5xx, a malformed reply, or a missing key, and stops on a 4xx or an

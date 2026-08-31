@@ -49,6 +49,7 @@ Repo settings → Secrets and variables → Actions → **Secrets**:
 | `STORING_API_KEY` | draft | **Optional.** Compresses chart PNGs through [Storing](https://storing.app) before upload. Leave unset and charts upload at full size. Generate from Storing's Settings page |
 | `SUPABASE_ACCESS_TOKEN` | draft | **Optional.** Enables the exchange-definition foreign-flow figure via the Supabase MCP connector. Leave unset and the run falls back to an omitted flow figure, exactly as documented in SKILL.md. Block 4's social-card auto-selection needs no credential at all (it lists our own GCP bucket over plain HTTP) — this token no longer affects it. See **Supabase MCP setup** below before generating one |
 | `GEMINI_API_KEY` | draft | **Optional.** Runs the humanizing pass over `newsletter.html` before the `[TEST]` email. Leave all three humanizing keys unset and the step is skipped, shipping Claude's prose as written. Generate at [aistudio.google.com/apikey](https://aistudio.google.com/apikey). See **Humanizing** below |
+| `OPENROUTER_API_KEY` | draft | **Optional.** One key covering GPT and Claude, used when the chain names a `vendor/model` id such as `anthropic/claude-sonnet-4`. Step-scoped like the two below |
 | `OPENAI_API_KEY` | draft | **Optional.** Only used by the humanizing step, and only when the model chain names a `gpt-*` / `o*` model |
 | `ANTHROPIC_API_KEY` | draft | **Optional.** Only used by the humanizing step, and only when the chain names a `claude-*` model. Exposed to that step alone, never at job level — a job-level `ANTHROPIC_API_KEY` would outrank `CLAUDE_CODE_OAUTH_TOKEN` and move drafting onto pay-per-token billing |
 
@@ -228,7 +229,10 @@ not, and at four to six issues a month it costs a few cents.
 
 The chain may mix providers — set `HUMANIZE_MODELS` to something like
 `claude-opus-5,gpt-5.6,gemini-3.7-flash` and each model is called through its own API with
-its own key. Adding a provider is one entry in `sectors-humanizer/scripts/providers.mjs`.
+its own key. Any id containing a `/` routes through OpenRouter instead
+(`anthropic/claude-sonnet-4,google/gemini-3-flash`), which needs only `OPENROUTER_API_KEY`
+for all of them. Adding a provider is one entry in
+`sectors-humanizer/scripts/providers.mjs`.
 
 ### Charts become hosted PNGs at draft time
 

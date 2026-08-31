@@ -140,7 +140,23 @@ test("models route to the right provider", () => {
   assert.equal(providerFor("gpt-5.6").name, "openai");
   assert.equal(providerFor("o4-mini").name, "openai");
   assert.equal(providerFor("claude-opus-5").name, "anthropic");
+  assert.equal(providerFor("anthropic/claude-sonnet-4").name, "openrouter");
+  assert.equal(providerFor("openai/gpt-5.6").name, "openrouter");
+  assert.equal(providerFor("google/gemini-3-flash").name, "openrouter");
   assert.throws(() => providerFor("llama-3"), /no provider matches/);
+});
+
+test("openrouter carries a schema and pins endpoints that honour it", () => {
+  const p = providerFor("anthropic/claude-sonnet-4");
+  assert.equal(p.envKey, "OPENROUTER_API_KEY");
+  assert.equal(p.url(), "https://openrouter.ai/api/v1/chat/completions");
+  assert.equal(p.headers("K").authorization, "Bearer K");
+  const b = p.body("anthropic/claude-sonnet-4", "sys", "[]");
+  assert.equal(b.model, "anthropic/claude-sonnet-4");
+  assert.equal(b.response_format.json_schema.strict, true);
+  assert.equal(b.provider.require_parameters, true);
+  assert.equal(b.reasoning_effort, undefined, "reasoning_effort 400s on non-reasoning models");
+  assert.equal(p.text({ choices: [{ message: { content: "R" } }] }), "R");
 });
 
 test("each provider builds its own auth and schema shape", () => {

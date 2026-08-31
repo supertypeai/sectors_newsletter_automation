@@ -16,6 +16,19 @@ const arraySchema = {
   additionalProperties: false,
 };
 
+// OpenAI and OpenRouter share the chat-completions shape; only the extras differ.
+const chatBody = (model, system, user) => ({
+  model,
+  messages: [
+    { role: "system", content: system },
+    { role: "user", content: user },
+  ],
+  response_format: {
+    type: "json_schema",
+    json_schema: { name: "humanized", strict: true, schema: arraySchema },
+  },
+});
+
 export const PROVIDERS = {
   gemini: {
     match: /^gemini-/,
@@ -48,20 +61,33 @@ export const PROVIDERS = {
     url: () => "https://api.openai.com/v1/chat/completions",
     headers: (key) => ({ authorization: `Bearer ${key}` }),
     body: (model, system, user) => ({
-      model,
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: user },
-      ],
-      response_format: {
-        type: "json_schema",
-        json_schema: { name: "humanized", strict: true, schema: arraySchema },
-      },
+      ...chatBody(model, system, user),
       reasoning_effort: "low",
       max_completion_tokens: 32000,
     }),
     text: (json) => json?.choices?.[0]?.message?.content,
     stopReason: (json) => json?.choices?.[0]?.finish_reason,
+  },
+
+  // Any "vendor/model" id, e.g. anthropic/claude-sonnet-4 or openai/gpt-5.6. One key
+  // instead of three, at the cost of routing through a third party.
+  openrouter: {
+    match: /^[a-z0-9-]+\/.+/i,
+    envKey: "OPENROUTER_API_KEY",
+    configKey: "openrouterApiKey",
+    url: () => "https://openrouter.ai/api/v1/chat/completions",
+    headers: (key) => ({ authorization: `Bearer ${key}`, "x-title": "sectors-humanizer" }),
+    body: (model, system, user) => ({
+      ...chatBody(model, system, user),
+      max_tokens: 32000,
+      // Rewriting to a fixed set of rules is not a reasoning task; effort here is spend.
+      reasoning: { effort: "low" },
+      // The same model is served by several endpoints and only some honour a schema;
+      // without this the request can silently route to one that ignores it.
+      provider: { require_parameters: true },
+    }),
+    text: (json) => json?.choices?.[0]?.message?.content,
+    stopReason: (json) => json?.choices?.[0]?.finish_reason || json?.error?.message,
   },
 
   anthropic: {

@@ -86,6 +86,7 @@ jobs:
       # ANTHROPIC_API_KEY would move `claude -p` drafting off the subscription onto
       # pay-per-token billing. The humanize step maps them back to their real names.
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      HUMANIZE_OPENROUTER_KEY: ${{ secrets.OPENROUTER_API_KEY }}
       HUMANIZE_OPENAI_KEY: ${{ secrets.OPENAI_API_KEY }}
       HUMANIZE_ANTHROPIC_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
@@ -224,8 +225,9 @@ jobs:
       # it runs before the [TEST] email so the reviewed copy is the one that ships.
       # Exits 0 on any Gemini failure: an outage costs polish, never the send.
       - name: Humanize the prose
-        if: env.GEMINI_API_KEY != '' || env.HUMANIZE_OPENAI_KEY != '' || env.HUMANIZE_ANTHROPIC_KEY != ''
+        if: env.GEMINI_API_KEY != '' || env.HUMANIZE_OPENROUTER_KEY != '' || env.HUMANIZE_OPENAI_KEY != '' || env.HUMANIZE_ANTHROPIC_KEY != ''
         env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           HUMANIZE_MODELS: ${{ vars.HUMANIZE_MODELS }}
