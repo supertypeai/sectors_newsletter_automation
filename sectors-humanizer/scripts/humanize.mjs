@@ -112,9 +112,15 @@ const INLINE = /^<\/?(a|b|strong|i|em|span|u|small|sup|sub|br|code|font|mark|abb
 
 // A block-mode fragment spans one run of text chunks joined by inline markup, so the
 // model can restructure across a <b> or <a> instead of rewriting either side blind.
+// The model sees no markup, so without this it guesses "heading" from length alone and
+// mistakes a short sentence for one. Derived from the tag immediately before the fragment;
+// a wrong guess only costs context, never integrity.
+const HEADING_TAG = /<h[1-6]\b|font-weight\s*:\s*(bold|[7-9]00)|^<(strong|b)\b/i;
+
 export function collectBlocks(chunks) {
   const spans = [];
   const segments = [];
+  const kinds = [];
   let i = 0;
   while (i < chunks.length) {
     if (chunks[i].type !== "text") {
@@ -137,12 +143,14 @@ export function collectBlocks(chunks) {
     }
     const value = chunks.slice(i, end + 1).map((c) => c.value).join("");
     if (isProse(value.replace(/<[^>]+>/g, " "))) {
+      const before = chunks[i - 1];
       spans.push({ start: i, end });
       segments.push(value.trim());
+      kinds.push(before && before.type === "markup" && HEADING_TAG.test(before.value) ? "heading" : "body");
     }
     i = end + 1;
   }
-  return { spans, segments };
+  return { spans, segments, kinds };
 }
 
 const innerTags = (s) => (String(s).match(/<[^>]+>/g) || []).join("|");
@@ -203,30 +211,34 @@ const CONTRACT = [
   "",
   "---",
   "",
-  "You are given a JSON array of text fragments taken from one newsletter, in reading",
-  'order. Return {"fragments": [...]} with the SAME number of strings, same order.',
+  "Below is the full prose of one newsletter, split into fragments in reading order.",
+  'Each has `i` (its position), `kind` ("heading" or "body"), and `text`. A heading owns',
+  "the body fragments that follow it until the next heading, so read them together and",
+  "make each heading match the section it introduces.",
   "",
-  "Hard rules, in priority order:",
+  'Return {"fragments": [...]}: one rewritten string per fragment, in the same order.',
+  "",
   "1. Never change, drop, add, or reformat any number, percentage, date, or $TICKER.",
-  "   A fragment whose figures moved is discarded, so the rewrite is wasted.",
-  "2. Return exactly one output string per input string. Never merge or split fragments.",
-  "3. Return a fragment unchanged when it should not be rewritten. That includes the",
-  "   masthead, navigation, footers, legal text, button labels, table headers, and the",
-  "   recurring section labels that must read identically from issue to issue. Rewrite",
-  "   editorial headlines and body prose.",
-  "4. A fragment may begin or end mid-sentence because it was cut at a markup boundary.",
+  "2. Return exactly one output string per input string. Never merge or split fragments,",
+  "   however much a passage would read better combined.",
+  "3. A fragment may begin or end mid-sentence because it was cut at a markup boundary.",
   "   Preserve that shape: do not add a capital letter or a full stop to close it off.",
-  "5. Emit no HTML tags, no markdown, and no citation markers.",
+  "4. Emit no HTML tags, no markdown, and no citation markers.",
+  "5. Furniture (masthead, footers, legal text, table headers) needs no work. Everything",
+  "   else is a draft you are editing.",
 ].join("\n");
 
-export async function callModel({ model, apiKey, prompt, segments, fetchImpl = fetch, timeoutMs = 120000 }) {
+export async function callModel({ model, apiKey, prompt, segments, kinds, fetchImpl = fetch, timeoutMs = 120000, contract = CONTRACT }) {
   const provider = providerFor(model);
+  const payload = kinds
+    ? segments.map((text, i) => ({ i, kind: kinds[i], text }))
+    : segments;
   let res;
   try {
     res = await fetchImpl(provider.url(model), {
       method: "POST",
       headers: { "content-type": "application/json", ...provider.headers(apiKey) },
-      body: JSON.stringify(provider.body(model, prompt.trim() + CONTRACT, JSON.stringify(segments))),
+      body: JSON.stringify(provider.body(model, prompt.trim() + contract, JSON.stringify(payload))),
       signal: AbortSignal.timeout(timeoutMs),
     });
   } catch (err) {
@@ -258,7 +270,7 @@ export async function callModel({ model, apiKey, prompt, segments, fetchImpl = f
   return parsed;
 }
 
-export async function humanize({ html, prompt, models = DEFAULT_MODELS, keyFor, fetchImpl = fetch, log = () => {}, mode = "block" }) {
+export async function humanize({ html, prompt, models = DEFAULT_MODELS, keyFor, fetchImpl = fetch, log = () => {}, mode = "block", contract = CONTRACT }) {
   const chunks = splitHtml(html);
   const block = mode === "block";
   const picked = block ? collectBlocks(chunks) : collectSegments(chunks);
@@ -277,7 +289,7 @@ export async function humanize({ html, prompt, models = DEFAULT_MODELS, keyFor, 
       const apiKey = resolve_(model);
       if (!apiKey) throw retryable(`${model}: no key for ${providerFor(model).envKey}`);
       log(`trying ${model} (${segments.length} fragments)`);
-      const humanized = await callModel({ model, apiKey, prompt, segments, fetchImpl });
+      const humanized = await callModel({ model, apiKey, prompt, segments, kinds: picked.kinds, fetchImpl, contract });
       const rewritten = humanized.filter((h, i) => typeof h === "string" && h.trim() && h.trim() !== segments[i]).length;
       // Some models echo the input back untouched — measured on gemini-3.6-flash, which
       // returned 0/181 on a document gemini-3.5-flash rewrote 28 fragments of. The outcome
