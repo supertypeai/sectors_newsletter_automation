@@ -48,6 +48,10 @@ Repo settings → Secrets and variables → Actions → **Secrets**:
 | `NEWSLETTER_PAT` | draft | **Optional.** PAT with `repo` scope, used for the final commit-to-main push instead of `GITHUB_TOKEN`. Only matters if branch protection on `main` requires it; the default token is otherwise sufficient since this commit only ever touches `newsletter/` |
 | `STORING_API_KEY` | draft | **Optional.** Compresses chart PNGs through [Storing](https://storing.app) before upload. Leave unset and charts upload at full size. Generate from Storing's Settings page |
 | `SUPABASE_ACCESS_TOKEN` | draft | **Optional.** Enables the exchange-definition foreign-flow figure via the Supabase MCP connector. Leave unset and the run falls back to an omitted flow figure, exactly as documented in SKILL.md. Block 4's social-card auto-selection needs no credential at all (it lists our own GCP bucket over plain HTTP) — this token no longer affects it. See **Supabase MCP setup** below before generating one |
+| `GEMINI_API_KEY` | draft | **Optional.** Runs the humanizing pass over `newsletter.html` before the `[TEST]` email. Leave all three humanizing keys unset and the step is skipped, shipping Claude's prose as written. Generate at [aistudio.google.com/apikey](https://aistudio.google.com/apikey). See **Humanizing** below |
+| `OPENROUTER_API_KEY` | draft | **Optional.** One key covering GPT and Claude, used when the chain names a `vendor/model` id such as `anthropic/claude-sonnet-4`. Step-scoped like the two below |
+| `OPENAI_API_KEY` | draft | **Optional.** Only used by the humanizing step, and only when the model chain names a `gpt-*` / `o*` model |
+| `ANTHROPIC_API_KEY` | draft | **Optional.** Only used by the humanizing step, and only when the chain names a `claude-*` model. Exposed to that step alone, never at job level — a job-level `ANTHROPIC_API_KEY` would outrank `CLAUDE_CODE_OAUTH_TOKEN` and move drafting onto pay-per-token billing |
 
 ### Claude auth: subscription, not a second subscription
 
@@ -89,6 +93,7 @@ Same page → **Variables** (not secrets, these are not sensitive):
 | `MAILROOM_REPLY_TO` | *(unset)* | Optional reply-to |
 | `MAILROOM_SCHEDULE_TIME_WIB` | `10:00` | Wall-clock time in `Asia/Jakarta` the **draft** job schedules each issue for — the next future occurrence of this time on the day it runs. This is the actual review window now (draft time to this time), not a merge click. Only affects the automated draft job — see below for the manual tool |
 | `MAILROOM_SCHEDULE_DELAY_MINUTES` | `60` | Fallback used only when scheduling by relative delay rather than a fixed WIB time — currently only reachable via `push-to-mailroom.yml`'s `schedule_time_wib` input left blank (see below). `0` sends immediately |
+| `HUMANIZE_MODELS` | `gemini-3.7-flash,gemini-3.6-flash,gemini-3.5-flash` | Comma-separated fallback chain for the humanizing pass, tried left to right on a 429, 5xx, malformed reply, or missing key. Providers may be mixed — the provider is inferred from the model id (`gemini-*`, `gpt-*`/`o*`, `claude-*`), e.g. `claude-opus-5,gpt-5.6,gemini-3.7-flash`. Change this to switch models without touching code |
 
 ## First run, safely
 
@@ -168,6 +173,66 @@ but the skill no longer reads it).
 the repo root is git-tracked by design (so teammates share the same server config) —
 that's exactly why this workflow generates its own config at runtime instead of using
 one, and why you should never paste a real token into a committed `.mcp.json` yourself.
+
+### Dry runs
+
+Every draft workflow takes a `dry_run` input. It keeps the expensive, real parts — live
+Sectors data, a real Claude draft, a real humanizing pass — and skips everything that
+leaves the runner:
+
+| Step | `dry_run` |
+| --- | --- |
+| Draft the issue (Claude + Sectors) | runs |
+| Humanize the prose (Gemini) | runs |
+| Host charts on mailroom | skipped |
+| `[TEST]` email to the reviewer | skipped |
+| Create the scheduled campaign | skipped |
+| Commit to `main` | skipped, uploaded as an artifact instead |
+
+The issue lands as a `dryrun-<type>-<date>` artifact on the run page, kept 14 days.
+Charts stay as local SVGs since nothing was uploaded, so open the HTML expecting missing
+images; the prose, figures and layout are otherwise exactly what would have sent.
+
+This is the opposite of `skip_draft`, which fakes the issue to exercise the delivery path
+for free. `dry_run` exercises the generation path and fakes nothing.
+
+To dry-run locally instead, point `NEWSLETTER_HOME` at `newsletter-dryrun/` — it is
+gitignored, so nothing you generate can reach the committed record.
+
+### Humanizing
+
+With any of `GEMINI_API_KEY`, `OPENAI_API_KEY`, or `ANTHROPIC_API_KEY` set, the draft job
+runs `sectors-humanizer/scripts/humanize.mjs`
+between locating the issue and hosting its charts, as one structured-output request.
+Running before the `[TEST]` email means the copy you review is the copy that sends.
+
+Edit the voice in `sectors-humanizer/prompt.md`. Nothing else needs changing.
+
+Only the text between tags is sent, as a JSON array, and only strings come back, so markup
+cannot change. Each rewrite is then checked and dropped, keeping Claude's wording for that
+fragment, if it moves a number or `$TICKER`, or if it grows — fragments cut mid-sentence
+at a markup boundary are where the model tries to complete them and splices in a word that
+was never there. Any total failure exits 0 with the original untouched, because a Gemini
+outage must not cost a Monday send; `HUMANIZE_STRICT=1` fails the run instead.
+
+Measured over the six archived issues: markup byte-identical every time, all 95-220
+figures per issue intact, and 107 of 116 rewrites kept.
+
+The pre-humanized HTML is kept beside the issue as `newsletter.raw.html` and committed
+with it, so every send has its before/after pair on record.
+
+One request per issue, roughly 1,600 tokens of prose. On Gemini's free tier that is a
+250K TPM and 20 RPD ceiling; expect 40-60s per issue, and expect `gemini-3.7-flash` to
+return 503 "experiencing high demand" often enough that the fallback chain earns its keep.
+Note that Gemini's free tier permits Google to train on what you send; a billed key does
+not, and at four to six issues a month it costs a few cents.
+
+The chain may mix providers — set `HUMANIZE_MODELS` to something like
+`claude-opus-5,gpt-5.6,gemini-3.7-flash` and each model is called through its own API with
+its own key. Any id containing a `/` routes through OpenRouter instead
+(`anthropic/claude-sonnet-4,google/gemini-3-flash`), which needs only `OPENROUTER_API_KEY`
+for all of them. Adding a provider is one entry in
+`sectors-humanizer/scripts/providers.mjs`.
 
 ### Charts become hosted PNGs at draft time
 
