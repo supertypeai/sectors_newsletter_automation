@@ -4,10 +4,10 @@ Intended send: Monday morning (confirmed 2026-07-20, moved off the original Satu
 cadence). Covers the trading week that just closed (Mon-Fri); the issue date is
 **today's actual date, whatever day the draft is generated on** (revised 2026-07-27,
 see **Header block, weekly-insights-v2** below), not the `data_as_of` Friday date and
-not a computed Monday. The successor to `weekly-wrap.md`. Both are live while the
-migration finishes; when v1 is retired this file becomes the only weekly recipe.
+not a computed Monday. The successor to the v1 `weekly-wrap` type, retired; this is now
+the only weekly type, and a request for "the wrap" routes here.
 
-Read `../newsletter-format.md`'s **Weekly Insights v2** skeleton and `../compliance.md`
+Read `../newsletter-format/skeletons/weekly-insights-v2.md` and `../compliance.md`
 before drafting. Worked reference: `newsletter/samples/weekly-insights-v2/`.
 
 ## What changed from v1, and why
@@ -79,8 +79,7 @@ node ../../scripts/sectors.mjs \
 Then, once the movers are known, per-ticker flow for whichever names the findings block
 features, and the corporate-action poll for the calendar (see §4).
 
-Endpoint gotchas carry over from `weekly-wrap.md` §2 unchanged. The ones that bit on the
-worked run:
+Endpoint gotchas, the ones that bit on the worked run:
 
 - `companies/top-changes` **ignores `start`/`end`** and returns a live snapshot pinned to its
   own `latest_close_date`. Check that value every run. If it equals the window's Friday you
@@ -146,17 +145,53 @@ the volume table while foreign money exits it; an insider filing against the sam
 weekly move.
 
 Cap it at **two or three findings**, each with a heading that states the finding, a visual,
-and three to five short bullets. Never paragraphs.
+and **three bullets**, four at the absolute outside. Never paragraphs. Three is the target,
+not the floor: the 16 Aug issue shipped five-bullet findings and the user cut each back to
+three by merging related facts into one bullet.
+
+### What gets cut when compressing a finding
+
+The user's edit removed one category of line every time, so treat these as non-shippable:
+
+- **Restated caveats.** "Nothing in the filing record explains the price decline on its own;
+  the transfer and the fall are concurrent, not proven cause and effect." §5b's causation
+  policy is satisfied by *how* the bullets are worded, not by appending a disclaimer that
+  takes back what was just written. Word the claim carefully, then stop.
+- **Recaps of the issue's own structure.** "TPIA isn't an LQ45 constituent, so this flow and
+  price move sit entirely outside the benchmark tables above." The reader can see that.
+- **"Taken together" closers** that re-summarize the bullets directly above them.
+- **Self-referential production notes.** Never write "chart generated this run, no matching
+  social card was available for the window, see appendix" in a caption or anywhere else. The
+  reader does not care how the visual was made; a caption describes what the visual shows.
+
+Merge rather than delete when two bullets carry one fact between them. The IMPC finding's
+transfer bullet, the counterparty bullet and the foreign-flow bullet became a single bullet
+that states the transfer, names the counterparty, and closes on what it means ("an internal
+transfer rather than fresh open-market accumulation"), with the flow figure folded into the
+last sentence.
 
 ### Visuals: the social cards
 
-Block 4's images come from the carousel pipeline, hosted on our own GCP bucket (see
-**Where the filenames come from**, below, for the listing mechanism and the exact URL
-shape). There's no separate publish/rehost step in the draft workflow for these —
-unlike a generated chart, a real card already has a permanent public URL by the time
-it's selected, so whatever gets written into `<img src>` during drafting is final.
+**Block 4 never renders its own images.** Its visuals are existing social cards from the
+carousel pipeline's bucket. Do not call `charts.mjs` for this block, do not produce a
+`chart-<slug>.svg` for it, and do not substitute a rendered chart because the card URLs were
+not to hand. Since the bucket cannot be listed without a credential (see below), the correct
+move when you don't have URLs is to **stop and ask the user for them**, not to generate
+something. There is no chart fallback in this type (confirmed 2026-08-31): if the user has
+no eligible card for a finding, drop that finding and write one the available cards support,
+or ship the block with fewer findings. A generated graph in a weekly-insights-v2 issue is a
+defect in every case, including a week with no eligible card.
 
-Filenames follow `<topic>_<YYYYMMDD>_<n>.jpg`, sometimes with a slide index
+Block 4's images come from the carousel pipeline's Google Cloud Storage bucket:
+
+```
+https://storage.googleapis.com/sectorsapp-sea/social_media/<filename>
+```
+
+Public, unauthenticated, no signed-URL expiry, so email clients load them directly with no
+mirroring step — unlike a generated chart, a real card already has a permanent public URL
+by the time it's selected, so whatever gets written into `<img src>` during drafting is
+final. Filenames follow `<topic>_<YYYYMMDD>_<n>.jpg`, sometimes with a slide index
 (`foreign-flow-1_20260718_1.jpg`). **The date is the generation date, not the data window**,
 so read the window off the image itself and state it in copy. The worked sample's CUAN card
 is dated 10 July and covers 19 Jan to 9 Jul, which is why its bullets say so explicitly.
@@ -168,7 +203,7 @@ the two-column size just because it happens to be alone.
 
 **Credit every social image to `instagram.com/sectorsapp`, always, whatever the actual
 source.** That is the public home of this content and the only attribution a reader should
-see. The GCP bucket is internal plumbing: it may appear in an `<img src>` because that is
+see. The storage bucket is internal plumbing: it may appear in an `<img src>` because that is
 how the image loads, and nowhere else. Never name the bucket, a filename, or a storage path in
 the appendix or in body copy, and never credit a different origin even when the asset came
 from somewhere else.
@@ -222,37 +257,41 @@ Selection criteria, applied in order:
    counts as **one** finding and renders side by side in two columns.
 7. **Budget.** Two or three findings, so at most about four images. Cut the weakest.
 
-**Where the filenames come from.** The carousel pipeline writes every card to a GCP
-bucket we own, `sectorsapp-sea`, under `social_media/<filename>` (changed 2026-08-24 —
-was the carousel's Supabase bucket; that copy still exists but is no longer where this
-skill looks). **List it directly, unattended, no MCP connector and no credential at
-all** — this bucket allows anonymous listing over its plain public HTTP API, unlike the
-Supabase one (which never did; see the retired approach below):
-
-```bash
-curl -s "https://storage.googleapis.com/storage/v1/b/sectorsapp-sea/o?prefix=social_media/&fields=items(name,timeCreated)"
-```
-
-Verified live 2026-08-24: 547 objects, one page, no `nextPageToken` (the JSON API pages
-past ~1000 results — if a future run's response includes one, follow it with
-`&pageToken=<token>` rather than assuming the list is complete). **Ignore `timeCreated`
-entirely for both filtering and ordering** — it's the date this bucket was backfilled
-from Supabase (every object clustered around 2026-08-19 regardless of the card's actual
-content date), not when the card was generated. The filename's own `YYYYMMDD` is the
-only date that means anything here; that's already the selection criteria's date filter
-below, unchanged.
-
-Build each eligible name's public URL as:
+**Where the filenames come from.** The carousel pipeline writes every card to a GCS
+bucket, `sectorsapp-sea`, under `social_media/<filename>` — a public, unauthenticated
+path, browsable by a human at
+`https://console.cloud.google.com/storage/browser/sectorsapp-sea/social_media`. Build
+each eligible name's public URL as:
 
 ```
 https://storage.googleapis.com/sectorsapp-sea/social_media/<filename>
 ```
 
-and **reference it directly in `<img src>`** — public, unauthenticated, no signed-URL
-expiry, so email clients load it with no rehosting step. A human can also browse the
-bucket directly at
-[console.cloud.google.com/storage/browser/sectorsapp-sea/social_media](https://console.cloud.google.com/storage/browser/sectorsapp-sea/social_media)
-for the same file list.
+The bucket cannot currently be listed programmatically without a credential, and public
+reads only resolve for an exactly-known filename (a guessed name 404s, and the trailing
+`_<n>` is not predictable) — so the filenames themselves have to come from somewhere
+else per run. Once you have one, reference it directly in `<img src>`: public,
+unauthenticated, no signed-URL expiry, so email clients load it with no rehosting step.
+
+> **Superseded 2026-08-31**: an earlier revision here (through 2026-08-24) reported this
+> bucket as anonymously listable over its plain public JSON API — `GET
+> https://storage.googleapis.com/storage/v1/b/sectorsapp-sea/o?prefix=social_media/`,
+> verified live against 547 real objects at the time. That capability is gone as of this
+> revision: the same call now requires auth. **Anonymous *read* of a known filename and
+> anonymous *list* of the bucket are separate GCS IAM permissions** (`storage.objects.get`
+> vs `storage.objects.list`) — the bucket keeping the first while losing the second is
+> exactly the failure mode this note exists to catch. If a future run finds the listing
+> call working again, verify it live and update this note rather than silently reverting
+> to asking the user out of habit — two options to restore unattended listing without
+> reopening the old Supabase-connector dependency:
+> - **Manifest file (preferred, no credential).** Have the carousel pipeline write a small
+>   JSON to a predictable public path as it renders, e.g.
+>   `.../social_media/manifest_<YYYYMMDD>.json`, listing each render's filename, topic,
+>   tickers and data window. The skill then fetches one known URL and picks against the
+>   selection criteria above. Keeps the bucket private-by-obscurity and needs no key in
+>   this skill.
+> - **Storage credential.** Give the skill a GCS credential so it can list by date prefix.
+>   More power, more setup, and another secret to hold alongside `config.json`'s API key.
 
 <details>
 <summary>Retired approach (through 2026-08-24): Supabase MCP connector</summary>
@@ -264,67 +303,43 @@ required property 'authorization'`), so this skill queried `storage.objects` —
 Postgres table Supabase Storage keeps that metadata in — through the Supabase MCP
 connector instead (`scripts/fixed-queries/social-media-bucket-listing.sql`, now deleted).
 That worked, but made card selection depend on a connector/credential
-(`SUPABASE_ACCESS_TOKEN`) that the GCP bucket's own public listing API doesn't need at
-all. Kept here only in case the GCP bucket's public listing is ever locked down and this
-has to be resurrected.
+(`SUPABASE_ACCESS_TOKEN`). Kept here only for whichever of the two options above gets
+built, since both need to enumerate objects some other way once the bucket's own
+anonymous listing is gone.
 
 </details>
 
-### Auto-selecting cards, unattended (always — no connector, no credential)
+### Interactive runs: ask for the URLs
 
-**Prefer this over generating a chart, always — a real social card beats a generated
-one whenever one is actually eligible.** Chart generation is the fallback for when
-nothing eligible exists that week, not a first choice taken for convenience. Unlike the
-retired Supabase-based approach, there's no "connector unavailable" branch to consider
-here at all — the GCP bucket's listing endpoint is a plain public HTTP call, always
-reachable from any runner with internet access:
+Since the bucket cannot currently be listed unattended (see the superseded note above),
+an interactive run derives the week's findings from the API first, then asks the user for
+the card URLs per **Where the filenames come from**, above — this is §3's blocking-ask
+policy, not optional. Apply the existing selection criteria (date filter, drop story-only
+prefixes, relevance, window-gap note, reconciliation, sets, budget) to whatever the user
+supplies.
 
-1. Derive the week's two or three findings from the API exactly as always ("Findings
-   first, images second," above — this doesn't change).
-2. List the bucket per **Where the filenames come from**, above.
-3. Apply the existing selection criteria above (date filter, drop story-only prefixes,
-   relevance, window-gap note, reconciliation, sets, budget) to the returned list exactly
-   as an interactive run would against a human-read file list, then build each eligible
-   card's URL per **Where the filenames come from**, above. This is the one visual path
-   in this skill that involves no local file at all: **never save a real card under a
-   `chart-<slug>.svg` name or any name the delivery pipeline's chart step would match.**
-   The unattended CI run rasterizes and re-uploads every `chart-*.svg` it finds in the
-   delivery folder on the assumption that it's a locally-generated chart in need of
-   hosting; a real card already has a permanent public URL and doesn't need or want that
-   treatment. Giving one that filename would upload a duplicate copy to mailroom's own
-   bucket for no reason and rewrite a perfectly good URL into a different one.
-4. **Distinguish the two reasons this can come up empty — they are not the same, and
-   collapsing them hides real bugs.** Silently treating both as "just use charts" is
-   how a broken listing call gets mistaken for a genuinely quiet week and never fixed:
+### Unattended runs: no one to ask, fall back to a generated chart
 
-   | What happened | How you can tell | What to record in `run-notes.md` |
-   | --- | --- | --- |
-   | **Listing call errored** | the HTTP request itself failed (network error, non-200 status, bucket renamed/moved) | **Quote the actual error text.** This is a defect (a real outage, or the bucket path changed), not a config gap, and needs fixing rather than absorbing |
-   | **Listing fine, nothing eligible** | the call returned objects, but none pass the date/story-prefix/relevance filters | "N objects listed, none eligible for the 20-24 Jul window." Normal, not a fault |
+There is no manifest or credential yet (see the two options above), so an unattended CI
+run has no mechanical way to discover card URLs at all. This is the one case where §3's
+"no chart fallback, ever" rule does not apply — there is no one to ask, so every finding's
+visual is generated instead:
 
-   The endpoint itself is known-good: verified live 2026-08-24 against the real bucket
-   (547 objects returned via the JSON API's `items(name,timeCreated)` fields, no auth).
-   So an error after that date means something actually changed (the bucket went
-   private, moved, or renamed), and should be surfaced loudly, never quietly swallowed
-   into the chart fallback.
-
-   In both cases, fall back to a generated chart for that finding so the issue is
-   never image-less:
-   - Render with `../../scripts/charts.mjs` instead. Pick the chart kind from the
-     finding's own shape, the same judgement the `dataviz` skill's form heuristic
-     describes: `moversChart` for a ranked signed list, `barChart` (with
-     `financial: true`) for a signed comparison, `sparkline`/`line` for a path over the
-     week, `donut` for a mix.
-   - Skip the Instagram/Threads credit line under a generated chart, it credits card
-     artwork that isn't there. Keep the follow-us block at the end of block 4, that one
-     is a standing CTA rather than an attribution.
-   - Note in `run-notes.md` (never inside the sent HTML, see SKILL.md's
-     **Running unattended** section) that this finding's visual was generated rather
-     than sourced from a card, and why, so a reviewer knows without having to guess.
-
-A mixed issue is normal and correct: one finding illustrated by a real card, another by
-a generated chart, because only one of them had an eligible card that week. Don't force
-consistency across findings at the expense of using a real card wherever one exists.
+- Render with `../../scripts/charts.mjs`. Pick the chart kind from the finding's own
+  shape, the same judgement the `dataviz` skill's form heuristic describes: `moversChart`
+  for a ranked signed list, `barChart` (with `financial: true`) for a signed comparison,
+  `sparkline`/`line` for a path over the week, `donut` for a mix.
+- Skip the Instagram/Threads credit line under a generated chart, it credits card artwork
+  that isn't there. Keep the follow-us block at the end of block 4, that one is a standing
+  CTA rather than an attribution.
+- Note in `run-notes.md` (never inside the sent HTML, see SKILL.md's **Running
+  unattended** section) that every finding's visual was generated rather than sourced,
+  and why — an all-generated unattended issue is expected under this policy, not a
+  defect to investigate.
+- **Never save a generated chart under a `chart-<slug>.svg` name** if the delivery
+  pipeline's own rasterize step would also try to claim it — check
+  `../../scripts/charts.mjs`'s own output-naming convention before assuming this
+  collision applies.
 
 > **Resolved 2026-07-27: default to the exchange definition (`idx_daily_data`) for weekly
 > aggregated foreign flow. Never use the broker-domicile aggregation (`idx_broker_summary_daily`
@@ -352,9 +367,9 @@ consistency across findings at the expense of using a real card wherever one exi
 > times `close` is an approximation, since only volumes are stored and a true value would need
 > separate buy-side and sell-side average prices.
 
-**Fixed query, not a per-ticker API loop.** Run
-`../../scripts/fixed-queries/foreign-flow-range.sql` through the Supabase MCP connector
-(read-only), substituting the week's Mon-Fri `{{start}}`/`{{end}}`:
+**Approved query, not a per-ticker API loop.** Invoke the `sectors-newsletter-dbquery` skill for
+its approved `foreign-flow-range` query, giving it the week's Mon-Fri `{{start}}`/`{{end}}`.
+Never run this SQL yourself; it is reproduced here only so you can see what comes back:
 
 ```sql
 select symbol,
@@ -378,9 +393,9 @@ MAPI -187.83B, BBRI -30.27B).
 
 Every figure in block 4 is restated as HTML text under its image, because many clients block
 remote images by default. Alt text carries the full figure set for the same reason. This is
-the type's substitute for the standard `chart-<slug>.svg` hero chart: if no suitable card
-exists for the week's findings, generate a chart with `charts.mjs` instead, so the issue is
-never image-less.
+the type's substitute for the standard `chart-<slug>.svg` hero chart. This type ships no
+`chart-<slug>.svg` at all: `charts.mjs` is not called anywhere in a weekly-insights-v2 run,
+and the bucket cards are the issue's only images.
 
 ## 4. The What's Ahead calendar
 
@@ -417,23 +432,61 @@ Two hard rules, both inherited from the monthly type:
 
 Close the block with the dividend calendar link, as before.
 
-## 4c. The Other Side
+## 4c. Summary
 
 The two-sided read, placed after What's Ahead and immediately before the CTA. Ported from
-`monthly-market-pulse.md` §8.9, compressed for a weekly.
+`monthly-market-pulse.md` §8.9, compressed for a weekly. **The heading is `Summary`**
+(renamed from "The Other Side", 2026-08-17); the sub-headings inside it keep the bull/bear
+names.
 
 **No new fetches.** Every bullet is grounded in a number or citation that already appears
 earlier in this issue. If a bullet needs a figure the issue doesn't carry, that figure
 belongs in Key Data Bites first, and then the bullet may reference it.
+
+**Every bullet ends somewhere new.** This block is macro and structural analysis, not a
+second pass over the same facts. The bullet has to close on a claim the issue hasn't made:
+what the numbers imply for positioning, liquidity, rotation, institutional behaviour or
+policy transmission.
+
+- Restatement, cut or finish it: "all five of the week's biggest gainers were non-LQ45 names,
+  each posting a double-digit weekly move."
+- Finished: "all five of the week's biggest gainers were non-LQ45 names, each posting a
+  double-digit weekly move. Capital is rotating down the market-cap ladder."
+
+**Repeat a figure only when the claim needs it.** The test is whether the sentence still
+lands with the number taken out. Scale, direction and reversal usually are load-bearing, so
+they stay: "foreign investors flipped to a net IDR 2.37 trillion sell, a reversal from the
+prior week's IDR 583.99B net buy, so global capital is derisking Indonesian exposure ahead of
+the coming rate decisions" needs both figures, because the reversal is the whole argument.
+Decoration is not load-bearing and reads as padding: if the claim is that bank fundamentals
+are supportive, "BBCA and BMRI both grew profit again in July" carries it, and re-printing
+`+1.57%` and `+24%` next to it only makes the reader re-read Headlines. Same for a price
+level, a close, or a stake percentage repeated for colour.
+
+When in doubt, write the claim first, then add back only the figures without which it would
+be vague.
+
+Write the closing claim in plain declarative prose. It is the one place in the issue that
+interprets rather than reports, so it should read like a view, not like a caption.
 
 Shape:
 
 - **The bull read** — two or three bullets.
 - **The bear read** — two or three bullets. Give it genuine weight; a token bear block that
   concedes nothing is worse than no block.
-- **What would settle it** — one closing line naming the specific dated print or event that
-  distinguishes the two reads. Normally this is one of block 7's own rows, corporate action
-  or macro, which is why the two blocks sit next to each other.
+- **What to watch next** — the closing sub-block (renamed from "What would settle it",
+  2026-08-17). One line naming the specific dated event that distinguishes the two reads,
+  normally one of block 7's own rows, then **two conditional bullets**, one per read, each
+  saying what outcome would validate that side. Conditions, never predictions:
+
+  ```markdown
+  Monitor price action and volume in GOTO and CPIN into the 31 August MSCI effective date:
+
+  - If the market absorbs the passive outflow with minimal price damage in both names, it
+    confirms broad-market resilience as the primary trend, validating the bull case.
+  - If the rebalancing triggers a heavy, unabsorbed unwind that spills into broader benchmark
+    constituents, foreign selling and blue-chip drag are the leading indicators instead.
+  ```
 
 Attribution follows §5b's causation policy without relaxation: a forward-looking bullet is
 either quoted and attributed to a named analyst, house or official with a date, or reframed
@@ -448,40 +501,168 @@ new_ratio, price, trading_period_start/end}`, `agm{agm_date, agm_time}`, and
 `dividend{ex_date, dividend_amount, dividend_yield, payment_date}`. A dividend announced in
 the news but with no ex-date in the endpoint yet belongs in Headlines, **not** the calendar.
 
-## 5. Keep the two content sources separate
+## 5. Keep the four blocks' functions separate
 
-This is a hard rule for this type, and the one the user corrected on the first draft:
+This is a hard rule for this type, and the one the user corrected on the first draft. The
+repetition failure mode is one fact appearing under Bites, again under Headlines, again
+under Summary, each time slightly reworded.
 
 - **Key Data Bites** is *derived from data*. Every line traces to an endpoint computation.
-- **Other Major Headlines** is *from news sources*. Every line has an outbound citation.
+- **Other Major Headlines** is *from news sources*, and strictly **new factual events** in
+  the window: bank earnings released, a merger rumor, a ruling, a mandate. Past tense,
+  cited, one event per line. No analysis, no forecast, no Bites number reworded.
+- **What's Ahead** is strictly **forward-looking catalysts** with a future date: the BI Rate
+  decision, an MSCI rebalance effective date, an ex-date, a scheduled result. Nothing that
+  already happened, including as background inside a "why it matters" cell.
+- **Summary** is strictly **macro and structural analysis** over what the three blocks above
+  already reported. A figure may recur here, but only carried inside a structural claim the
+  issue has not made yet: what the number means for positioning, liquidity, rotation or
+  policy transmission. The claim is the payload, the figure is context. A bullet that stops
+  where the earlier block stopped is a restatement, cut it or finish it.
+
+  ```markdown
+  Restatement: Foreign investors flipped to a net IDR 2.37 trillion sell this week, a
+  reversal from the prior week's IDR 583.99B net buy, led by a IDR 932.28B exit from TPIA.
+
+  Finished: Foreign investors flipped to a net IDR 2.37 trillion sell this week, a reversal
+  from the prior week's IDR 583.99B net buy, led by a IDR 932.28B exit from TPIA. Global
+  capital is derisking its Indonesian exposure ahead of the coming rate decisions.
+  ```
+
+Before shipping, run a duplication pass: list every distinct fact in the issue and the
+blocks it appears in. A fact in two blocks is a defect unless the second mention carries a
+new claim. Resolve it by keeping the fact in the earliest block that owns it, then either
+finishing the later mention with a real structural read or cutting it. An event that already
+has a row in What's Ahead does not also get a Headlines bullet: the MSCI review's effective
+date is a What's Ahead row, so the announcement drops out of Headlines rather than running
+in both.
 
 A fact must not appear in both. If `news/` reports a dividend declaration and you also have
 the number from an endpoint, it goes in Headlines with its citation, and Key Data Bites gets
 a different, computed line instead (sub-sector valuation, a flow aggregate, a breadth read).
 
-Headlines carry **no category prefix** ("Dividends —", "Commodities —"). Just the fact and
-its source link. Close the block with the news link.
+Headlines carry **no category prefix** ("Dividends,", "Commodities,"). Just the fact and a
+plain-text attribution.
+
+**Citations in the body are never clickable.** This is a skill-wide rule, not a v2 quirk
+(`SKILL.md` hard rule 14, `../newsletter-format.md`'s **UTM convention**), restated here
+because Headlines is where it bites hardest. Every news citation in the issue, Headlines
+bullets, macro rows in What's Ahead, and any cited figure elsewhere, renders as bare text in
+the form `(Source Name, DD Mon YYYY)`, with no `<a>` in the HTML and no markdown link in the
+`.md`. The outbound URL appears **only in the Sources list**, one line per source carrying
+name, date and link. Match the Sources entry to the body attribution by name and date so a
+reader can find it.
+
+The only links allowed in body copy are `sectors.app` links (tickers, sectors, brokers,
+read-more and calendar links, the CTA) plus the Instagram and Threads follow-us line, all of
+which keep the reader inside our own properties. Close the block with the news link.
 
 ## 5b. Writing rules applied throughout (ported from monthly-market-pulse)
 
 These two cost the issue almost no length and apply to every block, not to one section.
 
-### Claim subtitles
+### No claim subtitles (changed 2026-08-17)
 
-Every block heading from Key Data Bites onward carries one italic sentence directly under
-it, stating what that block's own numbers argue. **The heading name itself never changes**,
-the heading names the data and the subtitle names the argument.
+**This type carries no italic claim subtitle under any heading.** The rule was ported from
+`monthly-market-pulse` and the user cut every one of them from the 16 Aug issue: the
+subtitles previewed the block's own bullets, so a reader met each fact twice within four
+lines, which is the same repetition problem in miniature. Heading, then straight into the
+data.
+
+Where a block genuinely needs an observation, it goes **after** the data, as one short line
+under the table or bullets, saying something the rows don't already say:
 
 ```markdown
 ## Top Weekly Movers
 
-*Both ends of the table are Basic Materials names, so the sector label says nothing about
-what actually happened.*
+<gainers table>  <losers table>
+
+All five of the week's biggest gainers sit outside the LQ45.
 ```
 
-The subtitle must be falsifiable by that block's own figures. A restatement of the heading
-("Here are the week's movers", "The latest insider disclosures") is not a claim; cut it and
-write the real one. One sentence, never two.
+One line, no italics, no restating the table. If the only line you can write is a summary of
+the rows above it, write nothing. `monthly-market-pulse` keeps its own subtitle convention
+for now; this change is scoped to `weekly-insights-v2`.
+
+### Key Data Bites: one point per subject (changed 2026-08-26)
+
+Facts about the same subject share one bullet instead of scattering across the list. The
+failure the user flagged: LQ45's weekly return sat on one line, LQ45 breadth on another, and
+the best and worst LQ45 constituents on two more, so a reader assembling the benchmark
+picture had to walk four separate bullets.
+
+Group them under a labelled lead line with indented sub-points:
+
+```markdown
+- **LQ45 and IDX30 outperformed**: LQ45 +1.95% and IDX30 +1.77%, Friday to Friday, reversing
+  last week's -1.25% and -1.58%. Breadth was 34 up, 9 down, two unchanged of 45.
+  - Best constituent: HRTA (Hartadinata Abadi), +8.84%, closing at IDR 2,340.
+  - Worst constituent: JPFA (Japfa Comfeed Indonesia), -4.74%, closing at IDR 2,210.
+```
+
+Same treatment for foreign flow: the market-wide net figure leads, the largest net buy and
+net sell sit under it as sub-points. The block still ships around eight facts; it just
+carries them in fewer, tidier points.
+
+### No internal method notes in reader-facing copy (added 2026-08-26)
+
+The reader gets the result, never the plumbing. These never appear in the body of an issue:
+
+- Data-source qualifiers: "(exchange definition, `idx_daily_data`)", "(pinned Supabase
+  query)", "computed-LQ45 route", endpoint or table names of any kind.
+- Production notes: "chart generated this run", "no matching social card was available for
+  the window, see appendix".
+- Methodology asides that only exist to defend a number against an alternative method.
+
+Write "foreign investors sold a net IDR 319.95B of ISAT this week" and stop. §3's rule that
+foreign flow uses the exchange definition throughout governs **which number you compute**,
+not what you tell the reader. The appendix is where method belongs, and it is the only place.
+
+### Cut dead-end observations everywhere (generalised 2026-08-26)
+
+The §3 rule against restated caveats applies to the whole issue, not just block 4. A line
+whose content is that nothing is known carries no information, so it does not ship:
+
+- "Nothing in this week's filings or corporate-action record explains who was on the other
+  side of that foreign selling."
+- "Nothing in the disclosed record ties the sale directly to the week's price action; the
+  filing and the decline are concurrent, not proven cause and effect."
+
+If the join has no meaning behind it, the finding itself is the thing to cut, not to publish
+with a disclaimer attached. Careful wording under the causation policy below is what keeps a
+claim honest; a trailing hedge is not. Every bullet in the issue should be actionable or
+meaningful on its own.
+
+### No section-level descriptions of any kind (tightened 2026-08-31)
+
+Stricter than the italic-subtitle ban above, because the ban was evaded by writing the same
+line without the italics. **Nothing sits between a section heading and that section's first
+piece of data.** No subtitle, no framing line, no "here's what to look for", italic or not.
+Heading, then the table, chart or bullets.
+
+The one permitted exception is a plain date-scope line the reader needs to read the rows
+("Five most recent disclosures in the 24-28 August window.", "Week of 31 August-4
+September"). That states the window, never a conclusion about it.
+
+An observation still goes **after** the data, as one plain line, and only when it says
+something the rows do not. If the only line available summarises what is already visible
+above it, write nothing.
+
+### No inverted-pair sentence structures (added 2026-08-31)
+
+Ban the "not X, but Y" family and its mirror in every block. These read as manufactured
+insight and cost words without adding a fact:
+
+- "not proof of what caused it", "confirmation that showed up alongside the rally, not proof"
+- "a macro story rather than anything specific to BBRI's own results"
+- "the split ran along sector lines, not just a handful of outliers"
+- "the pattern isn't clean", "it reads as X, not Y"
+- Anything of the shape "isn't A, it's B", "less A than B", "A, not B".
+
+Write the positive claim and stop. If the contrast is genuinely load-bearing, state both
+sides as facts in sequence ("BBNI saw net foreign selling and still closed up +1.34%"),
+without the rhetorical pivot. The same rule kills the trailing hedge covered above: a
+sentence whose second half retracts its first half ships neither half.
 
 ### Causation policy
 
@@ -501,7 +682,7 @@ more careful. The rule is **name the mechanism and label its status**:
 
 Practical test: a reader can see exactly who is asserting what and how confident they are.
 It fails if the newsletter itself is quietly predicting a price. Bites in block 4 and every
-bullet in The Other Side are where this bites hardest.
+bullet in Summary are where this bites hardest.
 
 ## 6. Standing links
 
@@ -519,36 +700,70 @@ right-hand column below.
 | Headlines, read more | `sectors.app/indonesia/news` | `headlines` |
 | What's Ahead tickers | `sectors.app/idx/<ticker>` | `whats-ahead` |
 | What's Ahead, calendar | `sectors.app/indonesia/calendars/dividend-calendar` | `whats-ahead` |
-| The Other Side tickers | `sectors.app/idx/<ticker>` | `other-side` |
+| Summary tickers | `sectors.app/idx/<ticker>` | `other-side` |
 | Macro row citations | BI, BPS, wire coverage | **no UTM** |
 | CTA button | `sectors.app/watchlist` | `cta` |
 | CTA body, "workflow" | `sectors.app/workflow` | `cta` |
 | Footer citation | `sectors.app` | `footer` |
 | Block 4 close | `instagram.com/sectorsapp`, `threads.net/@sectorsapp` | **no UTM** |
-| Headline citations | Bisnis, Kontan, Kompas, … | **no UTM** |
+| Headline citations | plain text in body, URL in **Sources** only | **not linked** |
 
 ## 7. Self-review before delivery
 
-- Nine blocks, in order, nothing reinstated from v1's prose sections? No thesis paragraph
-  added above Key Data Bites, that was considered and declined (2026-08-03).
-- Does every block from Key Data Bites onward carry a one-sentence italic claim subtitle,
-  with the heading name itself unchanged, and is each subtitle falsifiable by that block's
-  own numbers rather than a restatement of the heading?
+- Nine blocks, in order, nothing reinstated from v1's prose sections? **The issue opens on
+  the Key Data Bites heading**, with nothing between the header block and it: no thesis
+  paragraph, no hook line, no scene-setter naming the week's tickers (declined 2026-08-03,
+  re-confirmed 2026-08-31 after one shipped anyway). A hook belongs in the subject line.
+- Are there **no** section descriptions under any heading, italic or plain (§5b, tightened
+  2026-08-31)? The only line allowed between a heading and its first data is a bare date
+  scope. Every block-level observation sits after the data as one plain line that says
+  something the rows do not.
+- **No inverted-pair sentences anywhere** (§5b): no "not X, but Y", "rather than", "isn't
+  A, it's B", "not proof of", "the pattern isn't clean". Positive claim, then stop.
+- **Block 4's images are bucket social cards only.** Every `<img src>` in the block starts
+  `https://storage.googleapis.com/sectorsapp-sea/social_media/`. A `mailroom-email-assets`
+  URL, a `charts.mjs` render or any other generated image in this block is a defect: stop
+  and ask the user for the week's card URLs instead of shipping a substitute. If no eligible
+  card exists for a finding, cut the finding.
+- **No em dashes or en dashes anywhere in the issue**, Sources and Appendix included. Use a
+  colon between a source and its label, a comma or a full stop in prose.
+- Sources list carries only the **news and research pieces actually cited for a fact in this
+  issue**. Reference pages that merely confirm a date (public-holiday calendars, a central
+  bank's published meeting schedule, exchange session hours) are not sources, drop them.
+- Appendix ends at the last endpoint-and-fields bullet plus the Instagram credit. Nothing
+  after it: no method note, no window description, no chart or section attribution.
 - Does every linking sentence pass §5b's test: the reader can see who asserts what and how
   confident they are, and the newsletter itself never predicts a price?
 - What's Ahead: are the scheduled macro rows real, dated, cited, and each one mapped to a
   ticker or sector that appears elsewhere in this issue? Unmapped rows cut?
-- The Other Side: two or three bullets per side, every one traceable to a figure already in
-  the issue with no new number introduced, the bear read given genuine weight, and **What
-  would settle it** a specific dated event rather than a vague "time will tell"? Every
-  forward-looking bullet attributed or reframed as a condition?
-- Key Data Bites: every line computed from an endpoint, none duplicated in Headlines?
-- Headlines: every line news-sourced and cited, no category prefixes, off-topic non-IDX
-  stories dropped?
+- Summary: two or three bullets per side, every one traceable to a figure already in
+  the issue with no new number introduced **and no figure reprinted** (conceptual reference
+  only), each bullet joining two reported things rather than restating one, the bear read
+  given genuine weight, and **What to watch next** a specific dated event rather than a
+  vague "time will tell"? Every forward-looking bullet attributed or reframed as a condition?
+- Key Data Bites: every line computed from an endpoint, none duplicated in Headlines, and
+  **facts about the same subject grouped into one point** with indented sub-points (benchmark
+  returns with breadth and best/worst constituent, foreign flow with largest buy and sell)?
+- **No internal method notes anywhere in the body**: no "(exchange definition, ...)", no
+  endpoint, table or query names, no "chart generated this run", no "no matching social card
+  available"? Method confined to the appendix?
+- **No dead-end lines**: nothing saying the record explains nothing, no "concurrent, not
+  proven cause and effect" trailer? Findings with no meaning behind them cut outright?
+- Headlines: every line news-sourced and cited, strictly new factual events in the window,
+  no analysis or forward-looking items, no category prefixes, off-topic non-IDX stories
+  dropped?
+- **Duplication pass run (§5):** every distinct fact appears in exactly one of Bites,
+  Headlines, What's Ahead, Summary? Any fact found in two blocks resolved by keeping
+  it in the earliest owning block?
 - Block 4: two or three findings, each a **join** of two sources, not a single-endpoint
   restatement? Bullets, never paragraphs?
 - Were the findings derived from the API **first**, with cards picked to illustrate them,
   rather than written around whatever images existed?
+- **Are block 4's visuals real bucket social cards, not generated charts?** Was the user
+  asked for the week's card URLs before drafting the block? A rendered `chart-*.svg` in this
+  block is a defect, with no exception: a week short on cards ships fewer findings.
+- Does every card URL's `YYYYMMDD` fall inside this issue's Mon-Fri window, with story-only
+  prefixes excluded and every image credited to `instagram.com/sectorsapp`?
 - **Foreign flow uses the exchange definition (`idx_daily_data`) throughout, never the broker
   aggregation** (§3), pulled via the fixed `foreign-flow-range.sql` query, not a per-ticker API
   loop. Card figures and prose figures must come from the same method; exchange and broker
@@ -558,13 +773,36 @@ right-hand column below.
   computed-LQ45 route (§2b) used plus disclosed if the snapshot didn't match?
 - Filings filtered by `timestamp` to on-or-before the window's Friday, structured fields only?
 - Calendar: `null` guards in place, week grid plus beyond-the-week table, dividend link?
-- Ticker style: bare linked `$TICKER` everywhere, **never** `Company Name ($TICKER)`, in
-  tables and prose alike, including the movers tables?
+- Ticker style: bare linked `TICKER` everywhere, **never** `TICKER (Company Name)` and
+  never `Company Name (TICKER)`, in tables and prose alike, including the movers tables,
+  Key Data Bites, the findings bullets and Other Major Headlines. **No exceptions**
+  (the former Headlines carve-out was removed 2026-08-31): a Headlines bullet about a
+  company names the ticker only. If a company has no IDX ticker, name the company plainly
+  and link nothing.
+- **Every single ticker occurrence is linked**, not just the first per section and not just
+  table cells (skill-wide, `SKILL.md` hard rule 13). The same ticker appearing eight times across the issue
+  carries eight `sectors.app/idx/<lower>` links, each with the block's own `utm_content` and
+  `utm_term=<ticker>`. Grep the finished HTML for the ticker string and check every hit sits
+  inside an `<a>`. Grep for a literal `$` as well, it should return nothing.
+- **No clickable citation in the body.** Grep the HTML for `<a href="http` and confirm every
+  hit is a `sectors.app` link, an Instagram/Threads follow link, or sits inside the Sources
+  list. A news outlet URL anywhere in Headlines, What's Ahead or the findings bullets is a
+  defect: move it to Sources and leave `(Source Name, DD Mon YYYY)` in the body.
+- **No generated chart anywhere in the issue.** No `chart-*.svg` in the delivery folder, no
+  `charts.mjs` call in the run. Block 4's images are bucket social cards or the finding is
+  cut.
+- Bullets in the findings block: **three each**, four at the outside? Any restated caveat,
+  structural recap, "taken together" closer or production note ("chart generated this run",
+  "no matching social card") cut?
+- Headings carry **no italic claim subtitle** anywhere in the issue? Where a block needs an
+  observation, does it sit as one plain line *after* the table or bullets?
+- Is the two-sided block headed **Summary**, closing with **What to watch next** and its two
+  conditional bullets, one per read?
 - Every figure restated as text under its image, alt text complete?
 - Is the Appendix (endpoint/field trace) present, after Sources and before the
-  disclaimer? **Endpoints and field names only**, one bullet per endpoint, with no
-  section label, chart name, table name, derivation or usage note attached to any
-  bullet (`../newsletter-format.md`'s Appendix section)?
+  disclaimer? **Endpoints and field names only**, one bullet per endpoint, with no section
+  label, chart name, table name, derivation or usage note attached to any bullet
+  (`../newsletter-format.md`'s Appendix section)?
 - Appendix credits `instagram.com/sectorsapp` for every social image, with no bucket name,
   filename or storage path anywhere in reader-facing copy?
 - No story-only render used (`filings-plain`, `filings_daily`, `broker-bandar`,

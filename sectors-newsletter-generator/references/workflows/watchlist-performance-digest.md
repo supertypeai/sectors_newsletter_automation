@@ -3,7 +3,7 @@
 A fixed template, same structure for every recipient: a ranked performance + peer
 comparison table for up to 5 of that user's own tracked tickers/sectors. Only the
 values (and which items appear) change per recipient, via `{{merge_tag}}`. Read
-`../newsletter-format.md`'s watchlist-performance-digest skeleton and its **Merge-tag
+`../newsletter-format/skeletons/watchlist-performance-digest.md` and its **Merge-tag
 convention** section before drafting, and `../compliance.md` before writing the
 context section, this is personalized performance content and the no-advice
 discipline applies in full.
@@ -19,10 +19,10 @@ Invoke the `sectors-newsletter-dbquery` skill (Skill tool) to run its approved
 `email`, `first_name`, `tickers` (array), `sectors` (array). **Never write or improvise
 SQL for this, and never query Supabase directly for user-account data**, that
 discipline is load-bearing, not a formality, see dbquery's
-`references/supabase-access.md`. (This is distinct from the two public market-data
-fixed queries this skill runs itself, `scripts/fixed-queries/broker-summary-range.sql`
-and `foreign-flow-range.sql`, used by monthly-market-pulse and weekly-insights-v2;
-those hold no PII and don't go through dbquery's gate.)
+`references/supabase-access.md`. (The two public market-data queries used by
+monthly-market-pulse and weekly-insights-v2, `broker-summary-range` and
+`foreign-flow-range`, now live in dbquery's `scripts/approved-queries/` too and are
+invoked the same way: this skill never runs SQL itself.)
 
 Known data-quality caveat in the real rows (per that query's own header comment,
 pending upstream DB cleanup): tickers are inconsistently suffixed (`.JK` for IDX,
@@ -142,7 +142,7 @@ node ../../scripts/sectors.mjs \
 
 ## 5. Draft
 
-Follow `../newsletter-format.md`'s watchlist-performance-digest skeleton: greeting +
+Follow `../newsletter-format/skeletons/watchlist-performance-digest.md`: greeting +
 headline mover (benchmarked, e.g. vs. the IDX composite's own 7-day move, or vs. the
 item's own history for an SGX name), the ranked table (≤5 rows, Exchange column
 always shown, IDX rows before SGX, sorted by signed move within each group,
@@ -186,7 +186,7 @@ as the audience source, not just the market-data calls).
 - Worked example rendered against one real sample user, PII scrubbed per dbquery's
   `references/supabase-access.md`, before this file is shared outside the session?
 - Is the Appendix (endpoint/field trace, including the dbquery audience query) present,
-  after Sources and before the disclaimer? **Endpoints and field names only**, one
-  bullet per endpoint, with no section label, chart name, table name, derivation or
-  usage note attached to any bullet (`../newsletter-format.md`'s Appendix section)?
+  after Sources and before the disclaimer? **Endpoints and field names only**, one bullet per endpoint, with no section
+  label, chart name, table name, derivation or usage note attached to any bullet
+  (`../newsletter-format.md`'s Appendix section)?
 - Disclaimer footer present, unmodified (`../newsletter-format.md`)?

@@ -1,49 +1,59 @@
-# Sectors Carousel Brand Voice
+# Sectors brand voice
 
-*Runtime entry is `./writing.md` (section 3, "Voice"); open this file for the full treatment and worked examples.*
+**One voice, every medium.** Carousels, reels, newsletters, publications, ads and story images all sound like the same writer. The format changes; the voice does not.
 
-The original content-skills pack leans on a personal `voice-dna` file (the creator's own voice). This skill writes for a **brand**, not a person, so this file is the voice every carousel matches. The writing skills (`viral-hooks`, `storytelling`, `dumbify`, `anti-ai-writing`) all defer to this file wherever they say "match your voice."
+This file is the full treatment. The one-paragraph version lives in `./core.md` section 7, and the rules that override style in every case are `./core.md` section 1.
+
+> **Reference copy.** Pulled in from the Sectors skills repo's shared `_shared/writing/brand-voice.md` (jigsawinthecity/claudeskills) so this skill stays self-contained and needs no other repo checked out alongside it. This copy is static, not auto-synced from there — re-pull it by hand if the canonical file changes upstream.
 
 ## Who is talking
 
-**Sectors**, an Indonesian capital-markets data platform (sectors.app, by Supertype). The carousel voice is a **sharp markets explainer**: the friend who actually reads the filings and tells you what the number means, without the jargon and without selling you anything. Think a clear-eyed markets desk, not a finfluencer and not a sell-side analyst.
+**Sectors**, a capital-markets data platform (sectors.app, by Supertype), covering the Indonesian, Singapore and Malaysian markets and the Indonesian mining complex.
 
-## Who we're talking to
+The voice is a **sharp markets explainer**: the friend who actually reads the filings and tells you what the number means, without the jargon and without selling you anything. A clear-eyed markets desk. Not a finfluencer, not a sell-side analyst.
 
-Retail investors and finance-curious people on Instagram who follow IDX (Indonesia Stock Exchange) names. They know tickers like BBCA, TLKM, GOTO. They are smart but **time-poor and not specialists**, they'll swipe away the second a slide feels like homework. They want to feel *informed*, like they now understand something they can repeat to a friend.
+Where a piece carries a named analyst byline, as publication pieces do, the byline changes the accountability, not the voice. A named analyst may state a thesis and must say what would falsify it. They still write in the register below.
+
+## Who we are talking to
+
+Retail investors and finance-curious people who follow names like BBCA, TLKM, GOTO, DBS. They are smart but **time-poor and not specialists**, and they leave the moment a piece feels like homework. They want to feel informed, to understand something well enough to repeat it to a friend.
+
+What that means in practice varies a little by where they meet us, but the voice does not change:
+
+- On social, a reader arrives mid-scroll and gives one unit a second to earn the next.
+- In the inbox, a reader has already opted in and will give a section a paragraph to prove itself, but never a page.
+- On an article, a reader arrived from a search or a link with a specific question and wants it answered before the scroll bar moves.
+- On an ad, a reader is deciding in about two seconds whether an event is for them.
 
 ## The register
 
-- **Language: English.** Indonesian market context, English copy. (The studio publishes in English; Indonesian phrasing in a draft is a bug.)
-- **Confident and plain.** Short declaratives. Say the thing. "BBCA earns more on every rupiah of equity than any big bank on the exchange." Not "BBCA demonstrates superior return metrics."
+- **Language: English.** Indonesian and regional market context, English copy. Indonesian phrasing in a draft is a bug.
+- **Confident and plain.** Say the thing. "BBCA earns more on every rupiah of equity than any big bank on the exchange," not "BBCA demonstrates superior return metrics."
 - **Specific over impressive.** A real number always beats an adjective. "Net profit up 11% to IDR 54T" beats "strong profit growth."
-- **Curious, not breathless.** We open loops and pay them off. We do not yell "GAME CHANGER."
-- **Numerate but humble about it.** We explain what a ratio means in one clause the first time it appears ("ROE, profit earned on shareholder money, hit 21%").
-
-## Non-negotiables (these override style every time)
-
-1. **Never fabricate a number.** Every figure on a slide comes from a real Sectors API field or a cited source. No estimates dressed as facts, no rounded-from-memory prices. If you don't have it, leave it out. (See `../sectors-api/data-quality.md`.)
-2. **Never give investment advice.** Describe, don't prescribe. No "buy", "sell", "this is cheap, load up", no price targets framed as our call. We report what the data shows; the reader decides. Analyst consensus may be *reported* as a fact ("34 analysts, consensus Buy"), never *endorsed*.
-3. **No hype vocabulary.** No "to the moon", "explosive", "must-own", "skyrocket", "10x". The market is interesting enough told straight.
-4. **Respect the reader's intelligence while lowering their effort.** Plain words, real insight. Simple ≠ simplistic.
-5. **When a slide cites the data source, say `sectors.app`, never "Sectors API" or bare "Sectors."** "Sectors API" is our own internal engineering name for the data layer, it means nothing to a retail reader and leaks implementation detail onto a public slide. `sectors.app` is the product the reader could actually go visit. This applies to caption-t source lines and any other on-slide citation ("Dividend yield: sectors.app," not "Dividend yield: Sectors API"). It's fine to say "Sectors API" in your own working notes or when reading `references/sectors-api/`, that's internal, just never let it reach a rendered slide.
+- **Curious, not breathless.** Open loops and pay them off. Never yell "GAME CHANGER."
+- **Numerate but humble about it.** Explain what a ratio means in one clause the first time it appears: "ROE, the profit earned on shareholders' money, hit 21%."
+- **Varied in cadence.** Short, medium, then one longer sentence that rolls to a close. A run of clipped sentences is the loudest tell that a machine wrote it. See `./core.md` section 5.
 
 ## Vocabulary
 
-- **Use:** the company's real name and ticker, plain verbs (rose, fell, earns, pays, owns, trades at), concrete units (IDR, %, ×, T for trillion). Indonesian rupiah is `IDR`, never `Rp` (e.g. `IDR 10,150`). Compact ≥1T/≥1B figures at
-two decimals (`IDR 31.40T`, `IDR 689.50B`); a figure ≥1 million and <1 billion, with no
-clean T/B suffix, renders as thousand-separated millions, two decimals: `IDR 5.85
-million`.
-- **Lose:** the AI/LinkedIn tells (delve, leverage, robust, pivotal, testament, landscape, in today's market), the finfluencer tells (secret, nobody's talking about, this is your sign), and dash-connectors as pauses (use periods/commas).
+**Use:** the company's real name and ticker, plain verbs (rose, fell, earns, pays, owns, trades at), concrete units (IDR, %, ×, T for trillion).
 
-## Voice in one line, good vs off-brand
+**Number formatting.** Indonesian rupiah is `IDR`, never `Rp`, as in `IDR 10,150`. Compact figures at or above 1B and 1T to two decimals: `IDR 31.40T`, `IDR 689.50B`. A figure at or above 1 million and below 1 billion, with no clean T or B suffix, renders as thousand-separated millions at two decimals: `IDR 5.85 million`.
+
+**Lose:** the AI and LinkedIn tells (delve, leverage, robust, pivotal, testament, landscape, "in today's market"), the finfluencer tells (secret, nobody's talking about, this is your sign), and any dash used as a connector or a pause, whether em dash, en dash or spaced hyphen. Use periods and commas. The full blocklist is `./core.md` section 4c.
+
+## Voice in one line, off-brand against on-brand
 
 | Off-brand | On-brand |
 |---|---|
-| "BBCA is crushing it this quarter! 🚀" | "BBCA just posted its highest ROE in five years." |
+| "BBCA is crushing it this quarter!" | "BBCA just posted its highest ROE in five years." |
 | "This stock is a must-buy at these levels." | "It trades at 22× earnings, a premium to the 14× sector median." |
 | "The dividend landscape is evolving." | "The payout has climbed five years straight, from IDR 120 to IDR 315 a share." |
 | "Unlock the power of IDX's top bank." | "Indonesia's most valuable company, by the numbers." |
 | "Foreign investors are fleeing!" | "Foreign investors sold a net IDR 1.4T over the last month." |
+| "It's not a profit story, it's a cost story." | "Revenue grew 4%. Operating costs fell 11%, and that gap is the whole result." |
+| "Margins fell. Costs rose. The market noticed." | "Margins fell 40bps as deposit costs rose, and the market noticed within a session." |
 
-When the writing skills tell you to "read your top posts for cadence," read this file instead. The voice above is the target.
+## When a source file says "match your voice"
+
+Some of the craft references in the skills are adapted from a pack built around one person's own voice. Wherever one of them tells you to read your own top posts for cadence, or to match your personal voice, read this file instead. The voice above is the target.

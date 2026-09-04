@@ -118,10 +118,10 @@ it.
   meeting, a rating review, an index reclassification date) rather than a generic
   "next print"? A vague forward-watch item is a sign the research stopped early, not
   a stylistic choice.
-- Does every `$TICKER` mention (table, chart label, AND inline prose) read bold,
+- Does every `TICKER` mention (table, chart label, AND inline prose) read bold,
   linked, and ticker-blue (`#9E0142`)? Gains/losses green/red (`#568475`/`#D53E50`)?
   (`../newsletter-format.md`'s Color convention, applies to every issue.)
 - Is the Appendix (endpoint/field trace) present, after Sources and before the
-  disclaimer? **Endpoints and field names only**, one bullet per endpoint, with no
-  section label, chart name, table name, derivation or usage note attached to any
-  bullet (`../newsletter-format.md`'s Appendix section)?
+  disclaimer? **Endpoints and field names only**, one bullet per endpoint, with no section
+  label, chart name, table name, derivation or usage note attached to any bullet
+  (`../newsletter-format.md`'s Appendix section)?

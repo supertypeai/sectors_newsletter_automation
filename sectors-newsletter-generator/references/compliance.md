@@ -1,8 +1,8 @@
 # Compliance, read before drafting any section
 
-This newsletter goes to subscribers. It carries the same non-negotiables as the sibling
-`sectors-carousel` skill (`sectors-api/data-quality.md`,
-`writing/brand-voice.md`), restated here for prose:
+This newsletter goes to subscribers. It carries the same non-negotiables every Sectors skill does
+(`sectors-api/data-quality.md`, `./writing/core.md` section 1), restated here
+for prose:
 
 ## The hard rules
 
@@ -44,7 +44,7 @@ This newsletter goes to subscribers. It carries the same non-negotiables as the 
 The newsletter's own brief asks, for the macro-reaction issue, whether affected tickers
 are "a good time to purchase," and for the three-stock story, for "a great future
 forecast." Read literally, both are investment advice — exactly what rule 3 above (and
-the carousel skill's identical hard rule) forbids. This is resolved by **reframing, not
+the identical hard rule in `./writing/core.md`) forbids. This is resolved by **reframing, not
 dropping**: the reader's real question — *is this expensive or cheap, and why* — is
 answerable factually without ever telling them what to do.
 

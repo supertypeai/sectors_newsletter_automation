@@ -1,6 +1,6 @@
 # Sectors API v2, Endpoint Reference
 
-**Synced copy.** The source of truth is `sectors-carousel/references/sectors-api/endpoints.md`; re-sync from there rather than editing this file in place. Paths it names in passing (`references/charts.md`, `visual-language.md`, `scripts/blocks.mjs`, `assets/logos.json`) are carousel paths and may not exist here.
+**Synced copy.** The source of truth is `sectors-carousel/references/sectors-api/endpoints.md`; re-sync from there rather than editing this file in place. Paths it names in passing (`references/charts/INDEX.md`, `visual-language.md`, `scripts/blocks.mjs`, `assets/logos.json`) are carousel paths and may not exist here.
 
 Scope: **IDX (Indonesia Stock Exchange) primarily**, plus the SGX (Singapore) endpoints in section 4. Live-verified 2026-06-12, re-verified 2026-07-02 (20-call audit; every "verified live" note below with a July date comes from that run). This is
 the trimmed working reference for an IG-carousel generator. For the full response
@@ -95,7 +95,7 @@ top-level revenue segments (source = segment name); the other edges in the
 same array flow into cost/opex buckets instead and will silently inflate a
 "revenue mix" if you don't filter them out. **For the full decomposition**
 (where revenue comes from AND where it goes after), feed the WHOLE array,
-unfiltered, straight into a `sankey` chart (`references/charts.md`)
+unfiltered, straight into a `sankey` chart (`references/charts/INDEX.md`)
 as `links`, the field is already shaped as `{value,source,target}` Sankey
 edges, no reshaping needed. TLKM's 17-edge tree reconciles exactly at every
 level (see the sankey worked example). Only companies in
@@ -355,6 +355,22 @@ inline metrics; don't expect an IDX-style `query_values` shortcut here.
 a subsector-level report, or a quarterly financials endpoint. A single-stock deep-dive (`report`
 + `daily`) is the carousel type this data layer currently supports well for SGX; don't promise a
 sector-pulse, smart-money, or dividend-calendar SGX carousel without probing further first.
+
+### SGX via the Sectors MCP connector (wider than the REST paths above)
+
+When a `sectors` MCP server is connected, it exposes SGX coverage well beyond the three REST
+paths documented here, and those tools are **allowed and preferred for SGX work**:
+
+`fetch-sgx-company-report`, `fetch-sgx-daily-transaction`, `fetch-sgx-top-companies`,
+`fetch-sgx-companies-by-sector`, `fetch-sgx-sectors`, `fetch-sgx-subsectors`,
+`fetch-sgx-tags`, `fetch-sgx-news`, `fetch-sgx-filings`, `fetch-sgx-buybacks`,
+`fetch-sgx-short-sell`.
+
+So the "not yet found" list above is a limit of the *raw REST* surface, not of SGX itself: a
+sector pulse, a top-companies ranking, a filings or buyback story, or a short-sell angle are
+all reachable for SGX through MCP. Prefer MCP first for SGX; fall back to the REST paths when
+no MCP server is connected. Same evidence rules as IDX apply — every number on a slide, scene,
+or newsletter line comes from a call you actually made, never from an article or from memory.
 
 ### SGX ticker logos — DO NOT USE THIS SOURCE AS-IS (watermarked)
 `https://storage.googleapis.com/sectorsapp-sea/sgx_logo/sgx_{TICKER}.png` exists and is

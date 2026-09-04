@@ -11,7 +11,7 @@ and keep it clearly attributed as *reported*, not as this newsletter's own figur
   optional.
 - **Three-stock-story issue**: company history, founders, fun facts, and the people
   behind the business are not in the Sectors API. Not optional.
-- **Weekly wrap**: web search corroborates the "why" behind whatever the data shows was
+- **Weekly Insights v2**: web search corroborates the "why" behind whatever the data shows was
   the week's biggest mover — the data proves *what* moved, search finds *why*.
 
 Your own knowledge cutoff is stale for "macro news in the past 2 days" and for anything
@@ -74,9 +74,13 @@ anything you cannot pin a publication date to.
 
 ## Inline citation format
 
-Every web-sourced claim gets an inline source, either a markdown link on the claim itself
-or a bracketed `(Source Name, DD Mon YYYY)`, and every issue closes with a **Sources**
-list — one line per source, name + date + link if available. This is in addition to the
+Every web-sourced claim gets an inline source as **plain bracketed text**,
+`(Source Name, DD Mon YYYY)`, never a clickable link (tightened 2026-08-31, applies to
+every issue type). The URL for that source appears in exactly one place, the **Sources**
+list closing the issue, one line per source: name, date, link. The earlier option of
+hanging a markdown link on the claim itself is withdrawn, because it gives the reader an
+exit from the issue before the CTA. See `newsletter-format.md`'s **UTM convention**
+section for the full statement of the rule. This is in addition to the
 `sectors.app` citation used for API-sourced figures (see `compliance.md` rule 6).
 
 **No source, no claim.** A statement that traces to neither a real Sectors API field nor
@@ -90,3 +94,19 @@ three-stock pick is featured. A standing historical fact (a five-year streak, a
 company's founding story) is proof material for the body, never the headline. If the
 "why now" search for a candidate comes up empty, that's a signal to re-angle, not to run
 a history-only piece and call it news.
+
+## What does not belong in the Sources list (added 2026-08-31)
+
+The Sources block lists the news and research pieces that carried a fact into the issue. A
+page consulted only to confirm a calendar date is not one of them, even though it was
+genuinely opened during drafting. Drop:
+
+- Public-holiday calendars used to check why a session was closed.
+- A central bank's or exchange's published meeting or session schedule, when the issue only
+  states the date of a meeting that block 7 already lists as a scheduled event.
+- Exchange trading-hour or listing-rule reference pages.
+- Any page whose entire contribution is a date the reader can see in the issue's own tables.
+
+Keeping them pads the list and dilutes the entries that actually back a claim. If a scheduled
+event's date is contested or was reported rather than published, that is a real citation and
+it stays.
