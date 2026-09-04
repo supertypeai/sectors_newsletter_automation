@@ -1,7 +1,7 @@
 -- Fixed query: market-wide aggregated broker summary over a date range.
 -- Used by workflows/monthly-market-pulse.md Broker Flow section (and any other
 -- issue type that needs a multi-day broker net-buy/net-sell ranking, e.g. a
--- weekly window for weekly-insights-v2 or weekly-wrap).
+-- weekly window for weekly-insights-v2).
 --
 -- Replaces the old per-day `brokers/top` API loop (no range param exists on that
 -- endpoint) with one Supabase query against idx_broker_summary_daily, summed

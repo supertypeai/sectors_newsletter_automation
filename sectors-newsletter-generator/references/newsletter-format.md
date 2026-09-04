@@ -9,7 +9,7 @@ The prose equivalent of the carousel skill's `deck-format.md`. Every issue is a 
 ---
 subject: <the email subject line>
 preview: <the inbox preview/preheader text>
-issue_type: weekly-insights-v2 | weekly-wrap | macro-reaction | three-stock-story | single-company-deep-dive | sector-spotlight | monthly-market-pulse | upcoming-event | new-release-feature | watchlist-performance-digest | did-you-catch-it
+issue_type: weekly-insights-v2 | macro-reaction | three-stock-story | single-company-deep-dive | sector-spotlight | monthly-market-pulse | upcoming-event | new-release-feature | watchlist-performance-digest | did-you-catch-it
 date: <YYYY-MM-DD, the issue/send date>
 data_as_of: <YYYY-MM-DD, the API's as-of date>
 sample_recipient: <watchlist-performance-digest only: a scrubbed placeholder
@@ -24,7 +24,7 @@ sample_recipient: <watchlist-performance-digest only: a scrubbed placeholder
   `watchlist-performance-digest`, the subject itself carries a `{{merge_tag}}` (it's a
   template, not one fixed line), see **Merge-tag convention** below.
 - **`preview`**: ~40-90 characters. Re-angles the subject with a second detail; never
-  restates it verbatim (same rule as the carousel caption's first line).
+  restates it verbatim (the same rule the social skills apply to a caption's first line).
 - **`issue_type`**: one of the built workflow slugs, matches the folder/file naming in
   the delivery convention (see SKILL.md).
 - **`date`** and **`data_as_of`**: the API "today" lags ~1 day (UTC), so these can differ
@@ -71,20 +71,29 @@ API" or bare "Sectors" (`compliance.md` rule 6).
 
 ## Ticker-mention convention (enforce everywhere, no exceptions)
 
-- **Bold, `$`-prefixed on first mention per section**: `**$BBCA**`.
-- **Link every bolded ticker mention** to its sectors.app profile:
-  `[**$BBCA**](https://sectors.app/idx/bbca)`, lowercase ticker, no `.JK` suffix. This
-  applies everywhere the ticker is bolded (first mention and any table cell), not just
-  once per section, a reader should be able to click through from wherever they land.
-  **Inline prose mentions count too, not just table cells** — a bare `$TICKER` typed
+- **Bold, and never `$`-prefixed**: `**BBCA**`. The `$` cashtag is banned outright, see
+  `SKILL.md` hard rule 16.
+- **Link every ticker mention, every occurrence, every issue type** (tightened
+  2026-08-31, applies to all ten types with no exception). Not once per section, not
+  first-mention-only: the same ticker appearing nine times across an issue carries nine
+  links to `[**BBCA**](https://sectors.app/idx/bbca)`, lowercase ticker, no `.JK`
+  suffix, each with that block's own `utm_content` and `utm_term=<ticker>`. A reader
+  should be able to click through from wherever they land, and an unlinked mention reads
+  as a different kind of object than a linked one four lines above it.
+  **Inline prose mentions count too, not just table cells**: a bare `TICKER` typed
   into a paragraph without the bold+link treatment is the single easiest miss, check
-  every paragraph, not just tables and chart labels.
+  every paragraph, chart label and alt-text line, not just tables. Before shipping, grep
+  the HTML for the ticker string itself and confirm every hit sits inside an `<a>`. Grep
+  for a literal `$` too: it should return nothing at all.
 - Pair with the company's full name at least once per section:
-  `Bank Central Asia ([**$BBCA**](https://sectors.app/idx/bbca))`.
+  `Bank Central Asia ([**BBCA**](https://sectors.app/idx/bbca))`.
+  **`weekly-insights-v2` overrides this: ticker only, never a company name in parentheses
+  and never a company name carrying the ticker, in every block** (2026-08-31). See that
+  type's skeleton.
 - **No elegant variation.** Don't rotate BBCA → "the lender" → "the banking giant" to
   avoid repetition — reuse the ticker or the company name plainly. This is the same
-  AI-tell filter the carousel skill's `writing.md` applies to slide copy.
-- **SGX tickers**: same bold/`$`/link treatment, `https://sectors.app/sgx/<lowercase
+  AI-tell filter in `./writing/core.md` section 4.
+- **SGX tickers**: same bold and link treatment, no `$`, `https://sectors.app/sgx/<lowercase
   bare code>` (no `.SI` suffix), e.g. `https://sectors.app/sgx/d05`. Confirmed
   2026-07-16.
 - **Sub-sector/sector mentions** (a sector named as its own subject, not attached to
@@ -96,6 +105,11 @@ API" or bare "Sectors" (`compliance.md` rule 6).
   `https://sectors.app/idx/broker/ak`. Confirmed 2026-07-16.
 
 ## UTM convention (every issue type, every `sectors.app` link)
+
+The authority is `~/.claude/skills/UTM_CONVENTION.md`, the organization-wide standard. Read it
+before writing the first link of a draft and check the finished draft against it before
+shipping. What follows is the newsletter-specific application of that standard; where the two
+ever disagree, `UTM_CONVENTION.md` wins.
 
 Every link to a domain **we own** carries UTM parameters so the CRM can attribute return
 visits to the issue and the block that drove them. Five params, always in this order,
@@ -128,6 +142,16 @@ never appear in a finished `newsletter.html`.
 - **`utm_term`** carries the bare ticker or broker code on links to
   `sectors.app/idx/<ticker>` and `sectors.app/idx/broker/<code>`, so per-name interest is
   still recoverable without inflating `utm_content`. Omit it on every other link.
+
+**No third-party link in the body, any issue type** (2026-08-31). A news citation in
+body copy renders as plain `(Source Name, DD Mon YYYY)` text with no `<a>` around it,
+and the outbound URL appears **only in the Sources list** at the foot of the issue. The
+reason is conversion, not tidiness: a live outbound link mid-issue hands the reader an
+exit before they reach the CTA, and every issue type is drafted to keep them reading to
+it. The only links allowed in body copy are `sectors.app` links (tickers, sectors,
+brokers, calendars, read-more, CTA) and our own Instagram and Threads follow lines, all
+of which keep the reader inside our properties. Match each body attribution to its
+Sources entry by name and date so the reader can still find the piece.
 
 **Never tag a third-party link.** Citations to Bisnis, Kontan, Kompas and any other outlet
 stay clean: our UTMs do nothing in their analytics, and appending tracking to someone else's
@@ -202,22 +226,31 @@ One fixed asset, one fixed markup, every issue type:
 - Hosted asset, not copied into the issue folder — link directly, same as every other
   externally-hosted image this skill already references (event posters, etc.).
 
-## Prose style (newsletter-specific, overrides the carousel's short-declarative slide voice)
+## Prose style (newsletter-specific, overrides the short-declarative instinct)
 
-The carousel skill's voice guide is written for slide copy, where the goal is a short
-declarative a swiper can read in one glance. A newsletter issue is read as continuous
-prose, not swiped as fragments, so this issue type asks for the opposite instinct in one
-respect: sentences that read the way a person actually drafts, not a stack of clipped
-fact statements.
+`./writing/core.md` is medium-neutral and binds here in full. This section adds
+what continuous prose needs on top of it. A newsletter issue is read as prose rather than
+swiped as fragments, so it asks for sentences that read the way a person actually drafts,
+and never a stack of clipped fact statements. Core section 5, the rhythm ban, is the rule
+this section leans on hardest.
 
 - **No dash as a connector.** Never use an em dash, an en dash, or a spaced hyphen to
   join two clauses or pivot mid-sentence. Use a comma, a period, or "and"/"but" instead.
   A hyphen inside a compound word or a numeric range (`62-65Mt/yr`, `year-on-year`) is
   not a connector and stays as is. This is the single biggest tell of AI-written copy to
-  a human reader. The carousel's own AI-tell filter already bans it for slide copy
-  (`writing/writing.md`); this reinforces it for
+  a human reader. The shared core already bans it
+  (`references/writing.md`); this reinforces it for
   running prose, where the temptation is stronger because a longer sentence looks like
-  it needs a pause.
+  it needs a pause. **This covers every part of the issue, not just prose**: Sources,
+  the Appendix, table cells, captions and alt text included (added 2026-08-31, after an
+  issue shipped with `&mdash;` separating every Sources entry from its label). Between a
+  source link and what it backs, use a colon. In the delivered HTML this means no
+  `&mdash;`, no `&ndash;`, and no literal em or en dash character anywhere in the file.
+- **No inverted-pair sentence structures.** "not X, but Y", "isn't A, it's B", "A rather
+  than B", "less A than B", and their mirrors are banned across every issue type (added
+  2026-08-31). They read as manufactured insight and usually retract the sentence's own
+  first half. State the positive claim and stop; where a contrast genuinely carries a
+  fact, write both sides as plain statements in sequence with no rhetorical pivot.
 - **Vary sentence length and structure the way a person drafting on deadline would.**
   Don't reduce every section to a stack of short subject-verb-object statements repeated
   one after another, that reads as repetitive and mechanical, not confident. Let some
@@ -257,15 +290,15 @@ no-dash/no-AI-tell rules, it constrains *shape*.
 
   | Ticker | Price (IDR) | Return WoW |
   |---|---|---|
-  | **$SMMA** | 15,600 | +12.6% |
-  | **$APIC** | 1,895 | +18.4% |
+  | **SMMA** | 15,600 | +12.6% |
+  | **APIC** | 1,895 | +18.4% |
 
   **Top losers**
 
   | Ticker | Price (IDR) | Return WoW |
   |---|---|---|
-  | **$DSSA** | 1,615 | -20.1% |
-  | **$BBCA** | 5,850 | -3.3% |
+  | **DSSA** | 1,615 | -20.1% |
+  | **BBCA** | 5,850 | -3.3% |
   ```
 
   A per-ticker valuation comparison (macro-reaction's core section, once there are 2+
@@ -295,7 +328,7 @@ no-dash/no-AI-tell rules, it constrains *shape*.
   skill's chart engine: `import` the function for the kind you need (`sparkline`/`line`
   for a price series, `barChart` for year-over-year, `donut` for a mix, `multiline` for
   self-vs-peer, and so on, the same 13-kind grammar documented in the carousel skill's
-  `references/charts.md`) and write its returned SVG string to `chart-<slug>.svg`.
+  `references/charts/INDEX.md`) and write its returned SVG string to `chart-<slug>.svg`.
 
   **In the HTML, reference the chart by filename** (`<img src="chart-<slug>.png">`),
   never as an inlined `data:` URI. Email delivery converts each `chart-*.svg` to a
@@ -431,386 +464,32 @@ concurrent, don't imply one caused the other.
 Markdown**, colored +/- cells, tables, CTA buttons and the hero chart don't survive
 plain Markdown the same way, and the point is a self-contained, data-backed email with
 no PDF attachment. Keep `newsletter.md` as the review draft; ship the `.html` alongside
-it, for all eleven types, not only weekly-wrap and upcoming-event. See
+it, for all ten types. See
 `newsletter/samples/<type-slug>/newsletter.html` for each type's own worked HTML
 reference.
 
-**Weekly Insights v2 supersedes Weekly wrap.** Both skeletons are listed while the
-migration finishes; pick v2 for a Monday send unless the user names v1. The full
-"Sectors Weekly Insights" digest below is weekly-wrap's own skeleton, its
-two-column mover cards and event banner are specific to that type's layout. Full recipe
-(API source per section, HTML delivery notes) in `workflows/weekly-wrap.md` §2b–2c.
+**Weekly Insights v2 is the weekly send.** The v1 `weekly-wrap` type was retired
+2026-08-31: its workflow doc, skeleton and sample are deleted, and a request for "the
+Saturday wrap" or "weekly wrap" now routes to `weekly-insights-v2` on its Monday send
+date. Full recipe in `workflows/weekly-insights-v2.md`; the shared HTML chrome lives in
+this file's **Color convention** section.
 
-1. **IDX Total Market Cap** — the headline stat (`idx-total` level) with a 3-up snapshot:
-   7d (label it "rolling") / 30d / YTD.
-2. One-paragraph **the week in one line** — the conclusion, stated first.
-3. **Index & market** — IDX total mcap / LQ45 / IDX30 moves as a **this-week vs
-   prior-week** table (fetch the prior Mon-Fri for the compare column). Good candidate for
-   the issue's one hero chart (the index's daily path over the week).
-4. **Weekly Top Movers** — top gainers and top losers as **two side-by-side cards/tables**
-   (in HTML; two Markdown tables in the `.md` draft), never one signed column. Mind the
-   `top-changes` live-window gotcha in the workflow doc: label movers with the window they
-   belong to.
-5. **What actually traded** — `most-traded` volume leaders and the featured name's foreign
-   flow (a domestic-churn vs foreign-inflow read), short prose.
-6. **Sector pulse** — which sub-sectors led/lagged, valuation + 1-week change
-   (`subsector/report/{slug}/`). Optional; a table once there are 3+ to compare.
-7. **New Filings** — the 5 most recent insider / major-holder disclosures (`filings`) as a
-   table: date, holder → ticker, buy/sell, change, post-owned. Structured fields only.
-8. **New IPOs** — this week's listings with **first-day change** (`daily[0].close` vs
-   offering price) and market cap, as a table, each ticker linked to its report page.
-9. **Headlines** — 5 recent IDX-relevant `news` items (title + short body + source link);
-   drop off-topic non-IDX stories. Note there is **no 0-100 news score** in the API; rank
-   by recency + relevance.
-10. **Upcoming Events** — the standard closing block, see **Upcoming events closing
-    block** below, not this type's own thing.
-11. **The takeaway** — the non-obvious so-what, not a restatement of section 2 — then a
-    CTA back to `sectors.app`, **Sources** list (if any web-sourced "why" was used), and
-    the disclaimer footer.
+## Pick one skeleton
 
-### Weekly Insights v2
+Read `references/newsletter-format/skeletons/<slug>.md`, that file only, for the issue type this run is writing. Never read all ten.
 
-The successor to Weekly wrap, and the one to reach for on a Monday send unless the user
-asks for v1 by name. **Nine blocks, info-packed, no long-form reading anywhere.** Full
-recipe in `workflows/weekly-insights-v2.md`.
-
-Every content block, 2 through 8, carries a **claim subtitle** (the CTA and Upcoming Events
-blocks do not, they argue nothing): the heading name stays
-exactly as listed below, and one italic sentence sits directly under it stating what that
-block's own numbers argue. The heading names the data, the subtitle names the argument. A
-subtitle that only restates the heading ("Here are the week's movers") is not a subtitle,
-cut it and write the claim.
-
-1. **Masthead, no greeting line** (revised 2026-07-29, superseding both the original
-   "Good morning!" and the later "Hi there," it was changed to) — issue number, send
-   date, window, data-as-of, straight into Key Data Bites. No opening hook paragraph,
-   no table of contents, and **no greeting line of any kind**. This is a broadcast
-   digest with no per-recipient binding (unlike `watchlist-performance-digest`, which
-   *does* keep its own "Hi there," as the compliance-mandated null-`first_name`
-   fallback for a genuinely personalized send, see that type's own workflow doc — don't
-   port that back here). A greeting implies a one-to-one address this type doesn't
-   have; the masthead's own issue number and date already do the job of opening the
-   issue. "Good morning" was time-of-day-specific and wrong whenever delivery slipped
-   past the morning (see Hard rule 11's own history); "Hi there," fixed that but was
-   still an ungrounded greeting with nothing to greet the reader *as*. Cutting it
-   entirely removes the whole class of problem.
-2. **Key Data Bites** — 8 one-line facts in a tinted box, each **derived from data**, every
-   ticker linked. This is where v1's market-level prose sections survive, one line each.
-   Nothing here may repeat a Headlines item (see block 6).
-3. **Top Weekly Movers** — top gainers and top losers as two side-by-side cards, same as v1.
-   Tables only; the ranked-bar chart is not used in this type.
-4. **What the Data Unearthed** — the issue's only analysis. Two or three findings, each a
-   **join of two sources** (movers × corporate actions, price × foreign flow, volume ×
-   filings), each with a heading stating the finding, a social card image, and 3-5 short
-   bullets. Never paragraphs. Two images under one heading go side by side, each at half
-   width; **a single image runs at 500px** (revised 2026-07-29, was half width), near
-   the full content column, not squeezed down just for being alone. Closes with a
-   follow-us line (Instagram, Threads).
-5. **Insider Filings** — the 5 most recent disclosures as one table: date, holder, ticker,
-   buy/sell, shares, stake before → after. Structured fields only, filtered by `timestamp`
-   to on-or-before the window's Friday. One short line calling out the standout filing.
-6. **Other Major Headlines** — 5 IDX-relevant `news` items, **from news sources**, each with
-   an outbound citation. **No category prefix** on the bullets. Closes with a read-more link
-   to `sectors.app/indonesia/news`.
-7. **What's Ahead** — a **Mon-Fri week-grid calendar** of corporate actions (stock splits,
-   dividend ex-dates, AGMs, rights issues), a "beyond the week" table for anything further
-   out, and a third compact **scheduled macro** table (Date, Event, Why it matters) of two
-   to four dated prints and policy events: BI RDG, BPS CPI or trade balance, an FOMC
-   decision, an index rebalance effective date. Corporate actions are polled from
-   `company/corporate-actions/{symbol}/`; the macro rows are sourced and cited, not an API
-   pull. Every macro row's "why" names a ticker or sector that already appears in this
-   issue; an unmapped row is a wire feed line, cut it. Closes with the dividend-calendar
-   link.
-8. **The Other Side** — the two-sided read, built entirely from figures already in the
-   issue, no new fetches. Two short stacked blocks, **The bull read** and **The bear read**,
-   two or three bullets each. Then one closing line, **What would settle it**, naming the
-   specific dated print or event that distinguishes the two, normally one of block 7's own
-   rows. Every forward-looking bullet is attributed to a named source with a date, or
-   reframed as a condition ("if CPI prints above 3.2%"). Never the newsletter's own
-   unattributed prediction.
-9. **CTA** — watchlist for exclusive reports, workflow for alerts, in a tinted panel with the
-   magenta button. Then appendix and the disclaimer footer.
-
-Blocks 2 and 6 must not overlap: computed facts in Bites, news-sourced facts in Headlines,
-never the same fact twice. Block 8 introduces no new figure at all; if a bullet needs a
-number the issue doesn't already carry, the number belongs in Bites first. This type has
-**no** takeaway section (block 8 is a two-sided read, not a verdict), no thesis paragraph
-above Key Data Bites, no sector-pulse section and no separate chart-of-the-week; the social
-cards in block 4 are the issue's visuals.
-
-### Macro-reaction
-1. **The news** — what happened in the last ~2 days, cited. Bulleted, stat-first
-   bullets once there's more than one discrete fact.
-2. **Section heading, pick one that fits the issue's actual shape**: "Winners and
-   losers" when the story genuinely splits into two opposing sides (the default, most
-   concrete of the three), "Who's exposed" when it's one-directional (everyone affected
-   loses or gains together), "The effects" as the plain fallback when neither fits.
-   Whichever heading, the content is the same: sectors/tickers likely affected and the
-   stated mechanism (a claim made openly, not a hidden assumption).
-3. Per-ticker **valuation & fundamentals context** — cheap/expensive vs. own history and
-   peers, real fundamentals, disclosed consensus if any (see `compliance.md`). Once
-   there are 2+ tickers, lead with a **comparison table** (price, P/E vs. peer average,
-   ROE, dividend yield), then a short paragraph per ticker for whatever doesn't fit a
-   column.
-4. **What to watch** — objective, non-prescriptive close (an upcoming print, an
-   ex-dividend date, a macro catalyst).
-5. **Sources** list + disclaimer footer.
-
-### Three-stock story
-1. Short framing — the thread linking the three picks (a sector, a group, a theme), or
-   an honest note that there isn't one and each stands on its own reason.
-2. Three **per-stock sections**, each with four sub-parts:
-   - *The story* — history + a genuine fun fact, cited.
-   - *The people* — founders, major holders, key executives likely to steer it (API +
-     cited web).
-   - *The numbers* — real fundamentals from the Sectors API, as a small table when it's
-     comparing the same metrics across all three picks.
-   - *The outlook* — attributed forward statements only (`compliance.md`).
-3. Closing line.
-4. **Sources** list + disclaimer footer.
-
-### Single company deep dive
-1. **The trigger** — one paragraph, the real recent event (earnings, corporate action,
-   ownership change) that makes this issue timely. Cited.
-2. **The read** — the one-line verdict, benchmarked (beat/missed vs what, cheap/dear vs
-   what). Stated before the detail that proves it.
-3. **The numbers** — the fundamentals that carry the read, as a small table when several
-   metrics or periods compare (revenue/earnings by year or quarter, ROE, margins). Good
-   candidate for the hero chart (price over 90 days with the trigger marked, or an
-   earnings bar series).
-4. **Valuation context** — P/E vs the name's own history and the peer average, dividend
-   yield if relevant. Reported as context, never as a buy/sell call.
-5. **What to watch** — objective, non-prescriptive close (next print, ex-dividend date).
-6. **Sources** list + disclaimer footer.
-
-### Sector spotlight
-1. **The hook** — one paragraph, why this sector now (led/lagged the week, a macro
-   repricing, earnings season). Cited.
-2. **The group** — the sub-sector's own read: median P/E and 1w/ytd cap move
-   (`subsector/report`), the benchmark every pick is measured against.
-3. **The comparison** — a **Markdown table**, one row per pick, columns = the shared
-   metrics that matter for this sector (price, P/E vs group median, ROE, dividend yield),
-   then a short paragraph per pick for what doesn't fit a column. State the metric being
-   ranked on.
-4. **The takeaway** — valuation context, not a recommendation ("cheap vs its own history"
-   never "the one to buy").
-5. **Sources** list + disclaimer footer.
-
-### Monthly market pulse
-An argument evidenced by data, not a data dump with news garnish. Every section is a
-trailing-30-day aggregate, never a single day's snapshot; see
-`workflows/monthly-market-pulse.md` for exactly how each metric gets aggregated
-(most-traded and broker flow have no native range param, so both are summed client-side
-from repeated daily calls, the same way every run).
-
-**Claim subtitles.** Every section heading below keeps its existing name (`## Top
-Movers`, `## Most traded`, `## Broker Flow`, ...) and gains one **italic
-single-sentence subtitle directly under the heading** stating that section's claim. The
-heading names the data; the subtitle names the argument. Never rename a heading into a
-claim.
-
-1. **Headline + trend paragraph, no separate "index in one line" heading.** The H1
-   states this run's own actual finding (drafted fresh each run from that run's
-   `idx-total` trend, a template headline is never reused verbatim run to run), and the
-   standfirst paragraph immediately under it carries the index's own 30-day move,
-   start/end values and any notable trough/peak in the window. This replaces what used
-   to be a separate "Index in one line" section, the same data now opens the issue
-   instead of repeating it under its own heading.
-1b. **The month in four numbers** — a four-tile stat row under the trend paragraph:
-   index cap move, the window's single largest mover, the aggregate net of the dominant
-   broker side, and one macro anchor (rate level, rupiah move, or the commodity that
-   mattered). Number plus one-line label per tile, nothing else. Every tile's figure
-   must also appear somewhere else in the issue.
-1c. **The Read** — two to four sentences carrying the issue's single thesis, stated
-   as a falsifiable claim, before any table, defended by every section that follows.
-2. **Top Movers** — one heading, two small tables underneath (top gainers, top losers
-   over the 30-day window, never a signed column), plus the issue's hero chart: a
-   diverging bar per ticker (green gain / red loss, off a shared zero line) with every
-   row's logo, ticker and full value label shown, not thinned to a handful. See
-   `scripts/charts.mjs`'s `moversChart` (built for exactly this shape; `barChart`'s
-   own label-thinning past 6 bars and lack of per-row logos don't fit a full movers
-   list). Chart caption states only what the chart shows (the tickers, the ranking,
-   the window), no interpretive commentary, that belongs in the surrounding prose.
-3. **Most traded** — ranked by total volume summed across the whole window, not one
-   day's top-N; a short table (ticker, company, 30d volume, price), **followed by a
-   short paragraph** naming one ticker from the list and its real, dated, cited reason
-   for trading heavily all month (an analyst call, a foreign-flow story, a sector policy
-   note). Not every window has a clean answer; say so rather than manufacturing one.
-4. **Broker Flow** — tabular, not a prose line: a top-net-buyers table and a
-   top-net-sellers table, columns broker code, broker name, 30d net, ranked by
-   aggregate net value across the window, **followed by a short paragraph** observing
-   the actual shape of the flow and any real, dated news that plausibly relates, cited
-   and stated as concurrent, never asserted as the proven cause. **Broker code links**
-   (confirmed 2026-07-16): `https://sectors.app/idx/broker/<lowercase code>`, e.g.
-   `https://sectors.app/idx/broker/ak`, same bold accent (`#9E0142`) ticker treatment as
-   a ticker link, every code cell in both tables gets one.
-4b. **Macro Backdrop** — after Broker Flow. Three to five macro items (BI rate, rupiah,
-   foreign flow, bond yields, global rates, IDX-relevant commodities, domestic prints,
-   policy/market-structure changes), each dated and cited, and each **mapped to names or
-   sectors that appear in this issue's own tables**. Unmapped macro items are cut; this
-   is not a general macro digest. Causal language follows the workflow's causation
-   policy: name the mechanism, label its status, attribute anything forward-looking.
-4c. **The Other Side** — **The bull read** and **The bear read**, three to four bullets
-   each, every bullet grounded in a number or citation already in this issue, then one
-   **What would settle it** line naming the specific dated print or event that
-   distinguishes them. Forward-looking bullets are quoted-and-attributed or reframed as
-   conditions ("if X prints above Y"), never the newsletter's own prediction.
-4d. **What to Watch, next 30 days** — compact table, columns Window / Event / Why it
-   matters, three to five rows, every row a real scheduled event (BI RDG, BPS release,
-   earnings window, index rebalance, cum-date) tied back to a name or sector in this
-   issue. Distinct from the Sectors in-house **Upcoming Events** block, which follows it
-   unchanged.
-5. **Appendix: Sectors API endpoints (fields used)**, after Sources and before the
-   disclaimer. Always included for this type (see the generic Appendix section below
-   for the format; this type doesn't treat it as optional the way a tight daily issue
-   would, five distinct endpoints and real client-side aggregation sit behind every
-   run, exactly what a reader might want to trace).
-6. Disclaimer footer (Sources whenever either paragraph above cites something web-sourced).
-
-Color and ticker convention for this type's HTML delivery: every ticker mention
-renders in the shared ticker accent (`scripts/charts.mjs`'s `TICKER`, `#9E0142`), and
-every gain/loss reading renders in the shared brand green/red (`GAIN` `#568475` /
-`LOSS` `#D53E50`), consistently across every table, the chart, AND any inline prose
-mention (a bare `$TICKER` in a paragraph, not just table cells and bar labels, is the
-easy miss, the same bold linked accent treatment applies there too, see the **Ticker-mention
-convention** section above).
-
-### Did you catch it
-FOMO family, one type-slug (`did-you-catch-it`) off one screener and one fetch pass
-(`workflows/did-you-catch-it.md`). Single-ticker spotlight, not a screener dump, one
-broadcast piece, same copy for every reader, no assumed reader state (this skill has no
-account data, see the workflow doc §3). **Product goal**: prove a `sectors.app`
-workflow alert would have caught the moment, so the section order runs **signal first,
-payoff second**, matching the real sequence of events, not the reverse.
-1. **The signal** — H1 poses the issue's own question ("did you catch it" is the hook,
-   not a literal heading to paste in), one-line standfirst naming the trigger date and
-   price plainly (`overview.all_time_price`'s dated low, e.g. "hit a 90-day low of IDR
-   446 on July 24," workflow doc §1), past tense, no imperative.
-2. **What was already true at the low** — the fundamentals guard as a small table (P/E
-   vs sector median, ROE vs sector median, leverage trend, see workflow doc §1 for how
-   each is derived from documented fields), stated as conditions that already held on
-   the trigger date, valuation context only, never "still cheap, don't miss it twice."
-3. **What happened next** — the payoff: last close vs the trigger price as a plain
-   percentage, hero chart (daily close from the trigger date to today, trough visually
-   evident, the up-move following it).
-4. **What to watch** — objective, non-prescriptive close.
-5. **CTA** — name the actual conditions from step 2 as a settable alert, concrete, not
-   generic, then the behavioral ask: set up a workflow alert, or add the ticker to a
-   watchlist. Never "buy now," never a price target, no countdown/scarcity language
-   (workflow doc §4).
-6. **Appendix** — flag the two documented spec adaptations explicitly (fundamentals
-   guard read at report date, not literally priced on the trigger date; leverage
-   compared annually, not at the literal 90-day mark). Then Sources, disclaimer footer.
-
-### Upcoming event
-Promo for a Sectors in-house workshop. Content is **user-supplied** (date/venue, agenda,
-speaker, registration link, banner), not market data. Ask for all four detail sets first
-(workflow doc), never invent them. **Ships as both `newsletter.md` and `newsletter.html`**
-(the send-ready email), see `workflows/upcoming-event.md` §4.
-1. **Hook headline** — what the participant walks away able to do + the most compelling
-   logistical fact (named speaker, hard date, "hands-on, live data").
-2. **Banner** — the user's marketing image right after the headline, one-line caption.
-3. **Essentials block/small table** — date/time (with timezone), venue/format, who it's
-   for. Catchable in one glance. CTA repeated right after this block.
-4. **What you walk away with** — a short bold-lead bullet list (4-5 items, no more), each
-   bullet opening with the benefit stated as an outcome, not the agenda feature, one
-   mechanism sentence after it. Write this section like a CxO deciding whether to expense
-   the ticket: time saved, an informational edge, no-technical-background achievability,
-   instructor credibility. **No emoji as bullet markers, and no table** for this section,
-   the essentials block and any data-teaser table already spend this issue's table
-   budget, a third one reads as spreadsheet fatigue in a short promo email. Full
-   guidance and the worked example in `workflows/upcoming-event.md`.
-5. **Optional short numbered "how we get there" list** — 3-5 items, only if the agenda
-   naturally chunks into stages, kept separate from and below the benefit list above so
-   it shows sequence without diluting the benefit-first framing.
-6. **Optional data teaser** — one real band-checked `sectors.mjs` result showing what
-   participants will build (cited `sectors.app`), skip if the agenda speaks for itself.
-7. **Speaker(s)** — name + role, a short credibility note works better than a full bio
-   dump.
-8. **CTA** — the registration link, plainly stated, repeated once near the close (three
-   total touches across the issue: hook, essentials, sign-off).
-9. Disclaimer footer (Sources only if a data teaser was used). No market-advice framing.
-
-### New release feature
-Product enablement, not market analysis. Source is a user-supplied release note (PDF
-or Markdown), not a live fetch and not the market API, see
-`references/workflows/new-release-feature.md` step 1. Exactly two body sections, ask
-for the release note and the feature to highlight before drafting either. **The subject
-line, preview text, and headline are about the release only** — never mention the
-highlighted feature there, it isn't the issue's hook, it's an add-on beneath it.
-1. **Release summary — the issue itself.** H1 headed with a **"Latest Release"** label
-   (eyebrow tag in HTML, inline colon-joined in Markdown, e.g. "Latest Release: The
-   Straits (3.7.0)"), the same pattern section 2's "Feature Highlight" label uses. A
-   brief, sentence-or-two-per-highlight recap of what shipped, pulled only from the
-   release note's own Highlights section
-   (Sectors release notes tend to run three of these). Omit an Announcement section
-   (community events, upcoming workshops) or an Improvements/deprecations section
-   entirely if the note has them, those are housekeeping, not release headlines. Not
-   an exhaustive changelog, the shape of the release, not every sub-bullet. Closes with
-   a **Read more** button linking to the release note's own URL.
-2. **Feature highlight — a secondary marketing/education section.** Headed with a
-   **"Feature Highlight"** label (an eyebrow tag over a specific title), reads as a
-   bonus aside beneath the release summary, not a second headline competing with it.
-   One feature, in depth (may not be the release's own headline item, whichever the
-   user asked to highlight): what it does, how to use it (steps, where it lives, plan
-   tier if gated), and, if it produces data, one real example (a table or figure
-   already published in the release note counts, cite it `sectors.app`). **A generated
-   chart is not the default here**, a table is usually enough, add one only if it
-   carries a takeaway the table doesn't already show. Closes with the CTA: **"Try the
-   feature now"** linking to the
-   feature's own URL if the user supplied one, otherwise **"Try it yourself now!"**
-   linking to `sectors.app`.
-3. **Sources** — the release note (title, version if it has one, publish date, link) +
-   disclaimer footer.
-
-### Watchlist/sector performance digest
-Personalized, per-recipient template, not a broadcast piece. Same structure for every
-recipient, only the values (and which tickers/sectors appear) change per
-`{{merge_tag}}`.
-1. **Greeting + the headline mover** — `{{first_name}}`, then the single biggest
-   7-day mover among that recipient's tracked tickers/sectors (by absolute move,
-   regardless of where it lands in the table below), stated as fact with a benchmark
-   (vs. the IDX composite for an IDX name, vs. its own recent history for an SGX name
-   where the composite isn't a fair comparison), same no-bare-percentage rule as every
-   other type here.
-2. **The ranked table** — up to 5 of the recipient's tracked tickers/sectors. Columns:
-   name, **Exchange** (`IDX` or `SGX`, its own column, always shown), 7-day move, one
-   peer-comparison figure. **Row order: group by exchange first (IDX rows before SGX,
-   alphabetical by country, Indonesia before Singapore), then by 7-day move descending
-   within each group** — this is display order, independent of which row is the
-   headline mover in step 1, the headline is chosen by absolute significance, the
-   table is ordered by exchange then signed move.
-   - **Peer comparison column**: P/E vs. peer average for an IDX ticker with peer
-     data (`company/report?sections=peers`). For a row where it isn't available yet
-     (every SGX ticker, `sections=peers` 400s there), write **"coming soon"**, never
-     leave the cell blank and never silently drop the column.
-   - A sector-level row shows the sector's own aggregate move (`subsector/report`'s
-     `mcap_change.1w`) plus a one-line callout of its top mover in that
-     peer-comparison cell (`companies/top-changes` filtered to the sub-sector).
-   - **Ticker link**: IDX tickers link `https://sectors.app/idx/<lowercase, no .JK>`
-     (existing convention). **SGX tickers link `https://sectors.app/sgx/<lowercase
-     bare code>`** (confirmed 2026-07-16, e.g. `https://sectors.app/sgx/d05`).
-   - **Sector link**: `https://sectors.app/indonesia/<sub-sector slug>` (confirmed
-     2026-07-16, e.g. `https://sectors.app/indonesia/banks`,
-     `https://sectors.app/indonesia/consumer-services`), the same kebab slug
-     `subsector/report/{slug}/` uses.
-3. **Takeaway paragraph, factors and news, never a call** — after the table, a short
-   paragraph naming real, dated, factual drivers behind what the table just showed:
-   potential factors affecting a tracked ticker/sector's move, related news, or a
-   genuinely upcoming event (an earnings date, a disclosed corporate action). Source
-   from the Sectors API first (`news/?symbols=` / `news/?sub_sector=`,
-   `company/corporate-actions/{symbol}/`), fall back to a cited web search only for
-   what the API can't cover (an SGX name's news, since `news/` is IDX-only), same
-   citation discipline as `sourcing.md` (inline `(sectors.app)` for API facts, a
-   dated named-outlet citation plus a **Sources** entry for anything web-sourced).
-   **Not every row needs a factor.** Only include one for a row where a real source
-   actually turned something up, never manufacture a narrative to fill every line,
-   same non-advice discipline as sector-spotlight and single-company-deep-dive
-   throughout, describe what happened and what's scheduled, never what to do about it.
-4. **CTA** — back to `sectors.app` to check the full watchlist/workflow, one link.
-5. **Sources** (list any web-sourced facts used in step 3, name + date + link, same
-   format as every other issue type; Sectors-API-sourced facts only need the standard
-   inline `(sectors.app)` citation, no separate Sources entry) + disclaimer footer.
+| issue type | skeleton file |
+|---|---|
+| Weekly Insights v2 | `skeletons/weekly-insights-v2.md` |
+| Macro-reaction | `skeletons/macro-reaction.md` |
+| Three-stock story | `skeletons/three-stock-story.md` |
+| Single company deep dive | `skeletons/single-company-deep-dive.md` |
+| Sector spotlight | `skeletons/sector-spotlight.md` |
+| Monthly market pulse | `skeletons/monthly-market-pulse.md` |
+| Did you catch it | `skeletons/did-you-catch-it.md` |
+| Upcoming event | `skeletons/upcoming-event.md` |
+| New release feature | `skeletons/new-release-feature.md` |
+| Watchlist/sector performance digest | `skeletons/watchlist-performance-digest.md` |
 
 ## Upcoming events closing block (required on every issue except `upcoming-event` itself, confirmed 2026-07-20)
 
@@ -873,24 +552,27 @@ event and the button styling may never vary either.
 
 ## Appendix: data sources (required for every issue, after Sources, before the disclaimer)
 
-A technical block mapping each metric actually used in the issue to its endpoint AND
-field, one endpoint per bullet, the specific fields it backed in parentheses. This is
-mandatory for every issue type this skill delivers, not a nice-to-have for a deep
-dive, even a short type gets one, it just has fewer bullets:
+A technical block listing the endpoints actually used in the issue and the fields taken
+from each, one endpoint per bullet. **Endpoints and field names only.** Do not say which
+section, table or chart the data backed, and do not explain how it was used; the reader is
+tracing provenance, not reading a build log. This is mandatory for every issue type this
+skill delivers, not a nice-to-have for a deep dive, even a short type gets one, it just has
+fewer bullets:
 
 ```markdown
 **Appendix: Sectors API endpoints (fields used)**
-- `company/report/ADRO.JK/` — `valuation.historical_valuation[]` (P/E, P/B vs peer
-  average), `financials.historical_eps`, `financials.historical_financial_ratio[]`
-  (ROE), `dividend.yield_ttm`, `dividend.payout_ratio`, `dividend.historical_dividends`,
-  `future.company_growth_forecasts` (consensus EPS/revenue growth),
-  `future.analyst_rating_breakdown`
-- `daily/ADRO.JK/` — 90-day close price series (hero chart)
-- `companies/` screener — `total_yield[2025]`, LQ45 constituents ranked by 2025
-  dividend yield
-- `company/corporate-actions/ADRO.JK/` — `dividend[]` history, buyback/capital-reduction
-  detail
+- `company/report/ADRO.JK/` — `valuation.historical_valuation[]`,
+  `financials.historical_eps`, `financials.historical_financial_ratio[]`,
+  `dividend.yield_ttm`, `dividend.payout_ratio`, `dividend.historical_dividends`,
+  `future.company_growth_forecasts`, `future.analyst_rating_breakdown`
+- `daily/ADRO.JK/` — `close`
+- `companies/` screener — `total_yield[2025]`
+- `company/corporate-actions/ADRO.JK/` — `dividend[]`
 ```
+
+Wrong, in every case: `— 90-day close price series (hero chart)`, `(P/E, P/B vs peer
+average)`, `LQ45 constituents ranked by 2025 dividend yield`, `backed the Broker Flow
+tables`. Each names a use, a section or a derivation. Name the field, stop.
 
 Rule 6's ban on raw field paths applies to **body copy**, not here: this section exists
 specifically so a reader who's finished the piece can trace any number back to its exact
@@ -904,12 +586,21 @@ list or ahead of the disclaimer. **Required on every issue, every type** (confir
 2026-07-16): a short type with one or two endpoint calls still gets a short appendix,
 proportional to how much was actually fetched, never skipped for length.
 
-**Keep it short** (confirmed 2026-07-20): endpoint and fields only, no prose explaining
-what a date range covered, why a param was or wasn't used, or how a result got filtered
-or aggregated client-side. That reasoning belongs in `queries.md` during drafting, not in
-the delivered appendix. A bullet like `filings/?limit=30&offset=0..210` — filing dates is
+**Keep it short** (confirmed 2026-07-20, tightened 2026-08-17): endpoint and fields only,
+no prose explaining what a date range covered, why a param was or wasn't used, how a result
+got filtered or aggregated client-side, **or which section of the issue the data fed**. All
+of that belongs in `queries.md` during drafting, not in the delivered appendix. Also collapse
+enumerations: `company/corporate-actions/<TICKER>/`, not the same path followed by the
+forty-plus tickers it was called for, and `filings/?limit=30`, not `?limit=30&offset=0..210`. A bullet like `filings/?limit=30&offset=0..210` — filing dates is
 correct; a bullet that goes on to explain `start`/`end` filters on transaction date and
 silently drops certain days is not, cut it down to the endpoint and field.
+
+**The Appendix ends at its last endpoint bullet** (added 2026-08-31). The only line allowed
+after that list is the one-line `instagram.com/sectorsapp` credit when the issue used social
+cards. Nothing else follows: no note on how a figure was aggregated, no description of the
+window a call covered, no naming of the block a pull fed, no "pinned query" or
+"exchange definition" gloss. If a reader would need that to trust the number, the fix is a
+clearer sentence in the body, not a footnote here.
 
 ## Standard disclaimer footer (fixed text, appended to every issue)
 
@@ -941,7 +632,7 @@ stays untagged, per the third-party/own-account-not-our-analytics rule above. Ac
 
 Newsletter prose, not slide fragments: 400-900 words typical across the whole issue.
 Vary sentence and paragraph length; simplify word choice, not cadence (inherit
-`writing/writing.md` section 3). **`watchlist-performance-digest` is shorter**,
+`./writing/core.md` section 3). **`watchlist-performance-digest` is shorter**,
 150-300 words outside the table, it's a personalized digest read in a couple minutes
 on a phone, not a full briefing, closer to dbquery's nudge-length norm than this
 skill's usual newsletter length.
@@ -952,7 +643,7 @@ skill's usual newsletter length.
 ---
 subject: Foreign investors sold the rally
 preview: Banks led the week, but the buyers weren't local.
-issue_type: weekly-wrap
+issue_type: weekly-insights-v2
 date: 2026-07-11
 data_as_of: 2026-07-10
 ---

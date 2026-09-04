@@ -3,8 +3,7 @@
 A promo issue for a **Sectors in-house event**: an online or offline workshop teaching
 participants to build systems and products on live Sectors API data. This is an event
 announcement, not market analysis, its content comes from **user-supplied event details**,
-not the market API and not web research. Read `../newsletter-format.md`'s upcoming-event
-skeleton before drafting.
+not the market API and not web research. Read `../newsletter-format/skeletons/upcoming-event.md` before drafting.
 
 ## 1. Collect the event details first (ask, don't invent)
 
@@ -88,7 +87,7 @@ that answer, not the feature.
 ## 4. Ship both `newsletter.md` and `newsletter.html`
 
 `upcoming-event` ships as a send-ready HTML email (`newsletter.html`), not just the
-Markdown draft, same as `weekly-wrap` (`../newsletter-format.md`'s delivery note, and
+Markdown draft, same as every other type (`../newsletter-format.md`'s delivery note, and
 `SKILL.md`'s delivery section). Keep `newsletter.md` as the review draft; build
 `newsletter.html` from it using the shared house chrome (email-safe inline styles, table
 layout, `#fdf7ee` card on `#f2ede4` background, `#9E0142` accent), the same pattern
@@ -114,6 +113,6 @@ for this type is `newsletter/newsletter_2026-07-13_upcoming-event/newsletter.htm
   (`#9E0142`) (`../newsletter-format.md`'s Color convention, applies to every issue)?
 - Is the Appendix (endpoint/field trace) present, after Sources and before the
   disclaimer? Just the teaser's one endpoint if that's all that was fetched, still
-  required. **Endpoints and field names only**, one bullet per endpoint, with no
-  section label, chart name, table name, derivation or usage note attached to any
-  bullet (`../newsletter-format.md`'s Appendix section)?
+  required. **Endpoints and field names only**, one bullet per endpoint, with no section
+  label, chart name, table name, derivation or usage note attached to any bullet
+  (`../newsletter-format.md`'s Appendix section)?

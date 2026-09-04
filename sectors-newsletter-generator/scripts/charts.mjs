@@ -67,7 +67,7 @@ const GOLD = "#8B004C";
 // tokens (see header note above), not the newsletter's own 22-hex categorical list.
 const GAIN = "#568475";  // repalette 2026-07-20, was #1D8A4E
 const LOSS = "#D53E50";  // repalette 2026-07-20, was #D6295A
-// TICKER: every ticker mention (a bar's own category label, a prose $TICKER, a table
+// TICKER: every ticker mention (a bar's own category label, a prose TICKER, a table
 // cell) renders in this blue throughout a newsletter issue, kept from the same 22-hex
 // list so it stays distinguishable from GAIN/LOSS's green/red semantics right next to it.
 const TICKER = "#9E0142";  // repalette 2026-07-20, was #3288BD; also the CTA button colour now

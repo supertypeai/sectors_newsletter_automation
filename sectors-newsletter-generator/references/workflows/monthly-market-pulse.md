@@ -3,7 +3,7 @@
 The trailing-30-day read: the month's top movers, volume leaders, the brokers behind the
 tape, and the macro backdrop those three sat inside. Every section is an aggregate
 across the whole window, never a single day's snapshot, that's the whole point of this
-type versus a daily one. Read `../newsletter-format.md`'s monthly-pulse skeleton before
+type versus a daily one. Read `../newsletter-format/skeletons/monthly-market-pulse.md` before
 drafting.
 
 **This type is an argument evidenced by data, not a data dump with news garnish.** Every
@@ -55,13 +55,14 @@ node ../../scripts/sectors.mjs \
   in step 6. Not every window will have a clean answer, if nothing real turns up, say
   so rather than manufacturing a reason.
 
-## 3. Broker flow (fixed Supabase query, not an API loop)
+## 3. Broker flow (approved Supabase query via dbquery, not an API loop)
 
 `brokers/top` **only accepts a single `date`, confirmed live** (`start`/`end` 400s:
 `"Invalid query parameters: start, end."`). There is no market-wide "top brokers over a
-range" endpoint via the Sectors API. Don't loop it day by day. Instead run the pinned
-query at `../../scripts/fixed-queries/broker-summary-range.sql` through the Supabase
-MCP connector (read-only), substituting the window's `{{start}}`/`{{end}}`:
+range" endpoint via the Sectors API. Don't loop it day by day. Instead invoke the `sectors-newsletter-dbquery`
+skill for its approved `broker-summary-range` query, giving it the window's
+`{{start}}`/`{{end}}`. Never run this SQL yourself; it is reproduced here only so you
+can see what comes back:
 
 ```sql
 with agg as (
@@ -85,9 +86,9 @@ order by a.net_val desc;
   that count simply sat out some sessions, not a data gap, state it that way if it
   comes up in copy.
 - `broker_name` comes free from the join, no separate registry call needed.
-- This is public market data, not user-account data, so it does not go through
-  `sectors-newsletter-dbquery`'s PII-only approved-queries gate (see that skill's
-  `references/supabase-access.md`); it's still read-only, verified live 2026-07-27
+- This is public market data, not user-account data, so no PII rules apply to the rows,
+  but it still runs through `sectors-newsletter-dbquery` like every other Supabase read (see that
+  skill's `references/supabase-access.md`); it's read-only, verified live 2026-07-27
   against 13-17 Jul 2026 (top buyer BB/Verdhana Sekuritas Indonesia +612.12B,
   `days_active`=5 on every row for that 5-day window).
 - Once the top buyers/sellers are ranked, web-search or `news/` for anything real that
@@ -171,7 +172,7 @@ Sources note rather than dressing a headline up as research.
 binding format reference, not just a worked example. Match section presence, order,
 and what sits under each block exactly.
 
-Follow `../newsletter-format.md`'s skeleton exactly:
+Follow `../newsletter-format/skeletons/monthly-market-pulse.md` exactly:
 
 1. **Headline + trend paragraph**, drafted fresh from this run's own `idx-total` trend,
    never a templated line reused from a prior issue.
@@ -225,7 +226,13 @@ Follow `../newsletter-format.md`'s skeleton exactly:
    sectors in this issue's own tables it touches. No unmapped macro items.
 9. **The Other Side** — the two-sided read. Two short stacked blocks, **The bull read**
    and **The bear read**, three to four bullets each, every bullet grounded in a number
-   or citation already in this issue. Then one closing line, **What would settle it**,
+   or citation already in this issue **but never reprinting it**: this block is macro and
+   structural analysis, so figures are referenced conceptually ("robust fundamental
+   backing from the big banks against a deteriorating foreign bid"), not restated with
+   their exact profit, percentage or rupiah values. Each bullet joins at least two things
+   the issue reported, or frames one structurally (valuation, liquidity, positioning,
+   policy transmission, index mechanics); a single earlier line with the number stripped
+   out is still a restatement, cut it. Then one closing line, **What would settle it**,
    naming the specific dated print or event that distinguishes the two. Attribution
    rules from step 5 apply to every forward-looking bullet: if it predicts, it is
    quoted and attributed, or it is reframed as a condition ("if X prints above Y").
@@ -233,13 +240,15 @@ Follow `../newsletter-format.md`'s skeleton exactly:
     matters. Three to five rows, each a real scheduled event: BI RDG date, BPS release
     date, earnings-season window, index rebalance effective date, dividend cum-date, a
     named company's scheduled result. Every row's "why" ties back to a name or sector in
-    this issue.
+    this issue. **Strictly forward-looking**: the "why" explains the pending decision or
+    effective date, never recaps what already happened elsewhere in the issue.
 11. **Upcoming Events** (the Sectors in-house events block, unchanged, distinct from
     §10's market calendar, see `../upcoming-events-source.md`).
 12. **Sources** list.
 13. **Appendix: Sectors API endpoints (fields used)**, always included for this type,
     after Sources and before the disclaimer. One bullet per endpoint/query actually used
-    this run, the resolved params or window, and which section it backed. Macro items
+    this run, with the fields taken from it. Endpoints and field names only: no section
+    the data fed, no explanation of how it was used or aggregated. Macro items
     from step 4 are not API pulls; they belong in Sources, not the Appendix.
 14. Disclaimer footer.
 
@@ -261,12 +270,18 @@ Follow `../newsletter-format.md`'s skeleton exactly:
 - Does every linking sentence pass step 5's test: the reader can see who asserts what
   and how confident they are, and the newsletter itself never predicts a price?
 - Does **The Other Side** give the bear read genuine weight, or is it a token block? Is
-  **What would settle it** a specific dated event, not a vague "time will tell"?
-- Is every What-to-Watch row a real scheduled event with a verifiable date?
+  **What would settle it** a specific dated event, not a vague "time will tell"? Does it
+  stay conceptual, reprinting **no** figure already published earlier in the issue?
+- Is every What-to-Watch row a real scheduled event with a verifiable date, and
+  forward-looking only with no recap of past events in the "why"?
+- **Duplication pass:** does every distinct fact live in exactly one section? Anything
+  appearing in two is a defect: keep it in the earliest section that owns it, and rewrite
+  the later mention conceptually or cut it.
 - Is `data_as_of` stamped and does the stated window match what the calls echoed back?
-- Does every `$TICKER` mention read bold, `$`-prefixed, and linked, including inline
+- Does every `TICKER` mention read bold, linked, and **without a `$` prefix**, including inline
   prose mentions outside a table?
 - Is every broker code in both Broker Flow tables linked to
   `sectors.app/idx/broker/<lower>`, same bold ticker-blue styling as a ticker link?
 - Is the Appendix present, after Sources and before the disclaimer, with one bullet
-  per endpoint actually called this run, and no macro items smuggled into it?
+  per endpoint actually called this run, and no macro items smuggled into it? Endpoints and
+  fields only, with no section labels or usage notes attached to any bullet?

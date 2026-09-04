@@ -8,14 +8,14 @@ reader toward setting one up. The story is told **signal first, payoff second**:
 the trigger date and the exact conditions true on it, before showing what happened
 after. Reported as a single broadcast piece, same content for every reader, no
 per-recipient framing (this skill has no account data, can't tell who already holds the
-ticker, see SKILL.md's **Personalization check**). Read `../newsletter-format.md`'s Did
-you catch it skeleton, `../compliance.md` (the imperative ban matters most here, see
+ticker, see SKILL.md's **Personalization check**). Read `../newsletter-format/skeletons/did-you-catch-it.md`, `../compliance.md` (the imperative ban matters most here, see
 **Framing guardrail** below), and `../sourcing.md` before drafting.
 
 **Scope note (mirrors SKILL.md's not-yet-built list):** this workflow covers only "did
-you catch it." Missed Dividend and Sector Rotation Miss are separate FOMO topics with
-their own triggers (ex-dividend date, sector-relative move), not built yet, don't
-stretch this doc to cover them.
+you catch it." Sector Rotation Miss is a separate FOMO topic with its own trigger
+(sector-relative move), not built yet, don't stretch this doc to cover it. Missed
+Dividend was dropped from the FOMO family on 2026-08-10 (see SKILL.md's not-yet-built
+list for why), don't build it off this doc or any other.
 
 ## 1. The screener, adapted to what the API can actually verify
 
@@ -153,7 +153,7 @@ factually, carry the emotional weight, the copy doesn't need to push:
   twice." State the number and the benchmark, stop there.
 - **No countdown, no scarcity language, no "before it's too late."** The move already
   happened, there's no real deadline being reported, inventing urgency where none
-  exists is the exact hype `compliance.md` and `brand-voice.md` rule out.
+  exists is the exact hype `../compliance.md` and `../writing/brand-voice.md` rule out.
 - CTA is **behavioral, not transactional**: "add to watchlist" or "set up a workflow
   alert," never "buy now," never a price target. Since the whole point of this type is
   driving the workflow-alert feature, name the **actual conditions** the piece just
@@ -200,10 +200,10 @@ factually, carry the emotional weight, the copy doesn't need to push:
 - No countdown/scarcity language (§4)?
 - Does the CTA name the actual conditions proved out in the piece as a settable alert,
   not a generic "set up a workflow" with no specifics?
-- Every `$TICKER` bold, linked, ticker-blue; gains/losses green/red
+- Every `TICKER` bold, linked, ticker-blue; gains/losses green/red
   (`../newsletter-format.md`'s Color convention)?
 - Appendix present, after Sources, before the disclaimer, and does it note the two
   documented spec adaptations (fundamentals guard at report date not literally at T0,
-  leverage compared annually not at 90 days)? **Endpoints and field names only**, one
-  bullet per endpoint, with no section label, chart name, table name, derivation or
-  usage note attached to any bullet (`../newsletter-format.md`'s Appendix section)?
+  leverage compared annually not at 90 days)? **Endpoints and field names only**, one bullet per endpoint, with no section
+  label, chart name, table name, derivation or usage note attached to any bullet
+  (`../newsletter-format.md`'s Appendix section)?

@@ -5,8 +5,7 @@ release (subject, preview, and headline are about the release, full stop), with 
 secondary marketing/education section added on beneath it spotlighting one feature from
 the release (not necessarily its own headline item, whichever the user wants promoted).
 This is the one issue type whose source is **entirely user-supplied**, not the market
-API and not a live fetch, see step 1 for why. Read `../newsletter-format.md`'s
-new-release-feature skeleton before drafting.
+API and not a live fetch, see step 1 for why. Read `../newsletter-format/skeletons/new-release-feature.md` before drafting.
 
 ## 1. Ask, don't fetch (confirmed 2026-07-17)
 
@@ -121,6 +120,6 @@ capability from memory or assumption.
   (`../newsletter-format.md`'s Color convention, applies to every issue)?
 - Is the Appendix (endpoint/field trace, or "sourced from the user-supplied release
   note, no live endpoint fetched" if no fresh API call was made) present, after Sources
-  and before the disclaimer? **Endpoints and field names only**, one bullet per
-  endpoint, with no section label, chart name, table name, derivation or usage note
-  attached to any bullet (`../newsletter-format.md`'s Appendix section)?
+  and before the disclaimer? **Endpoints and field names only**, one bullet per endpoint, with no section
+  label, chart name, table name, derivation or usage note attached to any bullet
+  (`../newsletter-format.md`'s Appendix section)?
