@@ -107,27 +107,28 @@ research pass collects far more than the draft should carry, so cut deliberately
 - **Names and roles only where they move the story.** A full executive roster per pick
   is API output, not writing.
 
-## 6. Visuals: check the GCP bucket first
+## 6. Visuals: check for a real social card first
 
 This type had no visuals guidance of its own before — it was silently inheriting
 SKILL.md's generic "every issue gets a generated chart" default and always
 running `charts.mjs`, never checking for a real card. Fix, same priority order as
-`weekly-insights-v2.md`'s "Auto-selecting cards, unattended" section: **a real
+`weekly-insights-v2.md`'s **Visuals: the social cards** section: **a real
 social card beats a generated chart whenever one is eligible; `charts.mjs` is the
 fallback for when nothing eligible exists, not a first choice taken for
 convenience.**
 
-List the GCP bucket per that section's "Where the filenames come from" (a plain
-public HTTP call, no connector or credential needed), then check each of this
-issue's three tickers for a real, eligible card (apply the
-date/story-prefix/relevance criteria `weekly-insights-v2.md` documents in full).
-A card covering one of the three is enough to illustrate that stock's section;
-there's no requirement that all three have one — mix real cards and a generated
-fallback per-stock as the bucket actually supports. Record which of the two
-outcomes applied (listing call errored / nothing eligible) in `run-notes.md` for
-each ticker checked, same distinction `weekly-insights-v2.md` documents —
-collapsing them into "used charts" hides a
-real defect behind what looks like a genuinely quiet week.
+The bucket cannot be listed without a credential (see that section's superseded
+note), so in an interactive run, ask the user for each of this issue's three
+tickers whether a real card exists for it, then apply the
+date/story-prefix/relevance criteria `weekly-insights-v2.md` documents in full to
+whatever they supply. A card covering one of the three is enough to illustrate
+that stock's section; there's no requirement that all three have one — mix real
+cards and a generated fallback per-stock as the user's answers actually support.
+**In an unattended run**, there is no one to ask, so every ticker without a
+user-supplied card falls back to `charts.mjs` per that same section's unattended
+policy. Record which case applied (real card / generated fallback, and why) in
+`run-notes.md` for each ticker checked — collapsing them into "used charts" hides
+whether a card was genuinely unavailable or just never asked about.
 
 ## 7. Self-review before delivery
 

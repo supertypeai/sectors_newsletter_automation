@@ -173,25 +173,79 @@ last sentence.
 ### Visuals: the social cards
 
 **Block 4 never renders its own images.** Its visuals are existing social cards from the
-carousel pipeline's bucket. Do not call `charts.mjs` for this block, do not produce a
-`chart-<slug>.svg` for it, and do not substitute a rendered chart because the card URLs were
-not to hand. Since the bucket cannot be listed without a credential (see below), the correct
-move when you don't have URLs is to **stop and ask the user for them**, not to generate
-something. There is no chart fallback in this type (confirmed 2026-08-31): if the user has
-no eligible card for a finding, drop that finding and write one the available cards support,
-or ship the block with fewer findings. A generated graph in a weekly-insights-v2 issue is a
-defect in every case, including a week with no eligible card.
-
-Block 4's images come from the carousel pipeline's Google Cloud Storage bucket:
+carousel pipeline's GCS bucket, `sectorsapp-sea`, under `social_media/<filename>`:
 
 ```
 https://storage.googleapis.com/sectorsapp-sea/social_media/<filename>
 ```
 
 Public, unauthenticated, no signed-URL expiry, so email clients load them directly with no
-mirroring step — unlike a generated chart, a real card already has a permanent public URL
-by the time it's selected, so whatever gets written into `<img src>` during drafting is
-final. Filenames follow `<topic>_<YYYYMMDD>_<n>.jpg`, sometimes with a slide index
+mirroring step — reference the URL directly in `<img src>` once you have one. Do not call
+`charts.mjs` for this block, do not produce a `chart-<slug>.svg` for it, and do not
+substitute a rendered chart because the URLs were not to hand.
+
+**Getting the URLs depends on whether anyone's there to ask:**
+
+- **Interactive run:** the bucket cannot be listed without a credential (see the
+  superseded note below), so derive the week's findings from the API first, then **stop
+  and ask the user for the eligible card URLs** — a blocking step, not optional. Apply
+  the selection criteria below to whatever they supply. **There is no chart fallback
+  here**: if the user has no eligible card for a finding, drop that finding and write one
+  the available cards support, or ship the block with fewer findings. A generated graph
+  in an interactive weekly-insights-v2 issue is a defect in every case, including a week
+  with no eligible card.
+- **Unattended run (CI, cron):** there is no one to ask, so this is the one context where
+  the no-fallback rule above does not apply — every finding's visual is generated instead.
+  Render with `../../scripts/charts.mjs`, picking the chart kind from the finding's own
+  shape (`moversChart` for a ranked signed list, `barChart` with `financial: true` for a
+  signed comparison, `sparkline`/`line` for a path over the week, `donut` for a mix). Skip
+  the Instagram/Threads credit line under a generated chart, it credits card artwork that
+  isn't there; keep the follow-us block at the end of block 4, that one is a standing CTA
+  rather than an attribution. Note in `run-notes.md` (never inside the sent HTML, see
+  SKILL.md's **Running unattended** section) that every finding's visual was generated
+  rather than sourced, and why — an all-generated unattended issue is expected under this
+  policy, not a defect to investigate. **Never save a generated chart under a
+  `chart-<slug>.svg` name** if the delivery pipeline's own rasterize step would also try
+  to claim it — check `../../scripts/charts.mjs`'s own output-naming convention before
+  assuming this collision applies.
+
+> **Superseded 2026-08-31**: an earlier revision here (through 2026-08-24) reported this
+> bucket as anonymously listable over its plain public JSON API — `GET
+> https://storage.googleapis.com/storage/v1/b/sectorsapp-sea/o?prefix=social_media/`,
+> verified live against 547 real objects at the time. That capability is gone as of this
+> revision: the same call now requires auth. **Anonymous *read* of a known filename and
+> anonymous *list* of the bucket are separate GCS IAM permissions** (`storage.objects.get`
+> vs `storage.objects.list`) — the bucket keeping the first while losing the second is
+> exactly the failure mode this note exists to catch. If a future run finds the listing
+> call working again, verify it live and update this note rather than silently reverting
+> to asking the user out of habit — two options to restore unattended listing without
+> reopening the old Supabase-connector dependency:
+> - **Manifest file (preferred, no credential).** Have the carousel pipeline write a small
+>   JSON to a predictable public path as it renders, e.g.
+>   `.../social_media/manifest_<YYYYMMDD>.json`, listing each render's filename, topic,
+>   tickers and data window. The skill then fetches one known URL and picks against the
+>   selection criteria below. Keeps the bucket private-by-obscurity and needs no key in
+>   this skill.
+> - **Storage credential.** Give the skill a GCS credential so it can list by date prefix.
+>   More power, more setup, and another secret to hold alongside `config.json`'s API key.
+
+<details>
+<summary>Retired approach (through 2026-08-24): Supabase MCP connector</summary>
+
+The carousel pipeline's Supabase bucket (`social_media_generation`) held the same files
+under the same filenames, but Supabase's own public HTTP API refuses to list a bucket
+without a credential (`POST /storage/v1/object/list/<bucket>` returns `headers must have
+required property 'authorization'`), so this skill queried `storage.objects` — the
+Postgres table Supabase Storage keeps that metadata in — through the Supabase MCP
+connector instead (`scripts/fixed-queries/social-media-bucket-listing.sql`, now deleted).
+That worked, but made card selection depend on a connector/credential
+(`SUPABASE_ACCESS_TOKEN`). Kept here only for whichever of the two options above gets
+built, since both need to enumerate objects some other way once the bucket's own
+anonymous listing is gone.
+
+</details>
+
+Filenames follow `<topic>_<YYYYMMDD>_<n>.jpg`, sometimes with a slide index
 (`foreign-flow-1_20260718_1.jpg`). **The date is the generation date, not the data window**,
 so read the window off the image itself and state it in copy. The worked sample's CUAN card
 is dated 10 July and covers 19 Jan to 9 Jul, which is why its bullets say so explicitly.
@@ -240,9 +294,9 @@ Selection criteria, applied in order:
    feed-eligible and fair game.
 
    This rule exists because of the credit rule below. We attribute every image to
-   `instagram.com/sectorsapp`, so a reader who goes looking has to be able to find it. A story
-   render will be long gone by the time the newsletter lands, which makes the credit a dead
-   end and the issue look sloppy.
+   `instagram.com/sectorsapp`, so a reader who goes looking has to be able to find it. A
+   story render will be long gone by the time the newsletter lands, which makes the credit
+   a dead end and the issue look sloppy.
 3. **Then, does it illustrate a finding you have, or suggest one worth building?** The date
    filter decides what is *available*; relevance decides what is *used*. A card that passes
    both filters and carries a real story is worth writing a finding around, provided the
@@ -256,90 +310,6 @@ Selection criteria, applied in order:
 6. **Sets.** A numbered pair (`-1`/`-2`) that shows both sides of one story, buy and sell,
    counts as **one** finding and renders side by side in two columns.
 7. **Budget.** Two or three findings, so at most about four images. Cut the weakest.
-
-**Where the filenames come from.** The carousel pipeline writes every card to a GCS
-bucket, `sectorsapp-sea`, under `social_media/<filename>` — a public, unauthenticated
-path, browsable by a human at
-`https://console.cloud.google.com/storage/browser/sectorsapp-sea/social_media`. Build
-each eligible name's public URL as:
-
-```
-https://storage.googleapis.com/sectorsapp-sea/social_media/<filename>
-```
-
-The bucket cannot currently be listed programmatically without a credential, and public
-reads only resolve for an exactly-known filename (a guessed name 404s, and the trailing
-`_<n>` is not predictable) — so the filenames themselves have to come from somewhere
-else per run. Once you have one, reference it directly in `<img src>`: public,
-unauthenticated, no signed-URL expiry, so email clients load it with no rehosting step.
-
-> **Superseded 2026-08-31**: an earlier revision here (through 2026-08-24) reported this
-> bucket as anonymously listable over its plain public JSON API — `GET
-> https://storage.googleapis.com/storage/v1/b/sectorsapp-sea/o?prefix=social_media/`,
-> verified live against 547 real objects at the time. That capability is gone as of this
-> revision: the same call now requires auth. **Anonymous *read* of a known filename and
-> anonymous *list* of the bucket are separate GCS IAM permissions** (`storage.objects.get`
-> vs `storage.objects.list`) — the bucket keeping the first while losing the second is
-> exactly the failure mode this note exists to catch. If a future run finds the listing
-> call working again, verify it live and update this note rather than silently reverting
-> to asking the user out of habit — two options to restore unattended listing without
-> reopening the old Supabase-connector dependency:
-> - **Manifest file (preferred, no credential).** Have the carousel pipeline write a small
->   JSON to a predictable public path as it renders, e.g.
->   `.../social_media/manifest_<YYYYMMDD>.json`, listing each render's filename, topic,
->   tickers and data window. The skill then fetches one known URL and picks against the
->   selection criteria above. Keeps the bucket private-by-obscurity and needs no key in
->   this skill.
-> - **Storage credential.** Give the skill a GCS credential so it can list by date prefix.
->   More power, more setup, and another secret to hold alongside `config.json`'s API key.
-
-<details>
-<summary>Retired approach (through 2026-08-24): Supabase MCP connector</summary>
-
-The carousel pipeline's Supabase bucket (`social_media_generation`) held the same files
-under the same filenames, but Supabase's own public HTTP API refuses to list a bucket
-without a credential (`POST /storage/v1/object/list/<bucket>` returns `headers must have
-required property 'authorization'`), so this skill queried `storage.objects` — the
-Postgres table Supabase Storage keeps that metadata in — through the Supabase MCP
-connector instead (`scripts/fixed-queries/social-media-bucket-listing.sql`, now deleted).
-That worked, but made card selection depend on a connector/credential
-(`SUPABASE_ACCESS_TOKEN`). Kept here only for whichever of the two options above gets
-built, since both need to enumerate objects some other way once the bucket's own
-anonymous listing is gone.
-
-</details>
-
-### Interactive runs: ask for the URLs
-
-Since the bucket cannot currently be listed unattended (see the superseded note above),
-an interactive run derives the week's findings from the API first, then asks the user for
-the card URLs per **Where the filenames come from**, above — this is §3's blocking-ask
-policy, not optional. Apply the existing selection criteria (date filter, drop story-only
-prefixes, relevance, window-gap note, reconciliation, sets, budget) to whatever the user
-supplies.
-
-### Unattended runs: no one to ask, fall back to a generated chart
-
-There is no manifest or credential yet (see the two options above), so an unattended CI
-run has no mechanical way to discover card URLs at all. This is the one case where §3's
-"no chart fallback, ever" rule does not apply — there is no one to ask, so every finding's
-visual is generated instead:
-
-- Render with `../../scripts/charts.mjs`. Pick the chart kind from the finding's own
-  shape, the same judgement the `dataviz` skill's form heuristic describes: `moversChart`
-  for a ranked signed list, `barChart` (with `financial: true`) for a signed comparison,
-  `sparkline`/`line` for a path over the week, `donut` for a mix.
-- Skip the Instagram/Threads credit line under a generated chart, it credits card artwork
-  that isn't there. Keep the follow-us block at the end of block 4, that one is a standing
-  CTA rather than an attribution.
-- Note in `run-notes.md` (never inside the sent HTML, see SKILL.md's **Running
-  unattended** section) that every finding's visual was generated rather than sourced,
-  and why — an all-generated unattended issue is expected under this policy, not a
-  defect to investigate.
-- **Never save a generated chart under a `chart-<slug>.svg` name** if the delivery
-  pipeline's own rasterize step would also try to claim it — check
-  `../../scripts/charts.mjs`'s own output-naming convention before assuming this
-  collision applies.
 
 > **Resolved 2026-07-27: default to the exchange definition (`idx_daily_data`) for weekly
 > aggregated foreign flow. Never use the broker-domicile aggregation (`idx_broker_summary_daily`

@@ -82,17 +82,18 @@ cheap or dear *versus what* (its own 5-year P/E band, the peer average). A numbe
 a benchmark is not a finding. Write the one-line verdict first, then fill the sections
 that prove it.
 
-**Check the GCP social-card bucket before generating a chart — always, same priority
-order as `weekly-insights-v2.md`'s "Auto-selecting cards, unattended" section, not a
-first choice taken for convenience.** List it per that section's "Where the filenames
-come from" (a plain public HTTP call, no connector or credential needed), then look for
-a real card about *this issue's ticker specifically* (not merely IDX-relevant) whose
-filename date falls within a reasonable recency window of the trigger event. A real
-card beats a generated chart whenever one is eligible; `charts.mjs` is the fallback for
-when nothing eligible exists, not a default taken without checking. Record which of the
-two cases applied in `run-notes.md`, same distinction `weekly-insights-v2.md` documents
-(listing call errored / nothing eligible) — collapsing them into "used a chart" hides a
-real defect behind what looks like a genuinely quiet week.
+**Check for a real social card before generating a chart — always, same priority order
+as `weekly-insights-v2.md`'s "Visuals: the social cards" section, not a first choice
+taken for convenience.** The bucket cannot be listed without a credential (see that
+section's superseded note), so in an interactive run, ask the user whether a real card
+exists for *this issue's ticker specifically* (not merely IDX-relevant) whose filename
+date falls within a reasonable recency window of the trigger event. A real card beats a
+generated chart whenever one is eligible; `charts.mjs` is the fallback for when nothing
+eligible exists, not a default taken without checking. **In an unattended run**, there is
+no one to ask, so the fallback applies directly, per that section's unattended policy.
+Record which case applied in `run-notes.md` — same distinction `weekly-insights-v2.md`
+documents — collapsing them into "used a chart" hides whether a card was genuinely
+unavailable or just never asked about.
 
 Then build the argument in the three-section shape the skeleton sets out
 (`../newsletter-format/skeletons/single-company-deep-dive.md`). Four habits decide whether

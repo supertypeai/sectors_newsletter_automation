@@ -117,7 +117,7 @@ because nobody was there to ask," and is for nobody but a PR reviewer.
 | --- | --- |
 | Issue type, none named in the prompt | `weekly-insights-v2` |
 | Foreign-flow definition | exchange (`idx_daily_data`) via `scripts/fixed-queries/foreign-flow-range.sql`; **needs the Supabase MCP connector**, see below |
-| Block 4 visuals, no card URLs supplied | **auto-select real cards from our GCP bucket first** (plain public HTTP listing, no connector/credential needed); generate with `scripts/charts.mjs` only if nothing eligible exists that week. See `workflows/weekly-insights-v2.md`'s **Auto-selecting cards, unattended** section |
+| Block 4 visuals, no one to ask for card URLs | **generate every finding's visual with `scripts/charts.mjs`** — the bucket cannot be listed unattended, so there is no mechanical way to find a real card. See `workflows/weekly-insights-v2.md`'s **Visuals: the social cards** section |
 | `$NEWSLETTER_HOME/samples/<type-slug>/` absent | proceed without it, note the absence in `run-notes.md` |
 | Upcoming-events sheet unreachable | omit that block, note it, don't fail the issue |
 | A requested type isn't built yet | stop with a clear error naming the type, don't substitute a different one |
