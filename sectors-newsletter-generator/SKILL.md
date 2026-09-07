@@ -117,7 +117,7 @@ because nobody was there to ask," and is for nobody but a PR reviewer.
 | --- | --- |
 | Issue type, none named in the prompt | `weekly-insights-v2` |
 | Foreign-flow definition | exchange (`idx_daily_data`) via `scripts/fixed-queries/foreign-flow-range.sql`; **needs the Supabase MCP connector**, see below |
-| Block 4 visuals, no one to ask for card URLs | **generate every finding's visual with `scripts/charts.mjs`** — the bucket cannot be listed unattended, so there is no mechanical way to find a real card. See `workflows/weekly-insights-v2.md`'s **Visuals: the social cards** section |
+| Block 4 visuals | **list the GCS bucket directly** (no credential needed) and auto-select eligible real cards; `scripts/charts.mjs` only for a finding with none eligible. See `workflows/weekly-insights-v2.md`'s **Visuals: the social cards** section |
 | `$NEWSLETTER_HOME/samples/<type-slug>/` absent | proceed without it, note the absence in `run-notes.md` |
 | Upcoming-events sheet unreachable | omit that block, note it, don't fail the issue |
 | A requested type isn't built yet | stop with a clear error naming the type, don't substitute a different one |
@@ -243,11 +243,11 @@ see their own workflow docs.
    Markdown tables for any ranked or compared list of 3+, and at most one real
    generated chart for the issue's hero trend (`newsletter-format.md`'s **Bite-sized &
    visual formatting** section, which routes chart work through the `dataviz` skill).
-   **The one-chart rule does not apply to `weekly-insights-v2` at all**: that type
-   generates no chart, so there is no count to cap. Its findings block takes social cards
-   from the bucket and the URLs come from the user, so pause here and ask for them before
-   drafting block 4. Generating a graph there is a defect with no fallback, see Delivery.
-   That type also uses the ticker alone with no company name (hard rule 15).
+   **The one-chart rule does not apply to `weekly-insights-v2` at all**: its findings
+   block runs one visual per finding (real social cards from the bucket, listed directly —
+   no pause, no asking — with a generated chart only as the per-finding fallback when
+   nothing's eligible), so there is no single count to cap; see Delivery. That type also
+   uses the ticker alone with no company name (hard rule 15).
 4. **Self-review** — the checklist at the end of the chosen workflow doc, plus
    `references/compliance.md`'s one-line test, plus a UTM check of every link against
    `~/.claude/skills/UTM_CONVENTION.md`, the organization-wide standard that every issue must
@@ -482,17 +482,16 @@ $NEWSLETTER_HOME/newsletter_<YYYY-MM-DD>_<type-slug>/
   convention** owns the shared HTML chrome and `workflows/upcoming-event.md` §4 carries the
   promo type's own delivery note.
   **`weekly-insights-v2` satisfies the visual requirement with the social cards from the
-  carousel pipeline's Google Cloud Storage bucket, not with a generated `chart-<slug>.svg`.** The
-  skill cannot list that bucket without a credential, so the URLs are **supplied by the
-  user**: once the week's findings are derived from the API, **stop and ask the user for
-  the eligible card URLs**. This ask is mandatory and blocking for this type; do not skip
-  it, do not guess filenames, and do not quietly render a chart in place of asking. **There
-  is no chart fallback for this type** (confirmed 2026-08-31): if the user has no eligible
-  card for a finding, cut the finding and build the block from the cards that exist. A
-  generated graph anywhere in a `weekly-insights-v2` issue is a defect, and this type ships
-  no `chart-<slug>.svg`. It is also
-  the one exception to stage 3's "at most one generated chart per issue": its findings
-  block runs one visual per finding, so two or three visuals is correct there.
+  carousel pipeline's Google Cloud Storage bucket, generated charts only as the per-finding
+  fallback.** The bucket lists directly, no credential needed (verify live — see
+  `workflows/weekly-insights-v2.md`'s **Visuals: the social cards** section for the exact
+  call and its own note on what to do if that ever stops working): list it, apply the
+  selection criteria, and build eligible cards' URLs. Only a finding with no eligible card
+  falls back to a generated chart via `scripts/charts.mjs`. This works the same whether or
+  not a human is present — do not skip straight to asking the user or to generating charts
+  for everything just because this is an unattended run. It is also the one exception to
+  stage 3's "at most one generated chart per issue": its findings block runs one visual per
+  finding, so two or three visuals is correct there.
 - Scratch fetches (raw `sectors.mjs --save-dir` JSON) go to the scratchpad or a
   `_draft`/`data` subfolder, not into the delivered folder.
 - Locally, `$NEWSLETTER_HOME` is a plain folder, separate from the

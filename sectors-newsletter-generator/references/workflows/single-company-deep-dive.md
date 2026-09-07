@@ -84,16 +84,15 @@ that prove it.
 
 **Check for a real social card before generating a chart — always, same priority order
 as `weekly-insights-v2.md`'s "Visuals: the social cards" section, not a first choice
-taken for convenience.** The bucket cannot be listed without a credential (see that
-section's superseded note), so in an interactive run, ask the user whether a real card
-exists for *this issue's ticker specifically* (not merely IDX-relevant) whose filename
-date falls within a reasonable recency window of the trigger event. A real card beats a
-generated chart whenever one is eligible; `charts.mjs` is the fallback for when nothing
-eligible exists, not a default taken without checking. **In an unattended run**, there is
-no one to ask, so the fallback applies directly, per that section's unattended policy.
-Record which case applied in `run-notes.md` — same distinction `weekly-insights-v2.md`
-documents — collapsing them into "used a chart" hides whether a card was genuinely
-unavailable or just never asked about.
+taken for convenience.** List the GCS bucket per that section (no credential needed),
+then look for a real card about *this issue's ticker specifically* (not merely
+IDX-relevant) whose filename date falls within a reasonable recency window of the
+trigger event. A real card beats a generated chart whenever one is eligible; `charts.mjs`
+is the fallback for when nothing eligible exists, not a default taken without checking —
+this works the same whether or not a human is present. Record which case applied
+(listing call errored / nothing eligible / real card found) in `run-notes.md` — same
+distinction `weekly-insights-v2.md` documents — collapsing them into "used a chart" hides
+a real defect behind what looks like a genuinely quiet week.
 
 Then build the argument in the three-section shape the skeleton sets out
 (`../newsletter-format/skeletons/single-company-deep-dive.md`). Four habits decide whether

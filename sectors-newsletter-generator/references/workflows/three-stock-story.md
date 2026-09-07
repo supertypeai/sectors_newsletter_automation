@@ -117,18 +117,15 @@ social card beats a generated chart whenever one is eligible; `charts.mjs` is th
 fallback for when nothing eligible exists, not a first choice taken for
 convenience.**
 
-The bucket cannot be listed without a credential (see that section's superseded
-note), so in an interactive run, ask the user for each of this issue's three
-tickers whether a real card exists for it, then apply the
-date/story-prefix/relevance criteria `weekly-insights-v2.md` documents in full to
-whatever they supply. A card covering one of the three is enough to illustrate
-that stock's section; there's no requirement that all three have one — mix real
-cards and a generated fallback per-stock as the user's answers actually support.
-**In an unattended run**, there is no one to ask, so every ticker without a
-user-supplied card falls back to `charts.mjs` per that same section's unattended
-policy. Record which case applied (real card / generated fallback, and why) in
+List the GCS bucket per that section (no credential needed, works the same whether or
+not a human is present), then check each of this issue's three tickers for a real,
+eligible card, applying the date/story-prefix/relevance criteria
+`weekly-insights-v2.md` documents in full. A card covering one of the three is enough
+to illustrate that stock's section; there's no requirement that all three have one —
+mix real cards and a generated fallback per-stock as the bucket actually supports.
+Record which case applied (real card / listing errored / nothing eligible) in
 `run-notes.md` for each ticker checked — collapsing them into "used charts" hides
-whether a card was genuinely unavailable or just never asked about.
+a real defect behind what looks like a genuinely quiet week.
 
 ## 7. Self-review before delivery
 

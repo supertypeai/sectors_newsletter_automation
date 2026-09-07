@@ -12,11 +12,9 @@ settle the Mon-Fri window, then build nine blocks. Key Data Bites
 carries every computed market-level fact; Other Major Headlines carries every news-sourced
 one; the two must never repeat a fact. The single analysis block joins two sources to find
 something the tables don't already say, illustrated with the carousel's social cards from the
-Google Cloud Storage bucket. Those cards are **never** charts this skill renders: the bucket
-can't be listed without a credential, so pause and ask the user for the week's URLs before
-drafting the findings block. There is no chart fallback in an interactive run — a finding
-with no eligible card is dropped, or the block ships with fewer findings; a generated chart
-is never substituted (unattended runs are the one exception, see the workflow doc).
+Google Cloud Storage bucket, listed directly with no credential needed. A generated chart is
+only the per-finding fallback when nothing eligible is listed, never a first choice (see the
+workflow doc's **Visuals: the social cards** section).
 What's Ahead closes with two to four dated, cited, mapped macro rows alongside the corporate
 actions, and **Summary** (bull read, bear read, what to watch next) sits between it and the
 CTA. Four blocks, four strictly separate jobs, and this is the type's main failure mode:
@@ -29,9 +27,9 @@ run a duplication pass before delivery. **No claim subtitles anywhere in this ty
 Findings run three bullets each, tickers are bare `TICKER` in every block, no `$`, no company name, and every
 linking sentence follows the workflow doc's §5b causation policy: name the mechanism, label
 its status, never predict a price on our own authority.
-**Open decision: ask the user which foreign-flow definition the issue should use before
-drafting any flow figure** (the cards and `foreign-flow/{symbol}` use different methods that
-disagree on direction, see the workflow doc §3), then apply that one definition throughout.
+**Foreign flow is settled, not an open decision: always use the exchange definition**
+(`idx_daily_data`), never `foreign-flow/{symbol}`'s broker-domicile figure — the two
+disagree on direction, not just magnitude (resolved 2026-07-27, see the workflow doc §3).
 
 ### Macro-reaction piece
 Open `references/workflows/macro-reaction.md`, and open `references/compliance.md`
