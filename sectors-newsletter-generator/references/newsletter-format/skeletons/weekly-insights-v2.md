@@ -44,9 +44,10 @@ that leaves a finding empty, the finding goes too.
    filings), each with a heading stating the finding, a social card image, and **three**
    short bullets, four at the outside. Never paragraphs. No restated caveats, no recaps of
    the issue's own structure, no "taken together" closers, no production notes in captions. **The images are existing social cards from the carousel
-   pipeline's Google Cloud Storage bucket, supplied by the user, never charts this skill renders**; ask
-   for the week's URLs before drafting the block. **There is no chart fallback**: a finding
-   with no eligible card is cut, and this type ships no `chart-<slug>.svg` at all. Two images under one heading go side by side; a single
+   pipeline's Google Cloud Storage bucket**; list the bucket and select them yourself, no
+   credential and no human needed, per the workflow doc's **Visuals: the social cards**
+   section. A finding with no eligible card falls back to a `charts.mjs` render, reason
+   logged in `run-notes.md`; this type ships no `chart-<slug>.svg` hero chart. Two images under one heading go side by side; a single
    image runs half width. Closes with a follow-us line (Instagram, Threads).
 5. **Insider Filings** — the 5 most recent disclosures as one table: date, holder, ticker,
    buy/sell, shares, stake before → after. Structured fields only, filtered by `timestamp`

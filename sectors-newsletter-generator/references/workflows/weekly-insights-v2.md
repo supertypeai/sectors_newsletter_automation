@@ -173,26 +173,39 @@ last sentence.
 ### Visuals: the social cards
 
 **Block 4 never renders its own images.** Its visuals are existing social cards from the
-carousel pipeline's GCS bucket, `sectorsapp-sea`, under `social_media/<filename>`.
+carousel pipeline's GCS bucket, `mailroom-email-assets`, under
+`social_media/<campaignId>/<contentGroup>/<filename>`.
 **List it directly, always, no connector and no credential needed** — this bucket allows
-anonymous listing over its plain public JSON API (verified live 2026-09-07, 690 objects,
-one page, no auth):
+anonymous listing over its plain public JSON API (verified live 2026-09-21, 302 objects
+under this prefix, one page, no auth):
 
 ```bash
-curl -s "https://storage.googleapis.com/storage/v1/b/sectorsapp-sea/o?prefix=social_media/&fields=items(name,timeCreated)"
+curl -s "https://storage.googleapis.com/storage/v1/b/mailroom-email-assets/o?prefix=social_media/&fields=items(name,timeCreated)"
 ```
 
 Build each eligible name's public URL as:
 
 ```
-https://storage.googleapis.com/sectorsapp-sea/social_media/<filename>
+https://storage.googleapis.com/mailroom-email-assets/<name>
 ```
 
+`<name>` is the full object name the listing returns, path segments and all — unlike the
+retired bucket below, the objects here are nested, so a bare filename does not resolve.
+
 Public, unauthenticated, no signed-URL expiry, so email clients load it directly with no
-rehosting step — reference it directly in `<img src>`. **Ignore `timeCreated` entirely
-for filtering or ordering** — it reflects when an object was written to this bucket, not
-when the card was generated; the filename's own `YYYYMMDD` is the only date that means
-anything here.
+rehosting step — reference it directly in `<img src>`. **`timeCreated` is the date to
+filter and order on here.** These objects are written at generation time, so it agrees
+with the epoch-milliseconds prefix the filename carries; either can be read, and there is
+no `YYYYMMDD` in the name to read instead.
+
+> **This bucket replaced `sectorsapp-sea` on 2026-09-09.** That bucket took no new card
+> after `2026-09-09T00:01:18Z` and is frozen, not deleted — its ~708 objects still list
+> and still load, so a run rebuilding an issue from before the cutover should read from
+> it, at the old `social_media/<topic>_<YYYYMMDD>_<n>.jpg` shape described under
+> "Retired approach" below. For any current week it holds nothing, and listing it returns
+> stale cards that look eligible by filename date. Note `sectorsapp-sea` is still the live
+> bucket for non-card assets (the masthead logo, `sgx_logo/`) — this cutover is about
+> `social_media/` only.
 
 **Prefer a real card over a generated chart, always, in both interactive and unattended
 runs — this needs no human to run at all.** List the bucket per above, apply the
@@ -218,6 +231,16 @@ claim it — check `../../scripts/charts.mjs`'s own output-naming convention bef
 assuming this collision applies. A mixed issue (some findings real cards, others
 generated) is normal and correct, don't force consistency across findings at the expense
 of using a real card wherever one's eligible.
+
+**Never pause for input on the way there.** These runs are automated (GitHub Actions,
+`NEWSLETTER_UNATTENDED=1`), so there is no one to ask and a question is a stalled job
+rather than an answer — the chart fallback exists precisely so the run can decide alone.
+
+A normal week lists ~100 eligible cards, so a block that comes out *entirely* generated is
+an infrastructure signal rather than a thin news week: the likely causes are the frozen
+bucket being listed for a current week (see the cutover note above) or the carousel
+pipeline not having run. Still ship the issue, and say so at the top of `run-notes.md` so
+the PR reviewer sees it.
 
 > **The listing endpoint has flipped between working and requiring auth before —
 > verify live before trusting either state of this note.** Anonymous *read* of a known
@@ -247,10 +270,17 @@ and this has to be resurrected.
 
 </details>
 
-Filenames follow `<topic>_<YYYYMMDD>_<n>.jpg`, sometimes with a slide index
-(`foreign-flow-1_20260718_1.jpg`). **The date is the generation date, not the data window**,
-so read the window off the image itself and state it in copy. The worked sample's CUAN card
-is dated 10 July and covers 19 Jan to 9 Jul, which is why its bullets say so explicitly.
+Object names follow `social_media/<campaignId>/<contentGroup>/<epochMs>-<hash>.jpg`. The
+name carries no topic and no readable date, so **what a card is about can only be read off
+the image itself** — open it before writing a word of copy around it. The content-group
+folder is the one classifying signal in the path: as of 2026-09-21 the groups present are
+`volume`, `filings`, `broker`, `financial`, `individual-shareholdings`, `news`, and
+`ungrouped` (the largest, 192 of 302 — an untagged upload, eligible like any other, not a
+lesser class of card).
+
+**The creation date is not the data window**, so read the window off the image and state it
+in copy. The worked sample's CUAN card was generated on 10 July and covers 19 Jan to 9 Jul,
+which is why its bullets say so explicitly.
 
 Two images under one heading go **side by side, two columns** (each ~263-268px, half the
 content column); **a single image under its own heading runs at 500px** (revised
@@ -279,12 +309,12 @@ come from the API; the card illustrates them.
 
 Selection criteria, applied in order:
 
-1. **Date filter first, and it is a hard filter.** Every filename carries a `YYYYMMDD`.
-   **Only cards whose `YYYYMMDD` falls inside the issue's Mon-Fri window are eligible.** A
-   card stamped after the window belongs to a later issue; one stamped before it has already
-   run. On the 6-10 Jul run this left exactly one eligible card,
-   `insider_cluster_cuan_20260710_2.jpg`, and correctly excluded the 20260717 and 20260718
-   renders.
+1. **Date filter first, and it is a hard filter.** Read each object's `timeCreated` (or
+   equivalently the epoch-milliseconds prefix on its filename — they agree).
+   **Only cards created inside the issue's Mon-Fri window are eligible.** A card stamped
+   after the window belongs to a later issue; one stamped before it has already run.
+   Pre-cutover objects in the frozen `sectorsapp-sea` bucket carry a `YYYYMMDD` in the
+   filename instead and `timeCreated` there means nothing — see the cutover note above.
 2. **Drop the story-only renders.** These prefixes go to Instagram Stories, not the feed, so
    they expire after 24 hours. Exclude any filename starting with:
 
@@ -365,9 +395,11 @@ MAPI -187.83B, BBRI -30.27B).
 
 Every figure in block 4 is restated as HTML text under its image, because many clients block
 remote images by default. Alt text carries the full figure set for the same reason. This is
-the type's substitute for the standard `chart-<slug>.svg` hero chart. This type ships no
-`chart-<slug>.svg` at all: `charts.mjs` is not called anywhere in a weekly-insights-v2 run,
-and the bucket cards are the issue's only images.
+the type's substitute for the standard `chart-<slug>.svg` hero chart: this type ships no
+*hero* chart, and its images are per-finding bucket cards instead. `charts.mjs` still has
+one job here — the per-finding fallback when no eligible card exists, per **Visuals: the
+social cards** above — so a run that renders one is working as intended, not breaking this
+rule.
 
 ## 4. The What's Ahead calendar
 
@@ -693,10 +725,11 @@ right-hand column below.
 - **No inverted-pair sentences anywhere** (§5b): no "not X, but Y", "rather than", "isn't
   A, it's B", "not proof of", "the pattern isn't clean". Positive claim, then stop.
 - **Was the bucket listed for every finding before reaching for `charts.mjs`?** A finding
-  illustrated with a generated chart when an eligible card existed for it is a defect; a
-  `mailroom-email-assets` URL in this block always is, real cards and generated charts are
-  the only two legitimate sources. Was the reason for each chart fallback (listing errored /
-  nothing eligible) recorded in `run-notes.md`?
+  illustrated with a generated chart when an eligible card existed for it is a defect. Every
+  card `<img src>` is a `mailroom-email-assets` URL; a `sectorsapp-sea` `social_media/` URL
+  on a post-2026-09-09 issue means the frozen bucket was listed by mistake and the cards are
+  stale. Was the reason for each chart fallback (listing errored / nothing eligible)
+  recorded in `run-notes.md`?
 - **No em dashes or en dashes anywhere in the issue**, Sources and Appendix included. Use a
   colon between a source and its label, a comma or a full stop in prose.
 - Sources list carries only the **news and research pieces actually cited for a fact in this
@@ -732,10 +765,10 @@ right-hand column below.
 - Were the findings derived from the API **first**, with cards picked to illustrate them,
   rather than written around whatever images existed?
 - **Was the bucket listed directly for block 4, rather than skipped straight to
-  `charts.mjs`?** A rendered `chart-*.svg` for a finding that had an eligible card is a
-  defect — a week genuinely short on eligible cards mixes real cards and generated charts
-  per finding, it doesn't ship fewer findings to avoid a chart.
-- Does every card URL's `YYYYMMDD` fall inside this issue's Mon-Fri window, with story-only
+  `charts.mjs`?** A rendered chart for a finding that had an eligible card is a defect — a
+  week genuinely short on eligible cards mixes real cards and generated charts per finding,
+  it doesn't ship fewer findings to avoid a chart.
+- Does every card's creation date fall inside this issue's Mon-Fri window, with story-only
   prefixes excluded and every image credited to `instagram.com/sectorsapp`?
 - **Foreign flow uses the exchange definition (`idx_daily_data`) throughout, never the broker
   aggregation** (§3), pulled via the fixed `foreign-flow-range.sql` query, not a per-ticker API
@@ -761,9 +794,9 @@ right-hand column below.
   hit is a `sectors.app` link, an Instagram/Threads follow link, or sits inside the Sources
   list. A news outlet URL anywhere in Headlines, What's Ahead or the findings bullets is a
   defect: move it to Sources and leave `(Source Name, DD Mon YYYY)` in the body.
-- **No generated chart anywhere in the issue.** No `chart-*.svg` in the delivery folder, no
-  `charts.mjs` call in the run. Block 4's images are bucket social cards or the finding is
-  cut.
+- **No hero chart.** This type ships no `chart-<slug>.svg`; block 4's per-finding visuals
+  are bucket social cards, with a `charts.mjs` render only where no eligible card existed
+  and the reason logged in `run-notes.md`.
 - Bullets in the findings block: **three each**, four at the outside? Any restated caveat,
   structural recap, "taken together" closer or production note ("chart generated this run",
   "no matching social card") cut?
