@@ -152,6 +152,8 @@ jobs:
           TODAY_WIB=$(TZ=Asia/Jakarta date +%F)
           claude -p "Write this week's ${ISSUE_TYPE} newsletter issue using the sectors-newsletter-generator skill. Deliver to \$NEWSLETTER_HOME. Today's date in Asia/Jakarta (WIB) time is $TODAY_WIB — use this exact date as the issue date per Hard rule 11, not whatever date your own environment reports (which may be UTC and several hours behind WIB depending on when this run fires). This is an unattended CI run: do not ask any questions, apply the documented unattended defaults, and record every default you took in the separate run-notes.md file the skill documents for this — never as an HTML comment in newsletter.html, and never in the visible body or the reader-facing Appendix." \
             --permission-mode bypassPermissions \
+            --model claude-sonnet-5-5 \
+            --effort medium \
             ${SUPABASE_MCP_CONFIG:+--mcp-config "$SUPABASE_MCP_CONFIG"}
 
       # Plumbing test: everything downstream of drafting (rasterize, compress, upload,
