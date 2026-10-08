@@ -64,7 +64,8 @@ that leaves a finding empty, the finding goes too.
    to four dated prints and policy events: BI RDG, BPS CPI or trade balance, an FOMC
    decision, an index rebalance effective date. Corporate actions are polled from
    `company/corporate-actions/{symbol}/`; the macro rows are sourced and cited, not an API
-   pull. Every macro row's "why" names a ticker or sector that already appears in this
+   pull. Grid cells follow the fixed format in the workflow doc's **§4a** (a bullet for an
+   empty day; ALL CAPS labels from a fixed set; one `TICKER detail` line per entry). Every macro row's "why" names a ticker or sector that already appears in this
    issue; an unmapped row is a wire feed line, cut it. **Strictly forward-looking**: every
    row is a catalyst with a future date (BI Rate decision, MSCI rebalance effective date, an
    ex-date, a scheduled result). No recap of what already happened, and the "Why it matters"

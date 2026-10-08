@@ -413,6 +413,66 @@ comes back empty; the whole board is free but slow.
 Split the output two ways: a **Mon-Fri week grid** for anything landing in the next five
 trading days, and a **"beyond the week" table** for everything further out.
 
+### 4a. How a week-grid cell is written
+
+This is a contract, not a style preference. After you write the HTML, mailroom's sync
+turns it into the markdown the website stores, and the website's weekly page then stacks
+each cell back into labelled groups. Both steps read the shape below. Weeks 35 to 39 each
+came out differently (an empty day as `n/a`, `•` or a blank cell; an entry as `UNTR IDR
+430`, `ISAT — 14:00` or three separate lines) because nothing here said which to use.
+
+**An empty day is a bullet:** `&bull;` in the muted cell style, nothing else. Not `n/a`,
+not `none`, not a dash of any kind (the no-dash rule applies in this block too, and the
+sync reserves ` — ` as its own separator), and not an empty or `&nbsp;` cell.
+
+**A day with events is a stack of category groups.** Each group is one label `<div>`
+followed by one entries `<div>`, both direct children of the `<td>`:
+
+```html
+<td valign="top" style="…">
+  <div style="font-size:10px;font-weight:800;color:#6b6b6b;letter-spacing:0.04em;">AGM</div>
+  <div style="padding-top:3px;line-height:1.8;"><a href="…">GIAA</a> 14:00<br><a href="…">ASGR</a> 14:30</div>
+  <div style="font-size:10px;font-weight:800;color:#568475;letter-spacing:0.04em;padding-top:6px;">EX-DIVIDEND</div>
+  <div style="padding-top:3px;line-height:1.8;"><a href="…">UNTR</a> IDR 430</div>
+</td>
+```
+
+1. **Label:** ALL CAPS, taken from the fixed set below, never improvised. A category
+   appears **once per day**: every entry of that category goes under that one label, never
+   a second label of the same name.
+2. **Entry:** the linked ticker, a space, then the detail, on **one line**: `UNTR IDR 430`.
+   The space after the link is required, since the sync reads the cell's text and the two
+   run together without it. No detail to give means the ticker alone.
+3. **Several entries in one group** are separated by `<br>`, in time order, then by ticker.
+   Never one `<div>` per entry, and never label, ticker and detail in three separate divs.
+4. **Flat:** no wrapper `<div>` per event around a label and its entries.
+5. **No dashes, no "per share", no currency word other than `IDR`.**
+
+| Label | Source field | Detail after the ticker |
+| --- | --- | --- |
+| `AGM` | `agm[]` | `agm_time` as `HH:MM`, or nothing if it is null |
+| `EX-DIVIDEND` | `dividend[]`, on `ex_date` | `IDR` and `dividend_amount` as the API gives it, e.g. `IDR 611.93` |
+| `STOCK SPLIT` | `stock_split[]` | `split_ratio`, e.g. `1:25` |
+| `RIGHTS EX-DATE` | `right_issue[]`, on `ex_date` | `old_ratio:new_ratio`, e.g. `7:4` |
+| `RIGHTS PERIOD OPENS` / `RIGHTS PERIOD ENDS` | `right_issue[]`, on `trading_period_start` / `trading_period_end` | the ticker alone |
+| `PUBLIC EXPOSE` | only when the poll actually returns one (week 35 did) | `HH:MM` |
+
+Within a day, order the groups as they appear in that table. The "beyond the week" table's
+**Action** column uses the same words in sentence case (`Ex-dividend`, `Stock split`,
+`Rights ex-date`), so a reader sees one vocabulary in both places.
+
+**What reads this, so you know what breaks it.** The website treats a bare ALL CAPS word
+as a group heading, and the token right after a heading as its first entry (which is why a
+lone ticker is safe after a label). A label that is not in the set still renders, but
+nothing downstream knows it. Each of these breaks a cell in its own way: a wrapper div per
+event is what glued week 39's entries into `EX-DIVIDENDUNTRIDR 430`; a missing space after
+the ticker link fuses `UNTR` and `IDR 430` the same way; a ` — ` inside an entry splits it
+into two.
+
+**In the markdown review copy** (`newsletter.md`) write the same grouping on one table
+row: `**AGM** [GIAA](…) 14:00<br>[ASGR](…) 14:30`, and `•` for an empty day. The HTML is
+the source of truth for what is sent and synced.
+
 ### 4b. Scheduled macro rows (ported from monthly-market-pulse §8.10)
 
 Corporate actions alone leave the block blind to the events that actually move the whole
@@ -741,6 +801,10 @@ right-hand column below.
   confident they are, and the newsletter itself never predicts a price?
 - What's Ahead: are the scheduled macro rows real, dated, cited, and each one mapped to a
   ticker or sector that appears elsewhere in this issue? Unmapped rows cut?
+- **What's Ahead grid cells follow §4a?** Grep the HTML: no `n/a`, `none`, `&nbsp;`-only or
+  dash-only cell (an empty day is `&bull;`); every label is from the fixed set, ALL CAPS,
+  and appears once per day; every entry is `TICKER detail` on one line with a space after
+  the link; no `<div>` wraps an event; no ` — ` or en/em dash inside a cell.
 - Summary: two or three bullets per side, every one traceable to a figure already in
   the issue with no new number introduced **and no figure reprinted** (conceptual reference
   only), each bullet joining two reported things rather than restating one, the bear read

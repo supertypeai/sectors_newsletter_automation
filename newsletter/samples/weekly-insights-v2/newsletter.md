@@ -142,7 +142,7 @@ to its [$NSSS](https://sectors.app/idx/nsss?utm_source=newsletter&utm_medium=ema
 
 | Mon 13 | Tue 14 | Wed 15 | Thu 16 | Fri 17 |
 |---|---|---|---|---|
-| — | — | — | — | **AGM** [$ASII](https://sectors.app/idx/asii?utm_source=newsletter&utm_medium=email&utm_campaign=weekly-insights-v2_2026-07-13&utm_content=whats-ahead&utm_term=asii) 09:00 |
+| • | • | • | • | **AGM** [$ASII](https://sectors.app/idx/asii?utm_source=newsletter&utm_medium=email&utm_campaign=weekly-insights-v2_2026-07-13&utm_content=whats-ahead&utm_term=asii) 09:00 |
 
 **Beyond the week**
 
