@@ -57,12 +57,16 @@ jobs:
       - name: Check whether today is in week 3 of the month (WIB)
         id: check
         run: |
-          day=$(TZ=Asia/Jakarta date +%-d)
+          # Week N of the month = the Mon-Sun week whose Monday falls on days 7(N-1)+1..7N,
+          # so jobs in the same week always agree which week it is. Testing the plain
+          # day of the month instead split one week across two numbers (e.g. Wed 7th was
+          # week 1 but Thu 8th week 2), and let a Wed-then-Thu pair run out of order.
+          day=$(TZ=Asia/Jakarta date -d "$(( $(TZ=Asia/Jakarta date +%u) - 1 )) days ago" +%-d)
           if [ "$day" -ge 15 ] && [ "$day" -le 21 ]; then
-            echo "WIB day $day is in week 3 — proceeding" >&2
+            echo "this week's Monday is WIB day $day: week 3, proceeding" >&2
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
-            echo "WIB day $day is not in days 15-21 — not week 3, skipping" >&2
+            echo "this week's Monday is WIB day $day, outside days 15-21: not week 3, skipping" >&2
             echo "run=false" >> "$GITHUB_OUTPUT"
           fi
 

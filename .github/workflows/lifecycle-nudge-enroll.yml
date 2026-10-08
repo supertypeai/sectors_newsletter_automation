@@ -17,7 +17,11 @@ name: Lifecycle nudge — enroll
 #     (61%). Weekly cuts that down to 4/31 permanently missed (days 8/15/22/29
 #     relative to a Thursday-anchored schedule) — not perfect, but the
 #     accepted tradeoff vs. the complexity of a tighter (~every 5 days)
-#     cadence.
+#     cadence. (The figures above were worked out when the monthly run fell
+#     on a Thursday in days 1-7. "Week 1" is now the week whose Monday is in
+#     days 1-7, which puts that Thursday in days 4-10: the same one-per-month
+#     spacing shifted a few days later, so the weekly-vs-monthly conclusion
+#     stands, though the exact day ranges quoted above would shift with it.)
 #   - credits-expiring/insider-nudge/setup-nudge stay first-week-of-month
 #     only, matching the send calendar's Week-1 Slot B placement — these
 #     don't have quota-cycle-renewal's day-of-month coverage problem, so
@@ -101,14 +105,18 @@ jobs:
           DRY_RUN: ${{ github.event.inputs.dry_run == 'true' && '1' || '' }}
         run: node .github/scripts/lifecycle-nudge.mjs enroll --only=quota-cycle-renewal
 
-      - name: Check whether today is in the first week of the month
+      - name: Check whether today is in week 1 of the month (weeks start Monday)
         id: gate
         run: |
-          day=$(date -u +%-d)
+          # Week N of the month = the Mon-Sun week whose Monday falls on days 7(N-1)+1..7N,
+          # so jobs in the same week always agree which week it is. Testing the plain
+          # day of the month instead split one week across two numbers (e.g. Wed 7th was
+          # week 1 but Thu 8th week 2), and let a Wed-then-Thu pair run out of order.
+          day=$(date -u -d "$(( $(date -u +%u) - 1 )) days ago" +%-d)
           if [ "$day" -le 7 ]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
-            echo "day $day is not in the first 7 days — skipping the monthly step" >&2
+            echo "this week's Monday is day $day, outside days 1-7: not week 1, skipping" >&2
             echo "run=false" >> "$GITHUB_OUTPUT"
           fi
 

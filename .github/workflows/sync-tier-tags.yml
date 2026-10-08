@@ -2,11 +2,11 @@ name: Sync tier tags
 
 # Keeps mailroom's STANDARD/INSIDER segments in sync with the real Sectors
 # subscription tier, ahead of the week-2 Thursday content sends
-# (draft-week2-content.yml) that target them. Runs the first Wednesday of week 2 —
+# (draft-week2-content.yml) that target them. Runs the Wednesday of week 2 —
 # the day before that Thursday send — not weekly: the user's explicit call, since
 # these segments only need to be fresh for that one send, not maintained
-# continuously for other uses. Same day-range gate as draft-week2-content.yml's own
-# `day >= 8 && day <= 14` check, one day earlier.
+# continuously for other uses. Same week-of-month gate as the Thursday send's, one
+# day earlier: both key off the Monday of the current week, so they always agree.
 #
 # dry_run defaults to "false", not "true" — a native `schedule:` firing has no
 # `inputs` at all (same property the lifecycle-nudge workflows' cron already relies
@@ -46,12 +46,16 @@ jobs:
       - name: Only proceed in week 2 of the month (WIB)
         id: gate
         run: |
-          day=$(TZ=Asia/Jakarta date +%-d)
+          # Week N of the month = the Mon-Sun week whose Monday falls on days 7(N-1)+1..7N,
+          # so jobs in the same week always agree which week it is. Testing the plain
+          # day of the month instead split one week across two numbers (e.g. Wed 7th was
+          # week 1 but Thu 8th week 2), and let a Wed-then-Thu pair run out of order.
+          day=$(TZ=Asia/Jakarta date -d "$(( $(TZ=Asia/Jakarta date +%u) - 1 )) days ago" +%-d)
           if [ "$day" -ge 8 ] && [ "$day" -le 14 ]; then
-            echo "WIB day $day is in week 2 — proceeding" >&2
+            echo "this week's Monday is WIB day $day: week 2, proceeding" >&2
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
-            echo "WIB day $day is not in days 8-14 — not week 2, skipping" >&2
+            echo "this week's Monday is WIB day $day, outside days 8-14: not week 2, skipping" >&2
             echo "run=false" >> "$GITHUB_OUTPUT"
           fi
 
