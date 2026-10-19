@@ -1,6 +1,8 @@
+<!-- SYNC:LOCAL header -->
 # Sectors API v2, Endpoint Reference
 
 **Synced copy.** The source of truth is `sectors-carousel/references/sectors-api/endpoints.md`; re-sync from there rather than editing this file in place. Paths it names in passing (`references/charts/INDEX.md`, `visual-language.md`, `scripts/blocks.mjs`, `assets/logos.json`) are carousel paths and may not exist here.
+<!-- /SYNC:LOCAL -->
 
 Scope: **IDX (Indonesia Stock Exchange) primarily**, plus the SGX (Singapore) endpoints in section 4. Live-verified 2026-06-12, re-verified 2026-07-02 (20-call audit; every "verified live" note below with a July date comes from that run). This is
 the trimmed working reference for an IG-carousel generator. For the full response
@@ -384,10 +386,12 @@ on a Sectors-branded asset — do not merge it into `assets/logos.json` and do n
 via a `logoUrl` override. This was tried and reverted (2026-07-08): a `D05` entry was briefly
 added to `logos.json`, discovered watermarked on render, and removed.
 
+<!-- SYNC:LOCAL sgx-logo-policy -->
 **Until a clean source is found, let SGX tickers fall back to the built-in gradient
 monogram** (`visual-language.md`'s documented degradation for "no logo asset"; `logoBox` in
 `scripts/blocks.mjs` already does this automatically for any ticker missing from
 `logos.json`, zero extra work needed). Don't add an SGX key to `logos.json` from this host.
+<!-- /SYNC:LOCAL -->
 If a future session finds a clean official SGX logo source (DBS's own newsroom/press-kit
 assets, Wikimedia Commons' bank/company logo pages, etc.), the merge mechanism itself is
 still sound: `assets/logos.json` is a flat `{TICKER: base64png}` map with no IDX/SGX

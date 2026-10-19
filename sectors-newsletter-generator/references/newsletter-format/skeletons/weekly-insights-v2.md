@@ -19,8 +19,7 @@ carve-out was removed 2026-08-31). Every occurrence is linked, not only the firs
 section: the same ticker mentioned six times carries six links to
 `sectors.app/idx/<lower>`, each with that block's `utm_content` and `utm_term=<ticker>`.
 
-**No clickable citation in body copy.** A news source is attributed as plain text,
-`(Source Name, DD Mon YYYY)`, and its URL appears only in the Sources list. The only links
+**No citation in body copy.** A news source gets no inline attribution at all (changed 2026-10-19). Its name, date, description and URL appear only in the Sources list. The only links
 in the body are `sectors.app` links and the Instagram/Threads follow line, so nothing sends
 the reader off site before the CTA.
 
@@ -44,17 +43,15 @@ that leaves a finding empty, the finding goes too.
    filings), each with a heading stating the finding, a social card image, and **three**
    short bullets, four at the outside. Never paragraphs. No restated caveats, no recaps of
    the issue's own structure, no "taken together" closers, no production notes in captions. **The images are existing social cards from the carousel
-   pipeline's Google Cloud Storage bucket**; list the bucket and select them yourself, no
-   credential and no human needed, per the workflow doc's **Visuals: the social cards**
-   section. A finding with no eligible card falls back to a `charts.mjs` render, reason
-   logged in `run-notes.md`; this type ships no `chart-<slug>.svg` hero chart. Two images under one heading go side by side; a single
-   image runs half width. Closes with a follow-us line (Instagram, Threads).
+   pipeline's Supabase bucket, supplied by the user, never charts this skill renders**; ask
+   for the week's URLs before drafting the block. **There is no chart fallback**: a finding
+   with no eligible card is cut, and this type ships no `chart-<slug>.svg` at all. Two images under one heading go side by side; every
+   bucket image is exactly 268px wide (`width="268"`, `width:268px;max-width:100%`), never full width. Closes with a follow-us line (Instagram, Threads).
 5. **Insider Filings** — the 5 most recent disclosures as one table: date, holder, ticker,
    buy/sell, shares, stake before → after. Structured fields only, filtered by `timestamp`
-   to on-or-before the window's Friday. One short line calling out the standout filing.
+   to on-or-before the window's Friday. Ranked by transaction value. No note under the table.
 6. **Other Major Headlines** — 5 IDX-relevant `news` items, **from news sources**, each with
-   a plain-text `(Source Name, DD Mon YYYY)` attribution, never a clickable link; the URL
-   lives in Sources. Tickers only, no company names. **No category prefix** on the bullets. Strictly **new factual
+   no inline attribution (the source appears only in the Sources list). Tickers only, no company names. **No category prefix** on the bullets. Strictly **new factual
    events** that happened inside the window (bank earnings released, a merger rumor, a
    regulatory ruling). Not analysis, not a forward-looking item, not a restatement of a
    Bites line. Closes with a read-more link to `sectors.app/indonesia/news`.
@@ -64,8 +61,7 @@ that leaves a finding empty, the finding goes too.
    to four dated prints and policy events: BI RDG, BPS CPI or trade balance, an FOMC
    decision, an index rebalance effective date. Corporate actions are polled from
    `company/corporate-actions/{symbol}/`; the macro rows are sourced and cited, not an API
-   pull. Grid cells follow the fixed format in the workflow doc's **§4a** (a bullet for an
-   empty day; ALL CAPS labels from a fixed set; one `TICKER detail` line per entry). Every macro row's "why" names a ticker or sector that already appears in this
+   pull. Every macro row's "why" names a ticker or sector that already appears in this
    issue; an unmapped row is a wire feed line, cut it. **Strictly forward-looking**: every
    row is a catalyst with a future date (BI Rate decision, MSCI rebalance effective date, an
    ex-date, a scheduled result). No recap of what already happened, and the "Why it matters"
@@ -81,10 +77,21 @@ that leaves a finding empty, the finding goes too.
    sentence still lands without the number, leave it out, it reads as padding. Closes with **What to watch next**: one
    line naming the dated event that distinguishes the two reads, normally a block 7 row,
    then two conditional bullets, one per read, each stating the outcome that would validate
-   that side. Conditions, never predictions; anything forward-looking is attributed to a
-   named source with a date or reframed as an "if".
+   that side. Conditions, never predictions; anything forward-looking is reframed as an "if", with any source in the Sources list only.
 9. **CTA** — watchlist for exclusive reports, workflow for alerts, in a tinted panel with the
    magenta button. Then appendix and the disclaimer footer.
+   **Fixed copy, verbatim every issue** (locked 2026-09-28; only `{{campaign}}` changes):
+
+   ```md
+   ## Keep the signals coming
+
+   Keep these names on your radar: add them to a **watchlist** for our exclusive reports, or set a [workflow](https://sectors.app/workflow?utm_source=newsletter&utm_medium=email&utm_campaign={{campaign}}&utm_content=cta) alert that pings you on the next filing or foreign-flow swing.
+
+   [Set up your watchlist](https://sectors.app/watchlist?utm_source=newsletter&utm_medium=email&utm_campaign={{campaign}}&utm_content=cta)
+   ```
+
+   HTML: the tinted `#fbe9d8` panel, heading "Keep the signals coming", same body with
+   "workflow" as a magenta link, magenta "Set up your watchlist" button, as in the sample.
 
 **Strict division of labour, blocks 2 / 6 / 7 / 8.** This is the type's main failure mode:
 the same fact reappearing three times under three headings, which reads as padding.

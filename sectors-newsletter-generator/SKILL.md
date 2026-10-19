@@ -1,9 +1,9 @@
 ---
-name: sectors-newsletter-generator
+name: sectors-newsletter
 description: >-
   Generate an on-brand, data-backed Markdown newsletter about the Indonesian (IDX) and
   Singapore (SGX) stock markets from live Sectors data and cited research. Use whenever the user wants
-  to write, draft, or produce a Sectors subscriber newsletter issue. Ten built issue
+  to write, draft, or produce a Sectors subscriber newsletter issue. Eleven built issue
   types across six families (market performance, market insights, company insights,
   Sectors-org announcements, FOMO, personalized), one picked per run from the catalog
   inside the skill. Trigger on phrases like "write the newsletter", "weekly insights
@@ -14,10 +14,10 @@ description: >-
   digest", or "did you catch it piece on [ticker]". The deliverable is Markdown text and
   tables, bite-sized and scannable, plus a required visual (a generated chart, or bucket social cards for weekly insights v2); it
   is not a slides or video renderer. Do NOT use it for Instagram carousels or slides
-  (use sectors-carousel), for video (use market-story-video), or for non-IDX/non-SGX
+  (use sectors-carousel), for video (use sectors-reels), or for non-IDX/non-SGX
   markets, and do NOT use it for lifecycle/CRM/transactional email (onboarding nudges,
   credit/plan reminders, upgrade/win-back) or for deciding recipients/frequency, those
-  need live user-account data and stay with the sibling `sectors-newsletter-dbquery`
+  need live user-account data and stay with the sibling `sectors-dbquery`
   skill instead.
 ---
 
@@ -52,8 +52,7 @@ exchange in the copy whenever both appear in one issue.
 
 ## Personalization check (run before picking an issue type)
 
-Settle one question first, by reading the request rather than asking the user:
-**does this content need real per-user data (which tickers or
+Ask one question first: **does this content need real per-user data (which tickers or
 sectors a specific user tracks, their account/billing state) that the Sectors API
 cannot supply?**
 
@@ -62,9 +61,9 @@ cannot supply?**
   sufficient, don't call any other skill.
 - **Yes, and it's account/billing state** (renewal dates, credits, onboarding status,
   who to send a nudge to): out of scope here entirely, hand off to the sibling
-  `sectors-newsletter-dbquery` skill, see **Out of scope** below.
+  `sectors-dbquery` skill, see **Out of scope** below.
 - **Yes, and it's which tickers/sectors a user tracks** (this is the `watchlist-performance-digest`
-  personalized type): invoke the `sectors-newsletter-dbquery` skill (via the Skill tool)
+  personalized type): invoke the `sectors-dbquery` skill (via the Skill tool)
   to run its approved `watchlist-tracked-interest` query and return the raw audience
   rows. **Never write or improvise SQL for user-account data in this skill** — the
   dbquery skill is the only path to that data, and it only ever runs a query that's
@@ -76,73 +75,9 @@ cannot supply?**
   workflows/monthly-market-pulse.md §3 and workflows/weekly-insights-v2.md.
 
 **This skill never calls `mcp__supabase__*` itself, for any category of data.** Every
-Supabase read goes through `sectors-newsletter-dbquery`, which only runs SQL already approved in
+Supabase read goes through `sectors-dbquery`, which only runs SQL already approved in
 its `scripts/approved-queries/` folder. A query improvised mid-draft is how a made-up
 number reaches a subscriber.
-
-## Running unattended (CI, cron, scheduled runs)
-
-When the environment variable `NEWSLETTER_UNATTENDED=1` is set, **no human is
-reachable during the run**. Never ask a question, never pause for input, never stop at
-a menu. Every decision this skill would normally put to the user has a documented
-default below; take it, and record the choice in a **separate `run-notes.md` file in
-the delivery folder**, never anywhere inside `newsletter.md` or `newsletter.html`.
-
-**Why a separate file and not a comment in the HTML.** The delivery pipeline sends
-`newsletter.html` to subscribers byte for byte, comments included — an HTML comment is
-invisible in a mail client but still ships in the message source, where any recipient
-can read it, and it counts against Gmail's ~102KB clipping threshold. `run-notes.md`
-is never read by the send path at all, so it reaches the PR reviewer and nobody else.
-It also keeps the distinction structural rather than syntactic: internal notes are a
-different *file*, not the same file relying on comment markers to stay hidden. That
-fragile in-file distinction is what produced the original bug.
-
-```markdown
-<!-- run-notes.md, sits beside newsletter.md, never sent -->
-# Unattended-run notes, 2026-07-29
-
-- Issue type: not named in the request, defaulted to weekly-insights-v2.
-- Foreign flow: Supabase MCP connector unavailable, figure omitted (not substituted).
-- Block 4 visuals: 2 of 3 findings used real cards; the third fell back to charts.mjs.
-```
-
-A run once rendered these notes as a visible `<div>` in the delivered email (confirmed
-2026-07-29, caught by the user) — that must never happen again, in any form. If in
-doubt whether something belongs in the visible Appendix or in `run-notes.md`: the
-Appendix answers "what data backs this issue" and is normal reader-facing content on
-every issue (Hard rule 8); `run-notes.md` answers "what did the robot decide on its own
-because nobody was there to ask," and is for nobody but a PR reviewer.
-
-| Decision point | Unattended default |
-| --- | --- |
-| Issue type, none named in the prompt | `weekly-insights-v2` |
-| Foreign-flow definition | exchange (`idx_daily_data`) via `scripts/fixed-queries/foreign-flow-range.sql`; **needs the Supabase MCP connector**, see below |
-| Block 4 visuals | **list the GCS bucket directly** (no credential needed) and auto-select eligible real cards; `scripts/charts.mjs` only for a finding with none eligible. See `workflows/weekly-insights-v2.md`'s **Visuals: the social cards** section |
-| `$NEWSLETTER_HOME/samples/<type-slug>/` absent | proceed without it, note the absence in `run-notes.md` |
-| Upcoming-events sheet unreachable | omit that block, note it, don't fail the issue |
-| A requested type isn't built yet | stop with a clear error naming the type, don't substitute a different one |
-| Anything else this skill would ask | take the documented default and state the choice in `run-notes.md` |
-
-Two things stay hard failures even here, because the alternative is publishing
-something false: a **fetch that returns no usable data for a required block** (say the
-window's index series comes back empty), and any figure that would have to be invented
-to fill a gap. Fail the run loudly instead. Hard rules 1 through 3 outrank the
-never-stall instruction above, always.
-
-**Foreign flow needs the Supabase MCP connector, not just the Sectors API.** The
-exchange definition is only reachable through `scripts/fixed-queries/foreign-flow-range.sql`
-against `idx_daily_data`; no Sectors API endpoint exposes the foreign buy/sell volume
-split (`daily/{symbol}` carries close/volume/market-cap only, and `foreign-flow/{symbol}`
-is the broker-domicile measure the rule forbids for this figure). So if the connector
-isn't configured in the runner, **omit the flow figure and note the omission in the
-`run-notes.md`** (never inside the sent HTML) rather than substituting the broker
-endpoint, which would publish the contradiction the rule exists to prevent. Flow is one
-line in Key Data Bites, not a required block; the issue stands without it.
-
-**Types that need human-supplied source material** (`upcoming-event`,
-`new-release-feature`, `watchlist-performance-digest`) are not automatable and must not
-be attempted unattended. If one is requested with `NEWSLETTER_UNATTENDED=1`, stop and
-say why.
 
 ## Pick the issue type (always first)
 
@@ -156,8 +91,8 @@ skeleton under `references/newsletter-format/skeletons/`; both files share the s
 | Market Performance | **Weekly Insights v2** (`weekly-insights-v2`) | **the default weekly send.** Nine blocks, info-packed, no long-form reading: greeting, Key Data Bites, Top Movers, one "What the Data Unearthed" findings block built on the social cards, Insider Filings, Headlines, a corporate-action week calendar, Summary, CTA. Monday send (Hard rule 11) |
 | Market Performance | **Monthly market pulse** (`monthly-market-pulse`) | the trailing 30 days' movers, most-traded and broker flow, each aggregated across the whole window, not a single day's snapshot. Tight, table-first |
 | Market Insights | **Macro-reaction** (`macro-reaction`) | tie the last ~2 days of macro news to affected sectors/tickers, then report each name's fundamentals and valuation context |
-| Company Insights | **Three-stock storytelling** (`three-stock-story`) | three companies' history, people, fun facts, attributed forward outlook |
-| Company Insights | **Single company deep dive** (`single-company-deep-dive`) | one name read in depth off a real earnings / corporate-action / ownership trigger |
+| Company Insights | **Three-stock storytelling** (`three-stock-story`) | three companies sharing one pattern this week, each with a dated timeline, numbers and key takeaway, attributed forward view |
+| Company Insights | **Single company deep dive** (`single-company-deep-dive`) | one company covered whole: business model and revenue mix, competitive moat tested against named peers, the unit-economics margin ladder, the macro forces on its line items, then the long-term read both ways. A recent event is only the reason to publish, a tenth of the issue. Runs 900-1,200 words under a three-figures-per-paragraph density cap. **Two formats, ask which:** the full deep dive, or an **earnings review** (one quarter's print explained: price chart, how-it-makes-money sankey, quarter at a glance, three things that mattered, open question) that also ships as a `newsletter.pdf` |
 | Company Insights | **Sector spotlight** (`sector-spotlight`) | one sub-sector read as a whole: its five-year valuation series, the median-vs-weighted dispersion, which industries sit at the cheap end, whether the week's move was broad, then the one name that breaks the pattern peer-compared on EV/EBITDA and leverage as well as P/E. Table-heavy, subsector-led headline, valuation context, never a call |
 | Sectors-org | **New release feature** (`new-release-feature`) | a brief summary of the latest release off a user-supplied release note (`sectors.app/release` is not live-fetchable), plus a secondary section spotlighting one feature the user picks, with a "Try the feature now" CTA. Subject/preview/headline name only the release, never the feature |
 | Sectors-org | **Upcoming event** (`upcoming-event`) | promo for a Sectors in-house workshop. Content is **user-supplied**: ask for date/time/venue, agenda/speaker/target audience, registration link, and marketing banner before drafting. Not market-data driven |
@@ -169,10 +104,6 @@ subject ("do the Saturday wrap," "deep dive on BBRI earnings," "spotlight the ba
 straight into that pipeline. If they delegate the choice ("you pick this week's issue"),
 choose and state a one-line "why this, why now" as you proceed. Only a bare "write the
 newsletter" with no type named gets the menu, offer the ten above grouped by family.
-
-**Under `NEWSLETTER_UNATTENDED=1` there is no menu.** A bare "write the newsletter" with
-no type named runs `weekly-insights-v2`, the default weekly send; say so in the appendix
-and carry on. See **Running unattended** above.
 
 A one-paragraph brief per type (useful when weighing two candidates) lives in
 `references/type-briefs.md`; the workflow doc itself is the source of truth, so once the
@@ -200,7 +131,7 @@ anything that doesn't serve the goal.
 | **Monthly market pulse** | Click into the tickers/tables to check the month's movers live |
 | **Macro-reaction** | Explore the affected sectors/tickers on Sectors to size up the move |
 | **Three-stock story** | Click through to each company's page on Sectors |
-| **Single company deep dive** | Open that company's report on Sectors and dig into the data |
+| **Single company deep dive** | Open that company's report on Sectors and work the segment, peer and ratio data themselves |
 | **Sector spotlight** | Screen the sub-sector on Sectors and compare the peers themselves |
 | **Did you catch it** | Add the ticker to a watchlist, or set up a workflow alert, so the next move doesn't get missed |
 | **Watchlist/sector performance digest** | Open Sectors to check their own tracked tickers/sectors in full, now that the digest showed a real move on one |
@@ -224,15 +155,11 @@ see their own workflow docs.
 1. **Research the angle** — web search and/or API discovery, before any drafting.
 2. **Fetch and validate data** — `sectors.mjs`, then band-check against
    `references/sectors-api/data-quality.md`. Before fetching, check
-   `$NEWSLETTER_HOME/samples/<type-slug>/queries.md` for that issue
+   `/Users/evelyn/Desktop/newsletter/samples/<type-slug>/queries.md` for that issue
    type's resolved endpoint list, param shape, and date/window rule (e.g. weekly-insights-v2's
    Mon-Fri anchor, macro-reaction's last-2-days news window) — reuse the same criteria
    this run, only the dates/tickers change. If no sample exists yet for a type, the file
-   still holds the documented recipe pattern; populate the sample after this run.
-   **If the folder itself is absent** (a fresh clone, a CI runner), fall back to the
-   recipe in this type's own workflow doc, note the absence in `run-notes.md`
-   (never inside the sent HTML), and carry on — a missing sample is never a
-   reason to stall or to fail the run. This
+   still holds the documented recipe pattern; populate the sample after this run. This
    folder lives next to the delivered issues, not inside the skill, specifically so it's
    easy to open and edit directly when the user wants to adjust a type's format or
    presentation, without touching skill internals.
@@ -243,20 +170,18 @@ see their own workflow docs.
    Markdown tables for any ranked or compared list of 3+, and at most one real
    generated chart for the issue's hero trend (`newsletter-format.md`'s **Bite-sized &
    visual formatting** section, which routes chart work through the `dataviz` skill).
-   **The one-chart rule does not apply to `weekly-insights-v2` at all**: its findings
-   block runs one visual per finding (real social cards from the bucket, listed directly —
-   no pause, no asking — with a generated chart only as the per-finding fallback when
-   nothing's eligible), so there is no single count to cap; see Delivery. That type also
-   uses the ticker alone with no company name (hard rule 15).
+   **The one-chart rule does not apply to `weekly-insights-v2` at all**: that type
+   generates no chart, so there is no count to cap. Its findings block takes social cards
+   from the bucket and the URLs come from the user, so pause here and ask for them before
+   drafting block 4. Generating a graph there is a defect with no fallback, see Delivery.
+   That type also uses the ticker alone with no company name (hard rule 15).
 4. **Self-review** — the checklist at the end of the chosen workflow doc, plus
    `references/compliance.md`'s one-line test, plus a UTM check of every link against
    `~/.claude/skills/UTM_CONVENTION.md`, the organization-wide standard that every issue must
    follow strictly. Also diff the draft's section order and
-   heading logic against `$NEWSLETTER_HOME/samples/<type-slug>/newsletter.md`
+   heading logic against `/Users/evelyn/Desktop/newsletter/samples/<type-slug>/newsletter.md`
    (when one exists) so flow and section-title logic stay consistent issue to issue for
-   the same type, not just compliant with the prose skeleton in isolation. When no
-   sample exists, review against the type's own skeleton in
-   `references/newsletter-format.md` instead and say so in the appendix.
+   the same type, not just compliant with the prose skeleton in isolation.
 5. **Deliver** — see Delivery below.
 
 ### Route by type
@@ -282,10 +207,10 @@ section of `macro-reaction`, `three-stock-story`, `single-company-deep-dive`,
 `sector-spotlight`, or `did-you-catch-it`, those are where the no-advice line is
 easiest to cross.
 
-**`weekly-insights-v2`'s foreign-flow figure is settled, not an open decision: always use
-the exchange definition** (`idx_daily_data`), never `foreign-flow/{symbol}`'s
-broker-domicile figure — the two disagree on direction, not just magnitude (resolved
-2026-07-27, see that workflow doc §3).
+**One open decision on `weekly-insights-v2`: ask the user which foreign-flow definition
+the issue should use before drafting any flow figure** (the social cards and
+`foreign-flow/{symbol}` use different methods that disagree on direction, see that
+workflow doc §3), then apply that one definition throughout.
 
 ## Hard rules (override style every time)
 
@@ -349,29 +274,15 @@ broker-domicile figure — the two disagree on direction, not just magnitude (re
     button to `eventUrl`, five fields per event straight off the sheet, nothing
     invented. Heading is the fixed text "Upcoming Events," not a variable lead-in. See
     `newsletter-format.md`'s **Upcoming events closing block** section for the exact
-    contract. **If the sheet is unreachable** (network failure, the doc moved), omit the
-    block and note the omission in `run-notes.md` (never inside the sent HTML)
-    rather than failing the issue or inventing an event; the sheet is a public `curl`,
-    so a failure here is transport, not content. Every row still upcoming is required
-    whenever the fetch *does* succeed.
-11. **Weekly Insights v2's issue date is today's actual date, not a computed Monday**
-    (revised 2026-07-27, superseding the 2026-07-20 "Monday immediately after the
-    Friday close" rule). Use the real date the draft is generated on, whatever day
-    that is, never a theoretical Monday derived from the reporting window. `date:` in
-    the frontmatter, the delivery folder's `<YYYY-MM-DD>`, the HTML `<!-- -->` header
-    comment, and every `utm_campaign` suffix all use this same actual date, not the
-    Friday `data_as_of` date and not a window-derived Monday. See
+    contract.
+11. **Weekly Insights v2 sends Monday, not Saturday** (confirmed 2026-07-20): the
+    header line's issue/send date is the Monday immediately after the reporting week's
+    Friday close, e.g. week of 6-10 Jul → issue date 13 Jul, week of 13-17 Jul → issue
+    date 20 Jul. `date:` in the frontmatter, the delivery folder's `<YYYY-MM-DD>`, and
+    every `utm_campaign` suffix all use this same Monday date, not the Friday
+    `data_as_of` date and not the old same-week Saturday. See
     `workflows/weekly-insights-v2.md` and the **Header block** section of
     `newsletter-format.md`.
-    **"Today" means today in Asia/Jakarta (WIB), not the runner's system clock**
-    (added 2026-08-13, after an automated Wednesday run stamped 12 Aug instead of
-    the real WIB date, 13 Aug — a GitHub Actions runner's ambient clock is UTC,
-    and WIB is UTC+7, so for several hours after WIB midnight the runner's own
-    date is still the previous day). This applies to every type, not just
-    weekly-insights-v2 — the send calendar and its cron schedules are WIB-anchored
-    throughout, so WIB is the one timezone "today" can unambiguously mean here. An
-    unattended CI run receives the correct WIB date explicitly in its drafting
-    instructions; never infer "today" from the environment.
 12. **HTML disclaimer footer uses fixed markup, verbatim, every issue** (confirmed
     2026-07-24): the bordered `<tr>` block with the non-advice line, the `sectors.app`
     citation link, and the `Sectors | sectors.app | @sectorsapp` line. Fill only the
@@ -386,7 +297,7 @@ broker-domicile figure — the two disagree on direction, not just magnitude (re
     with that block's `utm_content` and `utm_term=<ticker>`. Grep the finished HTML for the
     ticker string and confirm every hit sits inside an `<a>`. See `newsletter-format.md`'s
     **Ticker-mention convention**.
-14. **No clickable citation in body copy, any type** (confirmed 2026-08-31): a news source
+14. **No clickable citation in body copy, any type** (and, for `weekly-insights-v2` and `monthly-market-pulse`, no inline citation of any kind since 2026-10-19: Sources list only) (confirmed 2026-08-31): a news source
     is attributed as plain `(Source Name, DD Mon YYYY)` text, and its URL appears only in
     the Sources list. The only body links are `sectors.app` links and our own Instagram and
     Threads follow lines. An outbound link mid-issue hands the reader an exit before the
@@ -422,34 +333,19 @@ macro-reaction or three-stock-story types.
 
 ## Delivery
 
-**`$NEWSLETTER_HOME` is the root for both delivered issues and the `samples/`
-reference folder.** Resolve it in this order, and state which one you used in the
-appendix:
-
-1. the `NEWSLETTER_HOME` environment variable, if set (this is what CI sets);
-2. otherwise `<repo-root>/newsletter/`, alongside the skills checkout;
-3. otherwise ask, but only when a human is present — under `NEWSLETTER_UNATTENDED=1`
-   never ask, take option 2.
-
-Create the folder if it doesn't exist rather than treating its absence as an error.
-Never write a delivered issue to a path outside this root.
-
 Finished issues land at:
 
 ```
-$NEWSLETTER_HOME/newsletter_<YYYY-MM-DD>_<type-slug>/
+/Users/evelyn/Desktop/newsletter/newsletter_<YYYY-MM-DD>_<type-slug>/
     newsletter.md
     newsletter.html            every type: the send-ready HTML email
-    run-notes.md               unattended runs only: which documented defaults this run
-                                took, for the PR reviewer. NEVER read by the send path,
-                                so it can't reach a subscriber. See **Running
-                                unattended** above
-    chart-<slug>.svg           every type except weekly-insights-v2 in an interactive run
-                                (that type's unattended runs are the one exception, see
-                                its own workflow doc); the source of truth
-    chart-<slug>.png           the same chart rasterized for email; what the HTML
-                                actually references, since Gmail and Outlook strip SVG
-                                (generated by scripts/rasterize.mjs, needs `npm install`)
+    newsletter.pdf             single-company-deep-dive earnings-review format only, rendered
+                                from the HTML with scripts/html2pdf.mjs
+    chart-<slug>.svg           every type except weekly-insights-v2: the hero chart (source)
+    chart-<slug>.png           three-stock-story and single-company-deep-dive: the 2x raster
+                                the HTML actually references, made with scripts/svg2png.mjs
+    logo-<ticker>.png          single-company-deep-dive: company logo for the headline,
+                                from the carousel skill's assets/logos.json
     banner-<slug>.<ext>        upcoming-event only: the user-supplied banner, copied in
     sample-rows.csv            watchlist-performance-digest only: the real audience rows
                                 the dbquery skill's query returned this run (local only,
@@ -482,46 +378,37 @@ $NEWSLETTER_HOME/newsletter_<YYYY-MM-DD>_<type-slug>/
   convention** owns the shared HTML chrome and `workflows/upcoming-event.md` §4 carries the
   promo type's own delivery note.
   **`weekly-insights-v2` satisfies the visual requirement with the social cards from the
-  carousel pipeline's Google Cloud Storage bucket, generated charts only as the per-finding
-  fallback.** The bucket lists directly, no credential needed (verify live — see
-  `workflows/weekly-insights-v2.md`'s **Visuals: the social cards** section for the exact
-  call and its own note on what to do if that ever stops working): list it, apply the
-  selection criteria, and build eligible cards' URLs. Only a finding with no eligible card
-  falls back to a generated chart via `scripts/charts.mjs`. This works the same whether or
-  not a human is present — do not skip straight to asking the user or to generating charts
-  for everything just because this is an unattended run. It is also the one exception to
-  stage 3's "at most one generated chart per issue": its findings block runs one visual per
-  finding, so two or three visuals is correct there.
+  carousel pipeline's Supabase bucket, not with a generated `chart-<slug>.svg`.** The
+  skill cannot list that bucket without a credential, so the URLs are **supplied by the
+  user**: once the week's findings are derived from the API, **stop and ask the user for
+  the eligible card URLs**. This ask is mandatory and blocking for this type; do not skip
+  it, do not guess filenames, and do not quietly render a chart in place of asking. **There
+  is no chart fallback for this type** (confirmed 2026-08-31): if the user has no eligible
+  card for a finding, cut the finding and build the block from the cards that exist. A
+  generated graph anywhere in a `weekly-insights-v2` issue is a defect, and this type ships
+  no `chart-<slug>.svg`. It is also
+  the one exception to stage 3's "at most one generated chart per issue": its findings
+  block runs one visual per finding, so two or three visuals is correct there.
 - Scratch fetches (raw `sectors.mjs --save-dir` JSON) go to the scratchpad or a
   `_draft`/`data` subfolder, not into the delivered folder.
-- Locally, `$NEWSLETTER_HOME` is a plain folder, separate from the
+- `newsletter/` is a plain folder, separate from the skills repo and from the
   `sectors-carousel` skill's `scs/<ticker>_<slug>/` git repo, no git init needed here.
-  In CI it resolves inside the repo checkout instead, because the delivered issue is
-  what the review PR carries; that's the one case where issues are committed.
-- **`samples/` lives in this same `$NEWSLETTER_HOME` folder, not inside the skill.**
-  `$NEWSLETTER_HOME/samples/<type-slug>/` holds one `newsletter.md`
+- **`samples/` lives in this same `newsletter/` folder, not inside the skill.**
+  `/Users/evelyn/Desktop/newsletter/samples/<type-slug>/` holds one `newsletter.md`
   (+`.html`/chart where applicable) and a `queries.md` per issue type, deliberately kept
   next to the delivered issues rather than under the skill's own `references/` so the
   user can open and edit a type's format/presentation reference directly, without
   digging into skill internals. See **Shared pipeline shape** steps 2 and 4 for when
   this skill reads it, and refresh a type's sample here after any run whose output is
   more current or more refined than what's stored.
-  **This folder is not shipped with the skill** and will be missing on a fresh clone or
-  a CI runner. Both read sites above degrade gracefully when it is; nothing here is a
-  hard dependency.
 
 ## Setup and file map
 
-No install needed for a Markdown-only draft: `node` built-ins only, no npm packages,
-and the API key is `export SECTORS_API_KEY=<key>` (no key ships in the repo; a local
-`config.json`, copied from `config.example.json`, is an optional gitignored fallback if
-you prefer a file over the env var). **`scripts/rasterize.mjs` is the one exception** —
-it needs Puppeteer (`npm install` in this folder, once per machine) to turn a generated
-chart's SVG into the PNG email clients can actually display; skip it if you only want the
-`.md`, you need it for any issue you intend to send. Charts come from this skill's own
-`scripts/charts.mjs` (consult the `dataviz` skill for *which* chart fits, and the carousel
-skill's `references/charts/INDEX.md` for the "which Sectors field maps to which chart"
-table). Full setup notes, the file map, and the sibling-skill relationships live in
+No install needed: `node` built-ins only, and the shared API key already ships in
+`config.json`. Charts come from this skill's own `scripts/charts.mjs` (consult the
+`dataviz` skill for *which* chart fits, and the carousel skill's
+`references/charts/INDEX.md` for the "which Sectors field maps to which chart" table).
+Full setup notes, the file map, and the sibling-skill relationships live in
 `references/setup.md`. Sanity check:
 
 ```bash

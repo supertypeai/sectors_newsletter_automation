@@ -4,7 +4,11 @@
 
 This file is the full treatment. The one-paragraph version lives in `./core.md` section 7, and the rules that override style in every case are `./core.md` section 1.
 
-> **Reference copy.** Pulled in from the Sectors skills repo's shared `_shared/writing/brand-voice.md` (jigsawinthecity/claudeskills) so this skill stays self-contained and needs no other repo checked out alongside it. This copy is static, not auto-synced from there — re-pull it by hand if the canonical file changes upstream.
+<!-- GENERATED FILE. Do not edit. -->
+> **Generated copy.** The source of truth for this file lives in the Sectors skills
+> repo at `_shared/writing/brand-voice.md`, alongside the other content skills. This copy exists
+> because `sectors-newsletter` is shared with the company and run on machines that do not have this repo. Edit the canonical file and re-run
+> `node _shared/writing/sync.mjs`; an edit made here is overwritten on the next sync.
 
 ## Who is talking
 

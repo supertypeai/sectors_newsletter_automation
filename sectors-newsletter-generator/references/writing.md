@@ -3,9 +3,8 @@
 **Read `./writing/core.md` first, top to bottom.** It carries the non-negotiables, the editorial laws and the arc, plain words, the AI-tell filter, the rhythm ban, directness and the voice. All of it binds here. This file adds only what is specific to a newsletter, and it may tighten a core rule but never relax one.
 
 Alongside it: `./writing/brand-voice.md` (the voice in full) and `./writing/audit.md` (the gate
-before delivery). Those three are static reference copies of rules shared across every Sectors
-content skill, pulled in so this skill runs standalone — see each file's own header for where
-the canonical version lives and how to re-pull it.
+before delivery). Those three are generated copies of rules shared across every Sectors content
+skill, so this skill runs standalone. Never hand-edit them.
 
 **The unit here is one section.** Every "unit" rule in the core applies per section: a reader who jumps straight to the section that interests them must be able to read it without the ones above it.
 

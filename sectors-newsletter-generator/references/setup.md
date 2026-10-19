@@ -5,31 +5,26 @@ run needs this file.
 
 ## Setup
 
-No install needed for a Markdown-only draft: `node` built-ins only, no npm packages,
-and the API key is `export SECTORS_API_KEY=<key>` (no key ships in the repo; a local
-`config.json`, copied from `config.example.json`, is an optional gitignored fallback if
-you prefer a file over the env var). **`scripts/rasterize.mjs` is the one exception** —
-it needs Puppeteer (`npm install` in this folder, once per machine) to turn a generated
-chart's SVG into the PNG email clients can actually display; skip it if you only want the
-`.md`, you need it for any issue you intend to send. The required hero chart is generated
+No install needed. Unlike `sectors-carousel` there is no slide-rendering step — the
+only dependency is `node` (built-ins only, no npm packages) to run `sectors.mjs`, and
+the shared API key already ships in `config.json`. The required hero chart is generated
 with this skill's own `scripts/charts.mjs` (import the chart-kind function you need —
 `sparkline`/`line` for a price series, `barChart` for year-over-year (pass `financial:
 true` for a signed gain/loss series), `donut` for a mix, `moversChart` for a ranked
 gainers/losers list with per-row logos, etc. — and write its returned SVG string to a
-file). Still consult the `dataviz` skill first for **which kind of chart fits the data**
-(its form heuristic and the "which Sectors field maps to which chart" table in the
-sibling carousel skill's `references/charts/INDEX.md` both apply here unchanged);
-`charts.mjs` is the render step once that choice is made. This IS the carousel's chart
-engine, forked for a light surface rather than avoided: the two skills' geometry and
-chart-kind grammar now match, only the color constants differ (see `scripts/charts.mjs`'s
-header comment for the validated light-mode role map). **`moversChart`'s per-row logos
-come from `../market-story-video/assets/logos.json`** (957 IDX tickers, keyed by bare
-symbol, raw base64 PNG); a row given no `logoBase64` renders no image without
-complaining, so pass them explicitly or the chart silently ships bare. Sanity check:
+file, no Puppeteer, no build step). Still
+consult the `dataviz` skill first for **which kind of chart fits the data** (its form
+heuristic and the "which Sectors field maps to which chart" table in the sibling
+carousel skill's `references/charts/INDEX.md` both apply here unchanged); `charts.mjs` is the
+render step once that choice is made. This IS the carousel's chart engine, forked for a
+light surface rather than avoided: the two skills' geometry and chart-kind grammar now
+match, only the color constants differ (see `scripts/charts.mjs`'s header comment for
+the validated light-mode role map). Sanity check:
 
 ```bash
 node scripts/sectors.mjs "idx-total/?start=2026-07-01&end=2026-07-08"
 ```
+
 
 ## What's in this skill
 
@@ -39,11 +34,8 @@ references/
   newsletter-format.md            the Markdown output contract: header metadata,
                                    ticker convention, number formatting, per-type
                                    section skeletons, disclaimer footer
-  newsletter-format/skeletons/    one section-order skeleton per built issue type
   compliance.md                   hard rules + the advice-reconciliation guidance
   sourcing.md                     web research + citation rules
-  scope.md                        not-yet-built types, out-of-scope types
-  type-briefs.md                  one-paragraph brief per issue type
   upcoming-events-source.md       Google Sheet fetch recipe + selection logic for the
                                    closing-block promo every issue but upcoming-event
                                    carries (Hard rule 10)
@@ -56,7 +48,7 @@ references/
                                    recipe, non-advice framing
     three-stock-story.md          stock-pick discovery + history/people research +
                                    attributed-forecast recipe
-    single-company-deep-dive.md   trigger-anchored one-stock read, earnings/action/owner
+    single-company-deep-dive.md   whole-company breakdown, business/moat/economics/macro
     sector-spotlight.md           one sub-sector peer-comparison on valuation
     new-release-feature.md        user-supplied release note summary + one feature
                                    highlight, no live fetch
@@ -72,8 +64,8 @@ references/
                                    a synced copy shared with sectors-carousel)
   writing.md                      the newsletter surface: what prose needs on top of the core
   writing/
-    core.md, brand-voice.md,      the shared writing rules, static reference copies (see
-    audit.md                      each file's own header for the canonical source)
+    core.md, brand-voice.md,      the shared writing rules, generated copies kept identical
+    audit.md                      by _shared/writing/sync.mjs. Do not hand-edit.
 scripts/
   sectors.mjs                     authenticated Sectors API GET (zero external
                                    dependencies, self-locates its own config; a synced
@@ -87,26 +79,18 @@ scripts/
                                    GAIN/LOSS is brand green/red `#568475`/`#D53E50`,
                                    ticker mentions and every other link carry the accent
                                    `#9E0142`, see Hard rule 7)
-  rasterize.mjs                   local-only: Puppeteer-based SVG-to-PNG conversion for
-                                   the required hero chart, since Gmail and Outlook strip
-                                   inline SVG (see **Setup** above)
-  fixed-queries/                  Supabase MCP connector SQL for a market-wide range
-                                   query no Sectors API endpoint covers (broker summary,
-                                   foreign flow), run read-only through the connector
-config.example.json                template for the optional local key file;
-                                   SECTORS_API_KEY env is the primary source. Copy to
-                                   config.json (gitignored) and fill in only if you
-                                   prefer a file to the env var — never commit a real key
+config.json                       own copy of the shared Sectors API key
+                                   (sectorsApiKey); SECTORS_API_KEY env overrides
 ```
 
-**This skill is self-contained**: `scripts/sectors.mjs`,
-`references/sectors-api/`, and `references/writing/{core,brand-voice,audit}.md` are local
-copies, not relative-path reuse of `sectors-carousel` — this skill runs standalone even
-if `sectors-carousel` isn't installed. They originate from `sectors-carousel` (the
-single source of truth for voice and data discipline) and should be re-synced from
-there if that skill's copies change; don't fork the content itself, only the file
-location.
+**This skill is fully standalone.** It is shared with the company and runs on machines that
+have nothing else from this repo, so everything it needs lives inside it. `scripts/sectors.mjs`,
+`config.json` and `references/sectors-api/` are local copies rather than relative-path reuse of
+`sectors-carousel`. `references/writing/` holds generated copies of the shared writing rules,
+written by `_shared/writing/sync.mjs`; never hand-edit them, edit the canonical files and
+re-run the sync. The data-layer copies originate from `sectors-carousel` (the
+single source of truth for data discipline) and should be re-synced from there if that skill's copies change; do not fork the content itself, only the file location.
 
-**`market-story-video`** (the other sibling skill) is a separate, fully self-contained
-Remotion video pipeline with its own copies of the same brand/voice/data-layer
-references. It has no dependency relationship with this skill in either direction.
+**`sectors-reels`** (the other sibling skill) is a separate Remotion video pipeline with its own
+copy of the data-layer references, and it writes to the same shared writing rules this skill
+carries. It has no dependency relationship with this skill in either direction.

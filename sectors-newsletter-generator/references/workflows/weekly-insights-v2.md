@@ -1,11 +1,11 @@
 # Weekly Insights v2, workflow
 
 Intended send: Monday morning (confirmed 2026-07-20, moved off the original Saturday
-cadence). Covers the trading week that just closed (Mon-Fri); the issue date is
-**today's actual date, whatever day the draft is generated on** (revised 2026-07-27,
-see **Header block, weekly-insights-v2** below), not the `data_as_of` Friday date and
-not a computed Monday. The successor to the v1 `weekly-wrap` type, retired; this is now
-the only weekly type, and a request for "the wrap" routes here.
+cadence). Covers the trading week that just closed (Mon-Fri); the issue date is the
+Monday immediately after that week's Friday close, not the same-week Saturday and not
+the `data_as_of` Friday date. See **Header block, weekly-insights-v2** below for the
+exact date math. The successor to the v1 `weekly-wrap` type, retired 2026-08-31; this is now the
+only weekly type, and a request for "the wrap" routes here.
 
 Read `../newsletter-format/skeletons/weekly-insights-v2.md` and `../compliance.md`
 before drafting. Worked reference: `newsletter/samples/weekly-insights-v2/`.
@@ -20,9 +20,7 @@ inside Key Data Bites. What replaces them is one analysis block that has to earn
 
 The format borrows from two references the user supplied: Carbon Finance (dated masthead,
 one-line greeting, a dense linked-facts box, tagless headline one-liners) and Algo Research
-(a findings block, a forward calendar). **The greeting itself was dropped 2026-07-29**
-(see `newsletter-format.md`'s **Weekly Insights v2** skeleton, block 1) — everything
-else about the Carbon Finance masthead influence still applies.
+(a findings block, a forward calendar).
 
 ## 1. Settle the window
 
@@ -35,7 +33,7 @@ because the prior-week WoW figure is a Friday-to-Friday change and the index end
 no prior-close field. Fetch `?start=<prior-mon-minus-2>&end=<prior-fri-minus-7>` and take the
 last row.
 
-### Header block, weekly-insights-v2 (revised 2026-07-27)
+### Header block, weekly-insights-v2 (confirmed 2026-07-20)
 
 The header line under the masthead reads `Issue #{n} | {issue_date} | week of
 {mon}-{fri} | data as of {data_as_of}`, four fields, three different dates. Don't
@@ -44,19 +42,14 @@ collapse any two of them:
 - **`week of {mon}-{fri}`**: the Mon-Fri window settled above.
 - **`data as of {data_as_of}`**: that window's Friday, the API's last trading day,
   matches the frontmatter `data_as_of` field.
-- **`{issue_date}`**: **today's actual date**, the real date this draft is generated
-  on, whatever day of the week that is. This is the send date, it goes in the
-  frontmatter `date:` field, the delivery folder's `<YYYY-MM-DD>`, the HTML `<!-- -->`
-  header comment, and every `utm_campaign=` suffix on every link in the issue, all
-  four must agree.
-
-  **Superseded 2026-07-27**: earlier revisions computed this as a theoretical Monday
-  (`window_monday + 7 days`, "the Monday immediately after that Friday's close") or an
-  even older same-week Saturday. Both are retired. Neither survives a draft that
-  actually runs on a different day than assumed, e.g. a manually re-triggered run or a
-  merge that lands a day late: the masthead would then name a date the issue didn't
-  actually go out on. Using the real run date makes the header self-consistent by
-  construction regardless of when drafting or sending happens.
+- **`{issue_date}`**: **the Monday immediately after that Friday**, one full week
+  minus 4 days after the window's own Monday, i.e. `window_monday + 7 days`. This is
+  the send date, it goes in the frontmatter `date:` field, the delivery folder's
+  `<YYYY-MM-DD>`, the HTML `<!-- -->` header comment, and every `utm_campaign=`
+  suffix on every link in the issue, all four must agree. Example: week of 6-10 Jul →
+  issue date 13 Jul (not 11 Jul, the old same-week Saturday convention this replaced).
+  Never use the window's own Monday here either, that's already shown in the "week
+  of" field and would make the two fields redundant.
 
 ## 2. Fetch
 
@@ -170,122 +163,109 @@ that states the transfer, names the counterparty, and closes on what it means ("
 transfer rather than fresh open-market accumulation"), with the flow figure folded into the
 last sentence.
 
+### Fixed section titles (identical in every issue)
+
+Every issue uses these exact titles, spelled and cased the same, never renamed, shortened or
+"improved" per run (a 2026-10-19 run shipped "Market Developments" and "Key Triggers Ahead"
+and both were reverted):
+
+| Block | Exact title |
+|---|---|
+| 2 | Key Data Bites |
+| 3 | Top Weekly Movers |
+| 4 | What the Data Unearthed |
+| 5 | Insider Filings |
+| 6 | Other Major Headlines |
+| 7 | What's Ahead (sub-labels: Beyond the week, Scheduled macro) |
+| 8 | Summary (sub-headings: The bull read, The bear read, What to watch next) |
+| 9 | the CTA panel, no title |
+| after CTA | Upcoming Events |
+| end | Sources, then Appendix: Sectors API endpoints (fields used) |
+
+Finding headings inside What the Data Unearthed **state the weekly figure** (the Friday to
+Friday or Mon-Fri move the issue is about). Sub-window detail (Monday to Thursday, a single
+day, a pre-announcement leg) belongs in the bullets, never the heading. Where a draft and an
+earlier hand-edited version say the same thing, keep the hand-edited wording.
+
+### Summary never drops, structure never varies
+
+Block 8 ships in **every** issue with its three parts in order: The bull read, The bear read,
+What to watch next. It is never dropped, merged into another block, or shrunk to one line,
+including a thin week. When few inferences are new, derive them from the week's own flow,
+level and ratio facts (who bought against whom, the size of a flow against the repricing,
+how long a trend has run) rather than restating blocks 2 to 7. Block order, titles and
+sub-blocks stay identical from issue to issue, so a reader always finds each part in the
+same place.
+
+### Locked copy and layout (2026-10-19)
+
+- **CTA sentence is verbatim from the skeleton, never edited per issue.** In particular no
+  ", and the ones that did not make the cut,", or any other per-run addition. The wording is:
+  "Keep these names on your radar: add them to a watchlist for our exclusive reports, or set a
+  workflow alert that pings you on the next filing or foreign-flow swing." (Same in monthly-market-pulse.)
+- **Beyond the week table** (block 7) uses fixed column widths with `table-layout:fixed`:
+  Date 70px, Ticker 60px, Action 130px, Detail takes the rest, and Date and Action carry
+  `white-space:nowrap` so "Rights period ends" and "30 Oct" never wrap to two lines. The
+  Scheduled macro Date column is also `nowrap`.
+- **Key Data Bites has no "Next on Friday" style sub-bullet** listing the runners-up in share
+  volume. The volume bullet names the leader only; a share-count ranking over-rewards cheap
+  stocks and the large caps' volume is already covered in block 4.
+- **Insider Filings has no note under the table.** The table is ranked by transaction value and
+  stands alone: no standout-filing line, no explanation of what was left out.
+
+### Copy voice: conclusion first, data as support
+
+Hand-edited copy is the reference for voice (the 2026-10-19 pasted draft's finding bullets
+read better than the generated ones). Write like an analyst talking to a reader, not like a
+data dump:
+
+- **Lead with the reading, then back it with one or two figures.** "Most of the damage came
+  before the fines" first, then the numbers that show it. Never stack four figures in one
+  bullet with the claim left implied.
+- **Round secondary ratios into plain words** ("about nine times the usual outflow", "roughly
+  five to seven times the index"). Keep exact figures for the headline stat of a bullet.
+- **State what the number means** in the same sentence ("which says thin bids drove the
+  fall", "so the crash had a domestic bid under it"), as a data-supported conclusion, never a
+  prediction.
+- Natural sentence rhythm, no staccato fragments, no "not X, but Y" or "rather than".
+- Ask of every bullet: would a person say this out loud? If it reads as a table row in a
+  sentence, rewrite it.
+
 ### Visuals: the social cards
 
 **Block 4 never renders its own images.** Its visuals are existing social cards from the
-carousel pipeline's GCS bucket, `mailroom-email-assets`, under
-`social_media/<campaignId>/<contentGroup>/<filename>`.
-**List it directly, always, no connector and no credential needed** — this bucket allows
-anonymous listing over its plain public JSON API (verified live 2026-09-21, 302 objects
-under this prefix, one page, no auth):
+carousel pipeline's bucket. Do not call `charts.mjs` for this block, do not produce a
+`chart-<slug>.svg` for it, and do not substitute a rendered chart because the card URLs were
+not to hand. Since the bucket cannot be listed without a credential (see below), the correct
+move when you don't have URLs is to **stop and ask the user for them**, not to generate
+something. There is no chart fallback in this type (confirmed 2026-08-31): if the user has
+no eligible card for a finding, drop that finding and write one the available cards support,
+or ship the block with fewer findings. A generated graph in a weekly-insights-v2 issue is a
+defect in every case, including a week with no eligible card.
 
-```bash
-curl -s "https://storage.googleapis.com/storage/v1/b/mailroom-email-assets/o?prefix=social_media/&fields=items(name,timeCreated)"
+Block 4's images come from the carousel pipeline's Google Cloud Storage bucket:
+
+```
+https://storage.googleapis.com/sectorsapp-sea/social_media/<filename>
 ```
 
-Build each eligible name's public URL as:
+Public, unauthenticated, no signed-URL expiry, so email clients load them directly with no
+mirroring step. Filenames follow `<topic>_<YYYYMMDD>_<n>.jpg`, sometimes with a slide index
+(`foreign-flow-1_20260718_1.jpg`). **The date is the generation date, not the data window**,
+so read the window off the image itself and state it in copy. The worked sample's CUAN card
+is dated 10 July and covers 19 Jan to 9 Jul, which is why its bullets say so explicitly.
 
+**Every bucket image is exactly 268px wide, strictly, no exceptions.** One image under a
+heading runs at 268px; two images under one heading go side by side, two columns, each 268px.
+Never full width, never `width:100%`, never a percentage, never another pixel value. Use this
+exact tag shape, `width` attribute and inline style both:
+
+```html
+<img src="<bucket url>" width="268" alt="..." style="display:block;width:268px;max-width:100%;height:auto;border-radius:8px;">
 ```
-https://storage.googleapis.com/mailroom-email-assets/<name>
-```
 
-`<name>` is the full object name the listing returns, path segments and all — unlike the
-retired bucket below, the objects here are nested, so a bare filename does not resolve.
-
-Public, unauthenticated, no signed-URL expiry, so email clients load it directly with no
-rehosting step — reference it directly in `<img src>`. **`timeCreated` is the date to
-filter and order on here.** These objects are written at generation time, so it agrees
-with the epoch-milliseconds prefix the filename carries; either can be read, and there is
-no `YYYYMMDD` in the name to read instead.
-
-> **This bucket replaced `sectorsapp-sea` on 2026-09-09.** That bucket took no new card
-> after `2026-09-09T00:01:18Z` and is frozen, not deleted — its ~708 objects still list
-> and still load, so a run rebuilding an issue from before the cutover should read from
-> it, at the old `social_media/<topic>_<YYYYMMDD>_<n>.jpg` shape described under
-> "Retired approach" below. For any current week it holds nothing, and listing it returns
-> stale cards that look eligible by filename date. Note `sectorsapp-sea` is still the live
-> bucket for non-card assets (the masthead logo, `sgx_logo/`) — this cutover is about
-> `social_media/` only.
-
-**Prefer a real card over a generated chart, always, in both interactive and unattended
-runs — this needs no human to run at all.** List the bucket per above, apply the
-selection criteria below to the returned names, and build eligible URLs directly; there
-is nothing here that depends on a person being present to ask. **Distinguish the two
-reasons a finding can come up with no card — they are not the same, and collapsing them
-hides real bugs:**
-
-| What happened | How you can tell | What to record in `run-notes.md` |
-| --- | --- | --- |
-| **Listing call errored** | the HTTP request itself failed (network error, non-200 status, bucket renamed/moved) | **Quote the actual error text.** This is a defect (a real outage, or the bucket path changed), not a config gap, and needs fixing rather than absorbing |
-| **Listing fine, nothing eligible** | the call returned objects, but none pass the date/story-prefix/relevance filters below | "N objects listed, none eligible for the `<mon>`-`<fri>` window." Normal, not a fault |
-
-In either case, fall back to a generated chart for that finding so the issue is never
-image-less: render with `../../scripts/charts.mjs`, picking the chart kind from the
-finding's own shape (`moversChart` for a ranked signed list, `barChart` with `financial:
-true` for a signed comparison, `sparkline`/`line` for a path over the week, `donut` for a
-mix). Skip the Instagram/Threads credit line under a generated chart, it credits card
-artwork that isn't there; keep the follow-us block at the end of block 4, that one is a
-standing CTA rather than an attribution. **Never save a generated chart under a
-`chart-<slug>.svg` name** if the delivery pipeline's own rasterize step would also try to
-claim it — check `../../scripts/charts.mjs`'s own output-naming convention before
-assuming this collision applies. A mixed issue (some findings real cards, others
-generated) is normal and correct, don't force consistency across findings at the expense
-of using a real card wherever one's eligible.
-
-**Never pause for input on the way there.** These runs are automated (GitHub Actions,
-`NEWSLETTER_UNATTENDED=1`), so there is no one to ask and a question is a stalled job
-rather than an answer — the chart fallback exists precisely so the run can decide alone.
-
-A normal week lists ~100 eligible cards, so a block that comes out *entirely* generated is
-an infrastructure signal rather than a thin news week: the likely causes are the frozen
-bucket being listed for a current week (see the cutover note above) or the carousel
-pipeline not having run. Still ship the issue, and say so at the top of `run-notes.md` so
-the PR reviewer sees it.
-
-> **The listing endpoint has flipped between working and requiring auth before —
-> verify live before trusting either state of this note.** Anonymous *read* of a known
-> filename and anonymous *list* of the bucket are separate GCS IAM permissions
-> (`storage.objects.get` vs `storage.objects.list`); the bucket can keep the first while
-> losing the second, silently, with no announcement. A non-200 response here is the
-> "listing call errored" row above, same handling, nothing special about this cause. If
-> that becomes the steady state rather than a one-off, two options remove the dependency
-> on the bucket's own anonymous listing entirely: a small manifest JSON the carousel
-> pipeline writes alongside each render at a predictable path
-> (`.../social_media/manifest_<YYYYMMDD>.json`), or a GCS read credential for the skill
-> to list by date prefix (another secret to hold alongside `config.json`'s API key).
-
-<details>
-<summary>Retired approach (through 2026-08-24): Supabase MCP connector</summary>
-
-The carousel pipeline's Supabase bucket (`social_media_generation`) held the same files
-under the same filenames, but Supabase's own public HTTP API refuses to list a bucket
-without a credential (`POST /storage/v1/object/list/<bucket>` returns `headers must have
-required property 'authorization'`), so this skill queried `storage.objects` — the
-Postgres table Supabase Storage keeps that metadata in — through the Supabase MCP
-connector instead (`scripts/fixed-queries/social-media-bucket-listing.sql`, now deleted).
-That worked, but made card selection depend on a connector/credential
-(`SUPABASE_ACCESS_TOKEN`) that the GCS bucket's own public listing API doesn't need at
-all. Kept here only in case the GCS bucket's public listing is ever locked down for real
-and this has to be resurrected.
-
-</details>
-
-Object names follow `social_media/<campaignId>/<contentGroup>/<epochMs>-<hash>.jpg`. The
-name carries no topic and no readable date, so **what a card is about can only be read off
-the image itself** — open it before writing a word of copy around it. The content-group
-folder is the one classifying signal in the path: as of 2026-09-21 the groups present are
-`volume`, `filings`, `broker`, `financial`, `individual-shareholdings`, `news`, and
-`ungrouped` (the largest, 192 of 302 — an untagged upload, eligible like any other, not a
-lesser class of card).
-
-**The creation date is not the data window**, so read the window off the image and state it
-in copy. The worked sample's CUAN card was generated on 10 July and covers 19 Jan to 9 Jul,
-which is why its bullets say so explicitly.
-
-Two images under one heading go **side by side, two columns** (each ~263-268px, half the
-content column); **a single image under its own heading runs at 500px** (revised
-2026-07-29, was half column at 268px), near the full content width, not squeezed to
-the two-column size just because it happens to be alone.
+`max-width:100%` is only the narrow-phone safety net and must never replace the 268px width.
+Height stays `auto` so the card keeps its ratio.
 
 **Credit every social image to `instagram.com/sectorsapp`, always, whatever the actual
 source.** That is the public home of this content and the only attribution a reader should
@@ -309,12 +289,12 @@ come from the API; the card illustrates them.
 
 Selection criteria, applied in order:
 
-1. **Date filter first, and it is a hard filter.** Read each object's `timeCreated` (or
-   equivalently the epoch-milliseconds prefix on its filename — they agree).
-   **Only cards created inside the issue's Mon-Fri window are eligible.** A card stamped
-   after the window belongs to a later issue; one stamped before it has already run.
-   Pre-cutover objects in the frozen `sectorsapp-sea` bucket carry a `YYYYMMDD` in the
-   filename instead and `timeCreated` there means nothing — see the cutover note above.
+1. **Date filter first, and it is a hard filter.** Every filename carries a `YYYYMMDD`.
+   **Only cards whose `YYYYMMDD` falls inside the issue's Mon-Fri window are eligible.** A
+   card stamped after the window belongs to a later issue; one stamped before it has already
+   run. On the 6-10 Jul run this left exactly one eligible card,
+   `insider_cluster_cuan_20260710_2.jpg`, and correctly excluded the 20260717 and 20260718
+   renders.
 2. **Drop the story-only renders.** These prefixes go to Instagram Stories, not the feed, so
    they expire after 24 hours. Exclude any filename starting with:
 
@@ -326,9 +306,9 @@ Selection criteria, applied in order:
    feed-eligible and fair game.
 
    This rule exists because of the credit rule below. We attribute every image to
-   `instagram.com/sectorsapp`, so a reader who goes looking has to be able to find it. A
-   story render will be long gone by the time the newsletter lands, which makes the credit
-   a dead end and the issue look sloppy.
+   `instagram.com/sectorsapp`, so a reader who goes looking has to be able to find it. A story
+   render will be long gone by the time the newsletter lands, which makes the credit a dead
+   end and the issue look sloppy.
 3. **Then, does it illustrate a finding you have, or suggest one worth building?** The date
    filter decides what is *available*; relevance decides what is *used*. A card that passes
    both filters and carries a real story is worth writing a finding around, provided the
@@ -343,14 +323,43 @@ Selection criteria, applied in order:
    counts as **one** finding and renders side by side in two columns.
 7. **Budget.** Two or three findings, so at most about four images. Cut the weakest.
 
+**Where the filenames come from.** The bucket lives at
+`https://console.cloud.google.com/storage/browser/sectorsapp-sea/social_media`.
+Read the file list there, take the names whose `YYYYMMDD` falls in the window, and build the
+public URLs from them.
+
+The bucket cannot be listed programmatically without a credential, and public reads only
+resolve for an exactly-known filename (a guessed name 404s, and the trailing `_<n>` is not
+predictable). So today the URLs are **supplied by the user at generation time**. Ask for
+them; do not attempt to enumerate or guess.
+
+**This ask is a blocking step in the run, not an optional convenience.** Sequence: derive
+the findings from the API, then ask the user for the week's card URLs, then write block 4
+around the cards that pass the filters. Ask once, listing the window's date range so the
+user knows which renders qualify. Do not proceed past block 4 having silently rendered a
+chart in place of the cards, and do not treat "no URLs in the prompt" as permission to
+generate. If the user answers that there is no eligible card this week, the findings block
+is rebuilt around the cards that do exist or shipped with fewer findings; a chart is never
+substituted.
+
+Two ways to fix that, when the user wants to:
+
+- **Manifest file (preferred, no credential).** Have the carousel pipeline write a small JSON
+  to a predictable public path as it renders, e.g.
+  `.../social_media/manifest_<YYYYMMDD>.json`, listing each render's filename, topic,
+  tickers and data window. The skill then fetches one known URL and picks against the
+  criteria above. Keeps the bucket private-by-obscurity and needs no key in this skill.
+- **Storage credential.** Give the skill a GCS credential so it can list by date prefix.
+  More power, more setup, and another secret to hold alongside `config.json`'s API key.
+
 > **Resolved 2026-07-27: default to the exchange definition (`idx_daily_data`) for weekly
 > aggregated foreign flow. Never use the broker-domicile aggregation (`idx_broker_summary_daily`
 > / `idx_broker_registry`, what `broker-summary/top` and `foreign-flow/{symbol}` return) for this
 > figure.** The 18 Jul 2026 issue was left mixed (broker figure in Key Data Bites next to
 > exchange-definition cards) and is not a model to copy.
 
-> **The cards and the API use two different definitions of foreign flow. Never mix them
-> in one issue.** Resolved 2026-07-20 against the database, after an earlier note here
+> **The cards and the API use two different definitions of foreign flow. Pick one per issue
+> and never mix them.** Resolved 2026-07-20 against the database, after an earlier note here
 > wrongly called the cards buggy.
 >
 > | Source | Definition | Table |
@@ -363,13 +372,14 @@ Selection criteria, applied in order:
 > broker one; ANTM was +237.89B versus -136.67B. A foreign investor trading through a domestic
 > broker lands in a different bucket under each method.
 >
-> **Use the exchange definition** (`idx_daily_data`) for this issue type, always. It is what
+> **Default to the exchange definition** (`idx_daily_data`) for this issue type. It is what
 > Indonesian press quotes as "asing net buy/sell", and it is what the cards show, so card and
-> copy agree by construction. Caveat on the exchange figure: net volume
+> copy agree by construction. If you quote `foreign-flow/{symbol}` instead, say so and do not
+> also show a card built on the other definition. Caveat on the exchange figure: net volume
 > times `close` is an approximation, since only volumes are stored and a true value would need
 > separate buy-side and sell-side average prices.
 
-**Approved query, not a per-ticker API loop.** Invoke the `sectors-newsletter-dbquery` skill for
+**Approved query, not a per-ticker API loop.** Invoke the `sectors-dbquery` skill for
 its approved `foreign-flow-range` query, giving it the week's Mon-Fri `{{start}}`/`{{end}}`.
 Never run this SQL yourself; it is reproduced here only so you can see what comes back:
 
@@ -395,11 +405,9 @@ MAPI -187.83B, BBRI -30.27B).
 
 Every figure in block 4 is restated as HTML text under its image, because many clients block
 remote images by default. Alt text carries the full figure set for the same reason. This is
-the type's substitute for the standard `chart-<slug>.svg` hero chart: this type ships no
-*hero* chart, and its images are per-finding bucket cards instead. `charts.mjs` still has
-one job here — the per-finding fallback when no eligible card exists, per **Visuals: the
-social cards** above — so a run that renders one is working as intended, not breaking this
-rule.
+the type's substitute for the standard `chart-<slug>.svg` hero chart. This type ships no
+`chart-<slug>.svg` at all: `charts.mjs` is not called anywhere in a weekly-insights-v2 run,
+and the bucket cards are the issue's only images.
 
 ## 4. The What's Ahead calendar
 
@@ -412,66 +420,6 @@ comes back empty; the whole board is free but slow.
 
 Split the output two ways: a **Mon-Fri week grid** for anything landing in the next five
 trading days, and a **"beyond the week" table** for everything further out.
-
-### 4a. How a week-grid cell is written
-
-This is a contract, not a style preference. After you write the HTML, mailroom's sync
-turns it into the markdown the website stores, and the website's weekly page then stacks
-each cell back into labelled groups. Both steps read the shape below. Weeks 35 to 39 each
-came out differently (an empty day as `n/a`, `•` or a blank cell; an entry as `UNTR IDR
-430`, `ISAT — 14:00` or three separate lines) because nothing here said which to use.
-
-**An empty day is a bullet:** `&bull;` in the muted cell style, nothing else. Not `n/a`,
-not `none`, not a dash of any kind (the no-dash rule applies in this block too, and the
-sync reserves ` — ` as its own separator), and not an empty or `&nbsp;` cell.
-
-**A day with events is a stack of category groups.** Each group is one label `<div>`
-followed by one entries `<div>`, both direct children of the `<td>`:
-
-```html
-<td valign="top" style="…">
-  <div style="font-size:10px;font-weight:800;color:#6b6b6b;letter-spacing:0.04em;">AGM</div>
-  <div style="padding-top:3px;line-height:1.8;"><a href="…">GIAA</a> 14:00<br><a href="…">ASGR</a> 14:30</div>
-  <div style="font-size:10px;font-weight:800;color:#568475;letter-spacing:0.04em;padding-top:6px;">EX-DIVIDEND</div>
-  <div style="padding-top:3px;line-height:1.8;"><a href="…">UNTR</a> IDR 430</div>
-</td>
-```
-
-1. **Label:** ALL CAPS, taken from the fixed set below, never improvised. A category
-   appears **once per day**: every entry of that category goes under that one label, never
-   a second label of the same name.
-2. **Entry:** the linked ticker, a space, then the detail, on **one line**: `UNTR IDR 430`.
-   The space after the link is required, since the sync reads the cell's text and the two
-   run together without it. No detail to give means the ticker alone.
-3. **Several entries in one group** are separated by `<br>`, in time order, then by ticker.
-   Never one `<div>` per entry, and never label, ticker and detail in three separate divs.
-4. **Flat:** no wrapper `<div>` per event around a label and its entries.
-5. **No dashes, no "per share", no currency word other than `IDR`.**
-
-| Label | Source field | Detail after the ticker |
-| --- | --- | --- |
-| `AGM` | `agm[]` | `agm_time` as `HH:MM`, or nothing if it is null |
-| `EX-DIVIDEND` | `dividend[]`, on `ex_date` | `IDR` and `dividend_amount` as the API gives it, e.g. `IDR 611.93` |
-| `STOCK SPLIT` | `stock_split[]` | `split_ratio`, e.g. `1:25` |
-| `RIGHTS EX-DATE` | `right_issue[]`, on `ex_date` | `old_ratio:new_ratio`, e.g. `7:4` |
-| `RIGHTS PERIOD OPENS` / `RIGHTS PERIOD ENDS` | `right_issue[]`, on `trading_period_start` / `trading_period_end` | the ticker alone |
-| `PUBLIC EXPOSE` | only when the poll actually returns one (week 35 did) | `HH:MM` |
-
-Within a day, order the groups as they appear in that table. The "beyond the week" table's
-**Action** column uses the same words in sentence case (`Ex-dividend`, `Stock split`,
-`Rights ex-date`), so a reader sees one vocabulary in both places.
-
-**What reads this, so you know what breaks it.** The website treats a bare ALL CAPS word
-as a group heading, and the token right after a heading as its first entry (which is why a
-lone ticker is safe after a label). A label that is not in the set still renders, but
-nothing downstream knows it. Each of these breaks a cell in its own way: a wrapper div per
-event is what glued week 39's entries into `EX-DIVIDENDUNTRIDR 430`; a missing space after
-the ticker link fuses `UNTR` and `IDR 430` the same way; a ` — ` inside an entry splits it
-into two.
-
-**In the markdown review copy** (`newsletter.md`) write the same grouping on one table
-row: `**AGM** [GIAA](…) 14:00<br>[ASGR](…) 14:30`, and `•` for an empty day. The HTML is
-the source of truth for what is sent and synced.
 
 ### 4b. Scheduled macro rows (ported from monthly-market-pulse §8.10)
 
@@ -608,14 +556,15 @@ a different, computed line instead (sub-sector valuation, a flow aggregate, a br
 Headlines carry **no category prefix** ("Dividends,", "Commodities,"). Just the fact and a
 plain-text attribution.
 
-**Citations in the body are never clickable.** This is a skill-wide rule, not a v2 quirk
-(`SKILL.md` hard rule 14, `../newsletter-format.md`'s **UTM convention**), restated here
-because Headlines is where it bites hardest. Every news citation in the issue, Headlines
-bullets, macro rows in What's Ahead, and any cited figure elsewhere, renders as bare text in
-the form `(Source Name, DD Mon YYYY)`, with no `<a>` in the HTML and no markdown link in the
-`.md`. The outbound URL appears **only in the Sources list**, one line per source carrying
-name, date and link. Match the Sources entry to the body attribution by name and date so a
-reader can find it.
+**No citations in the body at all** (changed 2026-10-19, replaces the earlier plain-text
+`(Source Name, DD Mon YYYY)` form for this type). Headlines bullets, macro rows in What's
+Ahead, findings bullets and every other block state the fact with no parenthetical
+attribution, no "(Kontan, 12 Oct 2026)", no "per Kontan". The attribution lives only in the
+Sources list at the foot of the issue, one line per source carrying name, date, a short
+description of the article and the link. Write each Sources description so a reader can match
+it to the body fact by its content. Sectors API figures need no attribution either, the
+footer already says figures are from sectors.app unless otherwise cited. The one credit that
+stays in the body is the `instagram.com/sectorsapp` line under each social card.
 
 The only links allowed in body copy are `sectors.app` links (tickers, sectors, brokers,
 read-more and calendar links, the CTA) plus the Instagram and Threads follow-us line, all of
@@ -784,12 +733,15 @@ right-hand column below.
   something the rows do not.
 - **No inverted-pair sentences anywhere** (§5b): no "not X, but Y", "rather than", "isn't
   A, it's B", "not proof of", "the pattern isn't clean". Positive claim, then stop.
-- **Was the bucket listed for every finding before reaching for `charts.mjs`?** A finding
-  illustrated with a generated chart when an eligible card existed for it is a defect. Every
-  card `<img src>` is a `mailroom-email-assets` URL; a `sectorsapp-sea` `social_media/` URL
-  on a post-2026-09-09 issue means the frozen bucket was listed by mistake and the cards are
-  stale. Was the reason for each chart fallback (listing errored / nothing eligible)
-  recorded in `run-notes.md`?
+- **Every bucket image in block 4 carries `width="268"` and `style="...width:268px;max-width:100%;..."`.**
+  `width:100%` or any other width is a defect, fix before shipping.
+- **Block 4's images are bucket social cards only.** Every `<img src>` in the block starts
+  `https://storage.googleapis.com/sectorsapp-sea/social_media/`. A `mailroom-email-assets`
+  URL, a `charts.mjs` render or any other generated image in this block is a defect: stop
+  and ask the user for the week's card URLs instead of shipping a substitute. If no eligible
+  card exists for a finding, cut the finding.
+- **Does the Summary ship in full** (bull read, bear read, What to watch next), and does every bullet in blocks 4 and 8 lead with a reading and use at most two figures?
+- **Are all section titles exactly the fixed titles above**, and does every finding heading carry the weekly figure?
 - **No em dashes or en dashes anywhere in the issue**, Sources and Appendix included. Use a
   colon between a source and its label, a comma or a full stop in prose.
 - Sources list carries only the **news and research pieces actually cited for a fact in this
@@ -801,10 +753,6 @@ right-hand column below.
   confident they are, and the newsletter itself never predicts a price?
 - What's Ahead: are the scheduled macro rows real, dated, cited, and each one mapped to a
   ticker or sector that appears elsewhere in this issue? Unmapped rows cut?
-- **What's Ahead grid cells follow §4a?** Grep the HTML: no `n/a`, `none`, `&nbsp;`-only or
-  dash-only cell (an empty day is `&bull;`); every label is from the fixed set, ALL CAPS,
-  and appears once per day; every entry is `TICKER detail` on one line with a space after
-  the link; no `<div>` wraps an event; no ` — ` or en/em dash inside a cell.
 - Summary: two or three bullets per side, every one traceable to a figure already in
   the issue with no new number introduced **and no figure reprinted** (conceptual reference
   only), each bullet joining two reported things rather than restating one, the bear read
@@ -828,11 +776,10 @@ right-hand column below.
   restatement? Bullets, never paragraphs?
 - Were the findings derived from the API **first**, with cards picked to illustrate them,
   rather than written around whatever images existed?
-- **Was the bucket listed directly for block 4, rather than skipped straight to
-  `charts.mjs`?** A rendered chart for a finding that had an eligible card is a defect — a
-  week genuinely short on eligible cards mixes real cards and generated charts per finding,
-  it doesn't ship fewer findings to avoid a chart.
-- Does every card's creation date fall inside this issue's Mon-Fri window, with story-only
+- **Are block 4's visuals real bucket social cards, not generated charts?** Was the user
+  asked for the week's card URLs before drafting the block? A rendered `chart-*.svg` in this
+  block is a defect, with no exception: a week short on cards ships fewer findings.
+- Does every card URL's `YYYYMMDD` fall inside this issue's Mon-Fri window, with story-only
   prefixes excluded and every image credited to `instagram.com/sectorsapp`?
 - **Foreign flow uses the exchange definition (`idx_daily_data`) throughout, never the broker
   aggregation** (§3), pulled via the fixed `foreign-flow-range.sql` query, not a per-ticker API
@@ -854,13 +801,14 @@ right-hand column below.
   carries eight `sectors.app/idx/<lower>` links, each with the block's own `utm_content` and
   `utm_term=<ticker>`. Grep the finished HTML for the ticker string and check every hit sits
   inside an `<a>`. Grep for a literal `$` as well, it should return nothing.
+- **No citation of any kind in the body** (no `(Source, date)` text, no outlet name in a bracket). Grep the body for `(Kontan`, `(Bisnis`, `(Kompas`, `(Bloomberg`, `(Metro` and similar, zero hits outside Sources. Only the Instagram credit under a social card stays.
 - **No clickable citation in the body.** Grep the HTML for `<a href="http` and confirm every
   hit is a `sectors.app` link, an Instagram/Threads follow link, or sits inside the Sources
   list. A news outlet URL anywhere in Headlines, What's Ahead or the findings bullets is a
-  defect: move it to Sources and leave `(Source Name, DD Mon YYYY)` in the body.
-- **No hero chart.** This type ships no `chart-<slug>.svg`; block 4's per-finding visuals
-  are bucket social cards, with a `charts.mjs` render only where no eligible card existed
-  and the reason logged in `run-notes.md`.
+  defect: move it to Sources and leave nothing in the body.
+- **No generated chart anywhere in the issue.** No `chart-*.svg` in the delivery folder, no
+  `charts.mjs` call in the run. Block 4's images are bucket social cards or the finding is
+  cut.
 - Bullets in the findings block: **three each**, four at the outside? Any restated caveat,
   structural recap, "taken together" closer or production note ("chart generated this run",
   "no matching social card") cut?

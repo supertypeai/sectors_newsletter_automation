@@ -59,7 +59,7 @@ node ../../scripts/sectors.mjs \
 
 `brokers/top` **only accepts a single `date`, confirmed live** (`start`/`end` 400s:
 `"Invalid query parameters: start, end."`). There is no market-wide "top brokers over a
-range" endpoint via the Sectors API. Don't loop it day by day. Instead invoke the `sectors-newsletter-dbquery`
+range" endpoint via the Sectors API. Don't loop it day by day. Instead invoke the `sectors-dbquery`
 skill for its approved `broker-summary-range` query, giving it the window's
 `{{start}}`/`{{end}}`. Never run this SQL yourself; it is reproduced here only so you
 can see what comes back:
@@ -87,7 +87,7 @@ order by a.net_val desc;
   comes up in copy.
 - `broker_name` comes free from the join, no separate registry call needed.
 - This is public market data, not user-account data, so no PII rules apply to the rows,
-  but it still runs through `sectors-newsletter-dbquery` like every other Supabase read (see that
+  but it still runs through `sectors-dbquery` like every other Supabase read (see that
   skill's `references/supabase-access.md`); it's read-only, verified live 2026-07-27
   against 13-17 Jul 2026 (top buyer BB/Verdhana Sekuritas Indonesia +612.12B,
   `days_active`=5 on every row for that 5-day window).
@@ -194,23 +194,6 @@ Follow `../newsletter-format/skeletons/monthly-market-pulse.md` exactly:
    (logos + full labels + green/red diverging bars, see `scripts/charts.mjs`). Caption
    states only what the chart shows, no interpretive commentary. Subtitle carries the
    claim (e.g. breadth, where the month's real dispersion sat).
-
-   **Where the logos come from** (added 2026-07-31 — a run shipped a logo-less chart
-   because this wasn't written down anywhere): `moversChart` takes a `logoBase64` per
-   item, and **a row without one silently renders no image while keeping its spacing**,
-   so a missing logo looks like a design choice rather than a bug. Load them from the
-   sibling skill's registry:
-
-   ```js
-   const logos = JSON.parse(fs.readFileSync('../market-story-video/assets/logos.json','utf8'));
-   const items = rows.map(([symbol, value]) => ({ symbol, value, logoBase64: logos[symbol] }));
-   ```
-
-   957 IDX tickers, keyed by **bare symbol** (`'BUMI'`, never `'BUMI.JK'` — the `.JK`
-   form returns nothing), values already raw base64 PNG with no `data:` prefix, exactly
-   the shape `moversChart` wants. The file is git-tracked, so it's present in a CI
-   checkout too. Log a warning naming any ticker with no logo rather than letting the
-   row quietly render bare.
 6. **Most traded** — the aggregated ranking from step 2, a short table, **followed by a
    short paragraph** naming one ticker from the list and its real, dated, cited reason
    for running hot all month, under step 5's causation policy.
@@ -242,6 +225,9 @@ Follow `../newsletter-format/skeletons/monthly-market-pulse.md` exactly:
     named company's scheduled result. Every row's "why" ties back to a name or sector in
     this issue. **Strictly forward-looking**: the "why" explains the pending decision or
     effective date, never recaps what already happened elsewhere in the issue.
+10b. **CTA**, fixed copy, verbatim every issue: "Keep the signals coming" watchlist and
+    workflow block from `../newsletter-format/skeletons/monthly-market-pulse.md` §4e.
+    Never draft a bespoke CTA (e.g. "Check the month's movers yourself").
 11. **Upcoming Events** (the Sectors in-house events block, unchanged, distinct from
     §10's market calendar, see `../upcoming-events-source.md`).
 12. **Sources** list.
@@ -285,3 +271,19 @@ Follow `../newsletter-format/skeletons/monthly-market-pulse.md` exactly:
 - Is the Appendix present, after Sources and before the disclaimer, with one bullet
   per endpoint actually called this run, and no macro items smuggled into it? Endpoints and
   fields only, with no section labels or usage notes attached to any bullet?
+
+## Bucket social cards (width rule)
+
+Monthly pulse renders its own charts by default. If the user supplies social cards from the
+carousel pipeline's bucket for any block, each one is set at exactly 268px wide, the same as
+weekly insights v2: `<img src="<url>" width="268" alt="..." style="display:block;width:268px;max-width:100%;height:auto;border-radius:8px;">`.
+Never full width, never `width:100%`, never another pixel value. Two cards under one heading
+sit side by side, each 268px.
+
+## Citations and section titles
+
+No inline citation anywhere in the body (2026-10-19): no `(Source Name, DD Mon YYYY)`, no outlet
+name in a bracket. Sources appear only in the Sources list at the foot of the issue. Section
+titles are fixed from issue to issue; copy them from the skeleton and the last shipped issue,
+never rename a section per run. Headings that state a performance figure carry the monthly
+figure, with sub-window detail kept in the bullets.

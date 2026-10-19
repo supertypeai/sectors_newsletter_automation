@@ -86,6 +86,8 @@ section for the full statement of the rule. This is in addition to the
 **No source, no claim.** A statement that traces to neither a real Sectors API field nor
 a cited source gets cut before the issue ships, no exceptions.
 
+**Exception (2026-10-19): `weekly-insights-v2` and `monthly-market-pulse` carry no inline citation at all.** Their sources appear only in the Sources list at the foot of the issue. Other types keep the form above until the user extends the change.
+
 ## Recency discipline
 
 The *lead* of every issue has to be something that actually happened or changed
