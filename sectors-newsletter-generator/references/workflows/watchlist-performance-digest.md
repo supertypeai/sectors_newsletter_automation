@@ -14,7 +14,7 @@ itself (which tickers/sectors a specific user tracks). See SKILL.md's
 
 ## 1. Get the audience via the dbquery skill
 
-Invoke the `sectors-newsletter-dbquery` skill (Skill tool) to run its approved
+Invoke the `sectors-dbquery` skill (Skill tool) to run its approved
 `watchlist-tracked-interest` query. That query returns, per eligible user: `user_id`,
 `email`, `first_name`, `tickers` (array), `sectors` (array). **Never write or improvise
 SQL for this, and never query Supabase directly for user-account data**, that

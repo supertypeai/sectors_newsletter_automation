@@ -70,6 +70,20 @@ claim.
    issue. Strictly forward-looking: the "why" explains the pending catalyst, never
    recaps what already happened. Distinct from the Sectors in-house **Upcoming Events** block, which follows it
    unchanged.
+4e. **CTA**, after What to Watch and before Upcoming Events, identical to weekly
+   insights v2's CTA (campaign `monthly-market-pulse_<date>`). Never write a per-issue CTA.
+   **Fixed copy, verbatim every issue** (locked 2026-09-28; only `{{campaign}}` changes):
+
+   ```md
+   ## Keep the signals coming
+
+   Keep these names on your radar: add them to a **watchlist** for our exclusive reports, or set a [workflow](https://sectors.app/workflow?utm_source=newsletter&utm_medium=email&utm_campaign={{campaign}}&utm_content=cta) alert that pings you on the next filing or foreign-flow swing.
+
+   [Set up your watchlist](https://sectors.app/watchlist?utm_source=newsletter&utm_medium=email&utm_campaign={{campaign}}&utm_content=cta)
+   ```
+
+   HTML: the tinted `#fbe9d8` panel, heading "Keep the signals coming", same body with
+   "workflow" as a magenta link, magenta "Set up your watchlist" button, as in the sample.
 5. **Appendix: Sectors API endpoints (fields used)**, after Sources and before the
    disclaimer. Always included for this type (see the generic Appendix section below
    for the format; this type doesn't treat it as optional the way a tight daily issue

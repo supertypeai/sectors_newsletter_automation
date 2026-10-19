@@ -2,9 +2,10 @@
   "name": "sectors-newsletter-generator",
   "private": true,
   "type": "module",
-  "description": "Puppeteer is needed only by scripts/rasterize.mjs, which converts charts.mjs's SVG output to the PNG email clients can actually display. sectors.mjs and charts.mjs remain dependency-free: skip the install if you only need the Markdown draft.",
+  "description": "Puppeteer is needed only by scripts/svg2png.mjs and scripts/html2pdf.mjs, which convert charts.mjs's SVG output to the PNG email clients can actually display. sectors.mjs and charts.mjs remain dependency-free: skip the install if you only need the Markdown draft.",
   "scripts": {
-    "rasterize": "node scripts/rasterize.mjs"
+    "svg2png": "node scripts/svg2png.mjs",
+    "html2pdf": "node scripts/html2pdf.mjs"
   },
   "dependencies": {
     "puppeteer": "^25.2.1"

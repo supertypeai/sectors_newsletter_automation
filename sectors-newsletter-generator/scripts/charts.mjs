@@ -19,7 +19,7 @@
 // while instead of the usual green/red finance convention.
 //
 // GAIN/LOSS now use a green/red pair sourced from OUTSIDE that 22-hex list instead: the
-// light-mode `gain`/`loss` tokens already shipped in the sibling `market-story-video`
+// light-mode `gain`/`loss` tokens already shipped in the sibling `sectors-reels`
 // skill's own brand tokens (`src/tokens.ts`, light theme: gain #568475, loss #D53E50),
 // picked over the newsletter's own list on explicit request to match the plain finance
 // green/red convention. Checked against this file's #fcfcfb chart surface: #568475 is
@@ -63,7 +63,7 @@ const uid = (p) => `${p}${_uid++}`;
 // nothing warm in the approved list clears 3:1 on white (see header note).
 const PINK = "#C14D94";
 const GOLD = "#8B004C";
-// GAIN/LOSS: bar/flow polarity, brand green/red sourced from market-story-video's light
+// GAIN/LOSS: bar/flow polarity, brand green/red sourced from sectors-reels's light
 // tokens (see header note above), not the newsletter's own 22-hex categorical list.
 const GAIN = "#568475";  // repalette 2026-07-20, was #1D8A4E
 const LOSS = "#D53E50";  // repalette 2026-07-20, was #D6295A
@@ -387,22 +387,6 @@ export function moversChart(items, { w = 936, rowH = 46, labelZone = 190, pad = 
   const halfW = cx - plotL;
   const maxAbs = Math.max(1e-9, ...items.map((it) => Math.abs(it.value)));
   const fmt = (it) => (it.display != null ? it.display : `${it.value >= 0 ? "+" : ""}${trimNum(it.value)}%`);
-  // Reserve room for the value label before sizing bars. The longest-magnitude row's
-  // bar is the constraint: its label sits LABEL_GAP past the bar end, so without a
-  // reserve it runs off the canvas and the raster clips it (measured: "+45.71%"
-  // overflowed a 936-wide chart by 40px). Because labels are MONO, the width is
-  // predictable from the character count and needs no text measurement.
-  //
-  // LABEL_SIZE is shared by the reserve below and the <text> that draws the label, so
-  // the two can't drift: raising the font size without widening the reserve is exactly
-  // the bug this reserve exists to prevent.
-  const LABEL_SIZE = 23;
-  const LABEL_GAP = 10;
-  const MONO_ADVANCE = 0.6; // JetBrains Mono advance width, in em
-  const maxLabelPx = Math.max(...items.map((it) => fmt(it).length * LABEL_SIZE * MONO_ADVANCE));
-  // Floor keeps a pathological label (a very long `display` string) from collapsing
-  // the bars to nothing; it would rather overflow than render an unreadable chart.
-  const usableW = Math.max(halfW * 0.25, halfW - maxLabelPx - LABEL_GAP);
   let out = `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
     <line x1="${cx.toFixed(1)}" y1="${pad}" x2="${cx.toFixed(1)}" y2="${(h - pad).toFixed(1)}" stroke="rgba(11,11,11,0.14)" stroke-width="2"/>`;
   items.forEach((it, i) => {
@@ -416,12 +400,12 @@ export function moversChart(items, { w = 936, rowH = 46, labelZone = 190, pad = 
     const tickerX = pad + logoSize + 10;
     out += `<text x="${tickerX}" y="${(midY + 7).toFixed(1)}" fill="${TICKER}" font-family="${MONO}" font-size="24" font-weight="800" text-anchor="start">${esc(it.symbol)}</text>`;
     const neg = it.value < 0;
-    const barLen = (Math.abs(it.value) / maxAbs) * usableW;
+    const barLen = (Math.abs(it.value) / maxAbs) * halfW * 0.86;
     const barX = neg ? cx - barLen : cx;
     const fill = neg ? LOSS : GAIN;
     out += `<rect x="${barX.toFixed(1)}" y="${(rowY + 8).toFixed(1)}" width="${Math.max(2, barLen).toFixed(1)}" height="${(rowH - 16).toFixed(1)}" rx="6" fill="${fill}"/>`;
-    const labelX = neg ? barX - LABEL_GAP : barX + barLen + LABEL_GAP;
-    out += `<text x="${labelX.toFixed(1)}" y="${(midY + 7).toFixed(1)}" fill="${fill}" font-family="${MONO}" font-size="${LABEL_SIZE}" font-weight="800" text-anchor="${neg ? "end" : "start"}">${esc(fmt(it))}</text>`;
+    const labelX = neg ? barX - 10 : barX + barLen + 10;
+    out += `<text x="${labelX.toFixed(1)}" y="${(midY + 7).toFixed(1)}" fill="${fill}" font-family="${MONO}" font-size="23" font-weight="800" text-anchor="${neg ? "end" : "start"}">${esc(fmt(it))}</text>`;
   });
   return out + `</svg>`;
 }
@@ -1627,5 +1611,156 @@ export function compose(spec = {}, { warn } = {}) {
   }
 
   if (!printedNumber) warn?.(`compose: chart printed no numbers — every chart is a promise (charts.md); add axis ticks, a dot/refLine label, or a value label`);
+  return out + `</svg>`;
+}
+
+// ---------------------------------------------------------------------------
+// sankeySite: the sectors.app website's own sankey look (light theme), so a newsletter's
+// flow chart matches the product page. Added 2026-10-02 at the user's request for
+// consistency across site and newsletter. This is a deliberate exception to the fixed
+// newsletter palette, scoped to this one function: node colours are the 11-step Spectral
+// scale assigned in order of first appearance across the links (source, then target, link
+// by link, cycling), ribbons are source-to-target colour gradients at half opacity, and
+// each label takes a darkened shade of its node's colour. Layout is a small d3-sankey-style
+// pass (justified columns, link-weighted relaxation), with no dependency.
+// links: [{source, target, value}], value in one unit. opts.values appends the value to
+// each label (the site shows none, a PDF reader has no hover, so the newsletter turns it on).
+export const SPECTRAL = ["#9E0142", "#D53E4F", "#F46D43", "#FDAE61", "#FEE08B", "#FFFFBF", "#E6F598", "#ABDDA4", "#66C2A5", "#3288BD", "#5E4FA2"];
+export function sankeySite(links, { w = 936, h = 640, unit = "", values = true, fmt, fontSize = 23, nodeW = 22, gap = 24, bg = "#fcfcfb" } = {}) {
+  const id = uid("ss");
+  const byName = new Map();
+  const node = (n) => {
+    if (!byName.has(n)) byName.set(n, { name: n, out: [], in: [], depth: 0, color: SPECTRAL[byName.size % SPECTRAL.length] });
+    return byName.get(n);
+  };
+  const L = links.map((l) => ({ s: node(l.source), t: node(l.target), value: l.value }));
+  L.forEach((l) => { l.s.out.push(l); l.t.in.push(l); });
+  const nodes = [...byName.values()];
+  // depth = longest path from a source; sinks pushed to the last column (d3 "justify").
+  for (let pass = 0; pass < nodes.length; pass++) L.forEach((l) => { l.t.depth = Math.max(l.t.depth, l.s.depth + 1); });
+  const maxDepth = Math.max(...nodes.map((n) => n.depth), 1);
+  nodes.forEach((n) => { if (!n.out.length) n.depth = maxDepth; });
+  const sum = (a) => a.reduce((t, l) => t + l.value, 0);
+  nodes.forEach((n) => { n.value = Math.max(sum(n.in), sum(n.out)); });
+  const cols = Array.from({ length: maxDepth + 1 }, (_, d) => nodes.filter((n) => n.depth === d));
+  const padX = 8, padY = 24, top = padY, bottom = h - padY;
+  const ky = Math.min(...cols.map((c) => (bottom - top - (c.length - 1) * gap) / (sum(c.map((n) => ({ value: n.value }))) || 1)));
+  nodes.forEach((n) => { n.x = padX + (n.depth * (w - 2 * padX - nodeW)) / maxDepth; n.h = Math.max(n.value * ky, 2); });
+  cols.forEach((c) => { let y = top; c.forEach((n) => { n.y = y; y += n.h + gap; }); });
+  const resolve = (c) => {
+    c.sort((a, b) => a.y - b.y);
+    let y = top;
+    c.forEach((n) => { if (n.y < y) n.y = y; y = n.y + n.h + gap; });
+    y = bottom;
+    for (let i = c.length - 1; i >= 0; i--) { const n = c[i]; if (n.y + n.h > y) n.y = y - n.h; y = n.y - gap; }
+  };
+  const center = (n) => n.y + n.h / 2;
+  for (let it = 0; it < 12; it++) {
+    for (let d = 1; d <= maxDepth; d++) {
+      cols[d].forEach((n) => { if (n.in.length) n.y = sum(n.in.map((l) => ({ value: l.value * center(l.s) }))) / sum(n.in) - n.h / 2; });
+      resolve(cols[d]);
+    }
+    for (let d = maxDepth - 1; d >= 0; d--) {
+      cols[d].forEach((n) => { if (n.out.length) n.y = sum(n.out.map((l) => ({ value: l.value * center(l.t) }))) / sum(n.out) - n.h / 2; });
+      resolve(cols[d]);
+    }
+  }
+  nodes.forEach((n) => {
+    let y = n.y;
+    n.out.sort((a, b) => center(a.t) - center(b.t)).forEach((l) => { l.w = Math.max(l.value * ky, 1); l.sy = y + l.w / 2; y += l.w; });
+    y = n.y;
+    n.in.sort((a, b) => center(a.s) - center(b.s)).forEach((l) => { l.w = Math.max(l.value * ky, 1); l.ty = y + l.w / 2; y += l.w; });
+  });
+  const dark = (hex, f = 0.738) => "#" + [1, 3, 5].map((i) => Math.round(parseInt(hex.slice(i, i + 2), 16) * f).toString(16).padStart(2, "0")).join("");
+  const label = (n) => (values ? `${n.name}  ${fmt ? fmt(n.value) : trimNum(n.value) + unit}` : n.name);
+  let defs = "", ribbons = "", bars = "", labels = "";
+  const contract = 4; // site: nivo linkContract={3}, scaled to this canvas
+  L.forEach((l, i) => {
+    const x0 = l.s.x + nodeW, x1 = l.t.x, xm = (x0 + x1) / 2;
+    const hw = Math.max(l.w - 2 * contract, 1) / 2;
+    defs += `<linearGradient id="${id}g${i}" gradientUnits="userSpaceOnUse" x1="${x0}" y1="0" x2="${x1}" y2="0"><stop offset="0" stop-color="${l.s.color}"/><stop offset="1" stop-color="${l.t.color}"/></linearGradient>`;
+    const f = (v) => v.toFixed(1);
+    ribbons += `<path d="M${f(x0)},${f(l.sy - hw)}C${f(xm)},${f(l.sy - hw)} ${f(xm)},${f(l.ty - hw)} ${f(x1)},${f(l.ty - hw)}L${f(x1)},${f(l.ty + hw)}C${f(xm)},${f(l.ty + hw)} ${f(xm)},${f(l.sy + hw)} ${f(x0)},${f(l.sy + hw)}Z" fill="url(#${id}g${i})" fill-opacity="0.5"/>`;
+  });
+  nodes.forEach((n) => {
+    bars += `<rect x="${n.x.toFixed(1)}" y="${n.y.toFixed(1)}" width="${nodeW}" height="${n.h.toFixed(1)}" rx="3" fill="${n.color}"/>`;
+    const right = n.x < w / 2;
+    const tx = right ? n.x + nodeW + 8 : n.x - 8;
+    labels += `<text x="${tx.toFixed(1)}" y="${(n.y + n.h / 2 + fontSize * 0.35).toFixed(1)}" text-anchor="${right ? "start" : "end"}" font-family="Helvetica,Arial,sans-serif" font-size="${fontSize}" font-weight="600" fill="${dark(n.color)}" stroke="${bg}" stroke-width="4" stroke-linejoin="round" paint-order="stroke">${esc(label(n))}</text>`;
+  });
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><defs>${defs}</defs>${ribbons}${bars}${labels}</svg>`;
+}
+
+// Ownership before/after: one horizontal stacked bar per row, every segment labelled with its
+// own percentage, legend underneath. Built for three-stock-story's control-change picks
+// (e.g. a founder selling a stake). rows: [{label, segments:[{value, name}]}]; a segment's
+// `name` picks its colour and legend entry, so the same holder keeps one colour across rows.
+// A holder absent from a row is simply left out of that row's segments. Output is the 1072px
+// wide canvas the email renders at 536 CSS px (2x), so it stays sharp once rasterised.
+const OWN_PALETTE = ["#9E0142", "#5E4FA2", "#2C7FB8", "#52514E"];
+export function ownershipBars(rows, { w = 1072, labelW = 154, barH = 64, gap = 51, others = "Others and public" } = {}) {
+  const names = [];
+  rows.forEach((r) => r.segments.forEach((s) => { if (s.name !== others && !names.includes(s.name)) names.push(s.name); }));
+  const colorOf = (n) => (n === others ? "#d9d3c7" : OWN_PALETTE[names.indexOf(n) % OWN_PALETTE.length]);
+  const x0 = labelW + 16, trackW = w - x0 - 32;
+  const font = `font-family="Helvetica, Arial, sans-serif"`;
+  const h = 40 + rows.length * (barH + gap) + 40;
+  let out = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="${w}" height="${h}" fill="#fcfcfb"/>`;
+  rows.forEach((r, i) => {
+    const y = 40 + i * (barH + gap);
+    out += `<text x="${labelW}" y="${y + barH / 2 + 7}" text-anchor="end" font-size="22" font-weight="700" fill="#1c1c1c" ${font}>${esc(r.label)}</text>`;
+    let x = x0;
+    r.segments.forEach((s) => {
+      const sw = (s.value / 100) * trackW;
+      const c = colorOf(s.name);
+      out += `<rect x="${x.toFixed(1)}" y="${y}" width="${Math.max(0, sw - 2).toFixed(1)}" height="${barH}" fill="${c}" rx="3"/>`;
+      if (sw > 70) out += `<text x="${(x + (sw - 2) / 2).toFixed(1)}" y="${y + barH / 2 + 8}" text-anchor="middle" font-size="22" font-weight="800" fill="${s.name === others ? "#1c1c1c" : "#ffffff"}" ${font}>${s.value.toFixed(2)}%</text>`;
+      x += sw;
+    });
+  });
+  const legend = [...names, others];
+  let lx = x0;
+  const ly = h - 48;
+  legend.forEach((n) => {
+    out += `<rect x="${lx}" y="${ly}" width="18" height="18" fill="${colorOf(n)}" rx="3"/><text x="${lx + 26}" y="${ly + 15}" font-size="19" fill="#333" ${font}>${esc(n)}</text>`;
+    lx += 26 + n.length * 10.5 + 34;
+  });
+  return out + `</svg>`;
+}
+
+// Several tickers rebased to 100 on the first date, on one shared axis with a dashed 100
+// baseline, three date ticks and an end label per line (ticker in its own colour, signed move
+// in GAIN or LOSS). series: [{symbol, values:number[] (already rebased), color?}], dates: ISO
+// strings aligned to values. Right gutter holds the labels, so nothing clips at the edge.
+// Colours default to the shared peer set (ticker crimson, purple, grey) in series order.
+export function rebasedLines(series, dates, { w = 1072, h = 440, padL = 64, padR = 190, padT = 40, padB = 44 } = {}) {
+  const colors = ["#9E0142", "#5E4FA2", "#52514E"];
+  const all = series.flatMap((s) => s.values);
+  const lo = Math.floor((Math.min(...all, 100) - 1) / 10) * 10;
+  const hi = Math.ceil((Math.max(...all, 100) + 1) / 10) * 10;
+  const n = dates.length;
+  const X = (i) => padL + (i / (n - 1 || 1)) * (w - padL - padR);
+  const Y = (v) => padT + (1 - (v - lo) / (hi - lo)) * (h - padT - padB);
+  const font = `font-family="Helvetica, Arial, sans-serif"`;
+  let out = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="${w}" height="${h}" fill="#fcfcfb"/>`;
+  for (let v = lo; v <= hi; v += 10) {
+    const base = v === 100;
+    out += `<line x1="${padL}" x2="${w - padR}" y1="${Y(v)}" y2="${Y(v)}" stroke="${base ? "#8a8a8a" : "#e8e4dc"}" stroke-width="${base ? 2 : 1}"${base ? ` stroke-dasharray="6 5"` : ""}/><text x="${padL - 10}" y="${Y(v) + 5}" text-anchor="end" font-size="18" fill="#6b6b6b" ${font}>${v}</text>`;
+  }
+  const fmt = (d) => new Date(d + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+  [[0, "start"], [Math.round((n - 1) / 2), "middle"], [n - 1, "end"]].forEach(([i, anchor]) => {
+    out += `<text x="${X(i)}" y="${h - 14}" text-anchor="${anchor}" font-size="18" fill="#6b6b6b" ${font}>${fmt(dates[i])}</text>`;
+  });
+  const ends = series.map((s, k) => {
+    const c = s.color || colors[k % colors.length];
+    out += `<path d="M${s.values.map((v, i) => `${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" L")}" fill="none" stroke="${c}" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+    const last = s.values[s.values.length - 1];
+    return { s, c, last, y: Y(last), ly: Y(last) };
+  }).sort((a, b) => a.y - b.y);
+  for (let i = 1; i < ends.length; i++) if (ends[i].ly - ends[i - 1].ly < 30) ends[i].ly = ends[i - 1].ly + 30;
+  ends.forEach((e) => {
+    const pct = e.last - 100;
+    out += `<circle cx="${X(n - 1)}" cy="${e.y.toFixed(1)}" r="5" fill="${e.c}"/><text x="${X(n - 1) + 14}" y="${(e.ly + 6).toFixed(1)}" font-size="20" font-weight="700" ${font}><tspan fill="${e.c}">${esc(e.s.symbol)}</tspan><tspan dx="10" fill="${pct >= 0 ? GAIN : LOSS}">${pct >= 0 ? "+" : "-"}${Math.abs(pct).toFixed(1)}%</tspan></text>`;
+  });
   return out + `</svg>`;
 }

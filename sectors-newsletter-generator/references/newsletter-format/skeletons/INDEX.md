@@ -25,7 +25,8 @@ Read `references/newsletter-format/skeletons/<slug>.md`, that file only, for the
 | Weekly Insights v2 | `skeletons/weekly-insights-v2.md` |
 | Macro-reaction | `skeletons/macro-reaction.md` |
 | Three-stock story | `skeletons/three-stock-story.md` |
-| Single company deep dive | `skeletons/single-company-deep-dive.md` |
+| Single company deep dive (full) | `skeletons/single-company-deep-dive.md` |
+| Single company deep dive (earnings review) | `skeletons/single-company-earnings-review.md` |
 | Sector spotlight | `skeletons/sector-spotlight.md` |
 | Monthly market pulse | `skeletons/monthly-market-pulse.md` |
 | Did you catch it | `skeletons/did-you-catch-it.md` |

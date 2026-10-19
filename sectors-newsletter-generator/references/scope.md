@@ -32,7 +32,7 @@ These need live **user-account or billing state** this skill cannot fetch
 (`quest_completed`, `credits_used`, onboarding progress, renewal dates). They are
 lifecycle/CRM/transactional email, a different system entirely, triggered by account
 state rather than market content, and drafted end-to-end by the sibling
-`sectors-newsletter-dbquery` skill, not this one:
+`sectors-dbquery` skill, not this one:
 
 - Reminder: onboarding nudge, onboarding unclaimed reward, credit-expiry,
   quota-cycle renewal

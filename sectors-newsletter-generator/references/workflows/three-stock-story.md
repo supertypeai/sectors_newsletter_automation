@@ -1,15 +1,15 @@
 # Three-stock story, workflow
 
-Three companies, told as stories: history, fun facts, the people steering the business,
-and an attributed forward outlook. Read `../sourcing.md` and `../compliance.md`'s
+Three companies read together because of one pattern this week, each told through a dated
+timeline, its numbers and a key takeaway. Read `../sourcing.md` and `../compliance.md`'s
 "great future forecast" rule before drafting.
 
 ## 1. Pick three stocks
 
-Ideally with a connective thread — a sub-sector, a conglomerate group, a shared
-founder/tycoon, a theme — but three unrelated names each with a real, current reason to
-feature is fine too; say so honestly in the framing rather than forcing a thread that
-isn't there.
+The trio needs a pattern a reader can name before seeing the tickers: same-direction insider
+filings, a control change, a shared tycoon or group, a sub-sector theme. The pattern becomes the
+headline and the "why this matters" block, so settle it before researching further. Three
+unrelated names do not make an issue.
 
 Cheap, concrete discovery signals (same recipes the carousel skill uses, see
 `../sectors-api/endpoints.md` §2 for full syntax):
@@ -35,18 +35,26 @@ Each pick still needs a real current reason to feature, not just an interesting 
 
 ## 2. Research the story (web, cited)
 
-Founding story, notable milestones, a genuine fun fact, and — separately — the people
-likely to steer the business going forward. Cite everything per `../sourcing.md`.
+For each pick, the dated sequence that explains why it is here: control changes, deals, the
+filing itself, the company's response, the latest close. Collect dates and figures first, prose
+later, because the timeline is the spine of the block. Cite everything per `../sourcing.md`.
+Reconcile every filing against the exchange tape (price against that day's range, size against
+traded volume) before calling a trade off-market or a stake change real.
 
 ## 3. Fetch the people and the numbers
 
 ```bash
 node ../../scripts/sectors.mjs \
   "company/report/<TICKER>/?sections=overview,management,ownership,financials,future" \
+  "filings/?symbol=<TICKER>&limit=50" \
+  "daily/<TICKER>/?start=<~90d-ago>&end=<data_as_of>" \
   --save-dir <scratch-dir>
 ```
 
-Repeat per ticker, or batch all three into one `--save-dir` call.
+Repeat per ticker, or batch all three into one `--save-dir` call. `overview` feeds the three stat
+tiles (`last_close_price`, `market_cap`, and the 52-week high from `all_time_price` or the
+`daily` series, computed one way for all three picks). `daily` feeds both the latest-close
+timeline row and the rebased price chart.
 
 Key fields:
 - `management.key_executives[]{name,position}` and
@@ -83,71 +91,53 @@ attribution already did that work, and the trailing note reads as legal padding.
 nothing about consensus at all. Do not write a paragraph reporting the absence ("both
 fields return null, so no consensus is reported"); a missing field is not news.
 
-## 5. Section-fill order and prose density
+## 5. Build the issue
 
-Per stock, two sub-parts only: *The Story & People*, then *The Finances* with the
-attributed forward view folded into it. Section headings carry a narrative label, not a
-bare company name — see the skeleton at
-`../newsletter-format/skeletons/three-stock-story.md` for the full shape, including the
-thematic title, the two-paragraph framing, and the titled closing synthesis.
+Follow `../newsletter-format/skeletons/three-stock-story.md` for the block order and
+`../newsletter-format/company-issue-components.md` for the markup. Reference issue:
+`newsletter_2026-10-15_three-stock-story`.
 
-This type fails most often by being over-stuffed rather than under-researched. The
-research pass collects far more than the draft should carry, so cut deliberately:
+- Charts from `../../scripts/charts.mjs`: `ownershipBars` for a control change, `rebasedLines`
+  for the closing three-way price chart, plus any `barChart` (with `financial: true` for signed
+  moves) that one pick's story needs. Write each SVG next to the issue, then
+  `node ../../scripts/svg2png.mjs chart-<slug>.svg` and reference the PNG from both the HTML and
+  the Markdown. Every number on a chart must equal the number in the table and the timeline.
+- Write `newsletter.md` and `newsletter.html` together, never one alone.
+- Prose per block stays short. The timeline carries the dates, so the finances paragraph carries
+  only the trend, one ratio, debt and attributed forward view.
 
-- **One citation per claim that needs one, not per clause.** Founding dates, control
-  changes, deal values, quotes and the current news hook get a source. Figures that come
-  from the Sectors API do not each need a trailing `(sectors.app)` — the disclaimer and
-  the Appendix already establish where the numbers come from.
-- **Sources list carries only what the draft actually cites.** A twenty-line list where
-  the body cites six of them is research spill, not sourcing.
-- **Drop the scaffolding vocabulary.** No "The current story is," "The current hook is,"
-  "The real news is," "The closest thing to guidance is." Say the thing.
-- **Exact-precision figures earn their place.** Keep the numbers that carry the story;
-  round or drop the rest rather than stacking four decimals-deep figures in one sentence.
-- **Names and roles only where they move the story.** A full executive roster per pick
-  is API output, not writing.
+## 6. Cut deliberately
 
-## 6. Visuals: check for a real social card first
+The research pass collects far more than the draft should carry:
 
-This type had no visuals guidance of its own before — it was silently inheriting
-SKILL.md's generic "every issue gets a generated chart" default and always
-running `charts.mjs`, never checking for a real card. Fix, same priority order as
-`weekly-insights-v2.md`'s **Visuals: the social cards** section: **a real
-social card beats a generated chart whenever one is eligible; `charts.mjs` is the
-fallback for when nothing eligible exists, not a first choice taken for
-convenience.**
-
-List the GCS bucket per that section (no credential needed, works the same whether or
-not a human is present), then check each of this issue's three tickers for a real,
-eligible card, applying the date/story-prefix/relevance criteria
-`weekly-insights-v2.md` documents in full. A card covering one of the three is enough
-to illustrate that stock's section; there's no requirement that all three have one —
-mix real cards and a generated fallback per-stock as the bucket actually supports.
-Record which case applied (real card / listing errored / nothing eligible) in
-`run-notes.md` for each ticker checked — collapsing them into "used charts" hides
-a real defect behind what looks like a genuinely quiet week.
+- One citation per claim that needs one. Founding dates, control changes, deal values, quotes and
+  the news hook get a source. Figures from the Sectors API do not each need a trailing
+  `(sectors.app)`.
+- Sources lists only what the body cites.
+- No scaffolding vocabulary ("The current story is", "The real news is").
+- Names and roles only where they move the story. An executive roster is API output, not writing.
+- Attribution is sentence construction. Write "consensus of 67 analysts rates it 50 Buy" and
+  stop, with no trailing "not this newsletter's view". If `analyst_rating_breakdown` and
+  `company_growth_forecasts` are `null`, say nothing about consensus and do not report the absence.
 
 ## 7. Self-review before delivery
 
-- Does the title name a pattern a reader can grasp before knowing the tickers, rather
-  than listing the three events?
-- Does each per-stock heading carry a narrative label plus company plus ticker?
-- Two sub-parts per stock, with the forward view inside *The Finances* — no standalone
-  outlook block?
-- Does the closing section have its own thematic heading and read the three as one
-  spectrum, rather than restating each?
-- Is every forward-looking sentence attributed to management guidance, disclosed
-  strategy, or cited consensus — never stated as the newsletter's own prediction, and
-  never followed by a "not this newsletter's view" trailing note?
-- Is any paragraph reporting that an API field was null? Delete it.
-- Is every historical/people fact cited, once, without a citation on every clause?
-- Does the Sources list contain anything the body never cites?
-- Did `share_percentage`'s type inconsistency get cast before any comparison?
-- Does each pick have a real, current "why this, why now," not just an interesting past?
-- Does every `TICKER` mention (table, chart label, AND inline prose) read bold,
-  linked, and ticker-blue (`#9E0142`)? Gains/losses green/red (`#568475`/`#D53E50`)?
-  (`../newsletter-format.md`'s Color convention, applies to every issue.)
-- Is the Appendix (endpoint/field trace) present, after Sources and before the
-  disclaimer? **Endpoints and field names only**, one bullet per endpoint, with no section
-  label, chart name, table name, derivation or usage note attached to any bullet
-  (`../newsletter-format.md`'s Appendix section)?
+- Does the headline name a pattern without tickers, and does the glance box give each pick its
+  dated event in two sentences?
+- Does the "why this matters" block stay general, with a pull quote that states the limit of the
+  signal and gives no advice?
+- Per pick: stat tiles, intro, dated timeline ending on the latest close, finances paragraph,
+  table, key takeaway, in that order? Is the takeaway sized against the event with a figure?
+- Does every timeline row carry a date and a fact, and does the last row state the move against
+  a stated high or low in green or red?
+- Is every forward-looking sentence attributed (management guidance, disclosed strategy, cited
+  consensus), with no trailing disclaimer and no paragraph about a null field?
+- Do the closing chart and sentence rank the same moves, with window and trading days in the caption?
+- Did `share_percentage`'s string/float difference get cast before any comparison?
+- Does every ticker mention (prose, table, tile, chart label) read bold, linked and `#9E0142`;
+  gains `#568475`, losses `#D53E50`?
+- HTML references PNG charts, not SVG, and each `<img>` has descriptive alt text and `width="536"`?
+- Does the HTML match the Markdown block for block?
+- Sources, then Appendix (endpoints and fields only, one bullet per endpoint), then the disclaimer?
+- Copywriting: no dash connectors, no inverted pairs, no emoji, grep the HTML for `&mdash;`,
+  `&ndash;` and a literal `$`.
