@@ -109,7 +109,7 @@ jobs:
           mkdir -p "$NEWSLETTER_HOME"
 
       # sectors.mjs and charts.mjs are dependency-free; this is only for
-      # rasterize.mjs, which needs Puppeteer to turn chart SVGs into email-safe PNGs.
+      # svg2png.mjs, which needs Puppeteer to turn chart SVGs into email-safe PNGs.
       - name: Install the skill's render dependency
         run: npm ci --prefix sectors-newsletter-generator || npm install --prefix sectors-newsletter-generator
 

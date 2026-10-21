@@ -13,7 +13,7 @@
 // final hosted URL and a reviewer sees precisely the image subscribers will get.
 //
 // Steps, per chart-*.svg in the folder:
-//   1. rasterize to PNG via the skill's scripts/rasterize.mjs (Puppeteer, real fonts)
+//   1. rasterize to PNG via the skill's scripts/svg2png.mjs (Puppeteer, real fonts)
 //   2. POST it to mailroom POST /v1/uploads, which returns a permanent public URL
 //   3. rewrite newsletter.html so any reference to that chart points at the URL
 //
@@ -32,9 +32,9 @@ const {
   MAILROOM_API_KEY,
   MAILROOM_UPLOAD_URL = "https://mailroom.supertype.ai/api/v1/uploads",
   SKILL_DIR = "sectors-newsletter-generator",
-  // Env-facing name for rasterize.mjs's --scale, since a workflow step configures
+  // Env-facing name for svg2png.mjs's --scale, since a workflow step configures
   // through the environment rather than argv. Deliberately has no default here:
-  // rasterize.mjs owns that value, and repeating it would let the two drift.
+  // svg2png.mjs owns that value, and repeating it would let the two drift.
   CHART_SCALE,
   // Optional: compress each PNG through Storing before upload. Unset = skip.
   STORING_API_KEY,
@@ -62,7 +62,7 @@ if (!svgs.length) {
 console.log(`Found ${svgs.length} chart(s): ${svgs.join(", ")}`);
 
 // 1. Rasterize them all in one Puppeteer launch.
-const rasterize = join(SKILL_DIR, "scripts", "rasterize.mjs");
+const rasterize = join(SKILL_DIR, "scripts", "svg2png.mjs");
 if (!existsSync(rasterize)) die(`missing ${rasterize}. Is SKILL_DIR correct?`);
 try {
   execFileSync(
@@ -71,7 +71,7 @@ try {
     { stdio: "inherit" }
   );
 } catch {
-  die("rasterize.mjs failed, see output above");
+  die("svg2png.mjs failed, see output above");
 }
 
 /** Per-chart ceiling on the Storing round-trip. See the call site for why. */
