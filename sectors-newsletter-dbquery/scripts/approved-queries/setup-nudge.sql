@@ -39,6 +39,11 @@
 --     stops appearing in a later run and is cancelled out by the automation's own
 --     ever-enrolled/no-longer-eligible diff.
 --
+-- 2026-10-21 change: added "AND (u.credits_expire_at IS NULL OR u.credits_expire_at > now())".
+-- The credits column is not zeroed when credits expire, so credits > 0 alone
+-- matched users whose balance had already lapsed and told them they "have N
+-- credits". A NULL credits_expire_at is treated as "no expiry set" (still eligible).
+--
 -- This is the ONLY query this skill may run for setup-nudge. Never edit
 -- ad hoc; edits require re-approval, see ../../references/supabase-access.md.
 
@@ -52,5 +57,6 @@ WHERE u.is_active = true
   AND u.subscription_tier IS DISTINCT FROM 'INSIDER'
   AND u.subscription_cancellation = false
   AND u.credits > 0
+  AND (u.credits_expire_at IS NULL OR u.credits_expire_at > now())
   AND NOT EXISTS (SELECT 1 FROM api_apiresponsetime r WHERE r.user_id = u.id)
 ORDER BY u.id;

@@ -34,13 +34,20 @@
 --     stops appearing in a later run and is cancelled out by the automation's own
 --     ever-enrolled/no-longer-eligible diff.
 --
+-- 2026-10-21 change: credits only count toward eligibility, and are only
+-- returned, while unexpired (credits_expire_at IS NULL or > now()). The credits
+-- column is not zeroed on expiry, so an expired balance used to qualify a user
+-- and was quoted back to them in the email. Expired credits now come back as 0
+-- (monthly_quota is unaffected), so {{unused_value}} never mentions them; a user
+-- with neither live credits nor monthly_quota is no longer eligible.
+--
 -- This is the ONLY query this skill may run for insider-nudge. Never edit
 -- ad hoc; edits require re-approval, see ../../references/supabase-access.md.
 
 SELECT
   u.id AS user_id,
   u.email,
-  u.credits,
+  CASE WHEN u.credits_expire_at IS NULL OR u.credits_expire_at > now() THEN u.credits ELSE 0 END AS credits,
   u.monthly_quota
 FROM api_user u
 WHERE u.is_active = true
@@ -49,5 +56,8 @@ WHERE u.is_active = true
   AND u.subscription_cancellation = false
   AND NOT EXISTS (SELECT 1 FROM user_watchlist w WHERE w.user_id = u.id)
   AND NOT EXISTS (SELECT 1 FROM user_workflow wf WHERE wf.user_id = u.id)
-  AND (u.credits > 0 OR u.monthly_quota > 0)
+  AND (
+    (u.credits > 0 AND (u.credits_expire_at IS NULL OR u.credits_expire_at > now()))
+    OR u.monthly_quota > 0
+  )
 ORDER BY u.id;
