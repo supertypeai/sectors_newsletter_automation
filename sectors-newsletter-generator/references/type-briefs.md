@@ -76,13 +76,14 @@ carry it.
 
 ### Sector spotlight
 Open `references/workflows/sector-spotlight.md`. In brief: the subject is the sub-sector,
-not a ticker. Pull `subsector/report` for the group's five-year median P/E-P/B-P/S series,
-the median-vs-weighted dispersion, the cap move and the growth forecasts; screen members
-above a stated market-cap floor to show which industries cluster at the cheap end; pull the
-week's movers to say whether the move was broad or concentrated; then feature the one name
-that breaks from the pattern with a peer table carrying EV/EBITDA and leverage, not P/E
-alone. Table-heavy, every heading a claim, every table captioned. Valuation context only,
-never "the one to buy."
+not a ticker, and the reader may be an investor or someone following the news. Open in plain
+language, add a "How to read the numbers" box, then pull `subsector/report` for the five-year
+median P/E, the median-vs-weighted dispersion, the cap move and the growth forecasts; screen
+members above a stated market-cap floor, split them by the pattern the screen shows and
+compare what the week did to each group; then feature the one name that breaks the pattern
+with a one-angle, three-column peer table. HTML blocks in
+`references/newsletter-format/sector-spotlight-components.md`. Say "lowest" and "highest
+multiples", never "cheap" or "expensive". Valuation context only, never "the one to buy."
 
 ### Monthly market pulse
 Open `references/workflows/monthly-market-pulse.md`. In brief: `top-changes`
