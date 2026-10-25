@@ -26,7 +26,7 @@ claim.
    index cap move, the window's single largest mover, the aggregate net of the dominant
    broker side, and one macro anchor (rate level, rupiah move, or the commodity that
    mattered). Number plus one-line label per tile, nothing else. Every tile's figure
-   must also appear somewhere else in the issue.
+   must also appear somewhere else in the issue. The tile row carries `data-keep="1"`.
 1c. **The Read** — two to four sentences carrying the issue's single thesis, stated
    as a falsifiable claim, before any table, defended by every section that follows.
 2. **Top Movers** — one heading, two small tables underneath (top gainers, top losers
