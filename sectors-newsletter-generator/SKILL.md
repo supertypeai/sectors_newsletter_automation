@@ -93,7 +93,7 @@ skeleton under `references/newsletter-format/skeletons/`; both files share the s
 | Market Insights | **Macro-reaction** (`macro-reaction`) | tie the last ~2 days of macro news to affected sectors/tickers, then report each name's fundamentals and valuation context |
 | Company Insights | **Three-stock storytelling** (`three-stock-story`) | three companies sharing one pattern this week, each with a dated timeline, numbers and key takeaway, attributed forward view |
 | Company Insights | **Single company deep dive** (`single-company-deep-dive`) | one company covered whole: business model and revenue mix, competitive moat tested against named peers, the unit-economics margin ladder, the macro forces on its line items, then the long-term read both ways. A recent event is only the reason to publish, a tenth of the issue. Runs 900-1,200 words under a three-figures-per-paragraph density cap. **Two formats, ask which:** the full deep dive, or an **earnings review** (one quarter's print explained: price chart, how-it-makes-money sankey, quarter at a glance, three things that mattered, open question) that also ships as a `newsletter.pdf` |
-| Company Insights | **Sector spotlight** (`sector-spotlight`) | one sub-sector read as a whole: its five-year valuation series, the median-vs-weighted dispersion, which industries sit at the cheap end, whether the week's move was broad, then the one name that breaks the pattern peer-compared on EV/EBITDA and leverage as well as P/E. Table-heavy, subsector-led headline, valuation context, never a call |
+| Company Insights | **Sector spotlight** (`sector-spotlight`) | one sub-sector read as a whole for investors and general readers: a plain-language opening, a "How to read the numbers" box, the five-year median P/E, the median-vs-weighted dispersion, the week's move split between the lowest- and highest-multiple groups, then the one name that breaks the pattern with a one-angle, three-column peer table. Tiles, bars, cards and flow strips, not a run of tables. Subsector-led headline, valuation context, never a call |
 | Sectors-org | **New release feature** (`new-release-feature`) | a brief summary of the latest release off a user-supplied release note (`sectors.app/release` is not live-fetchable), plus a secondary section spotlighting one feature the user picks, with a "Try the feature now" CTA. Subject/preview/headline name only the release, never the feature |
 | Sectors-org | **Upcoming event** (`upcoming-event`) | promo for a Sectors in-house workshop. Content is **user-supplied**: ask for date/time/venue, agenda/speaker/target audience, registration link, and marketing banner before drafting. Not market-data driven |
 | FOMO | **Did you catch it** (`did-you-catch-it`) | a single ticker that hit a real dated low (`overview.all_time_price`), already cleared a fundamentals guard on that date (P/E and ROE vs sector median, leverage trend), then rallied >=10% off it. Told signal-first, to prove a workflow alert would have caught the moment. One broadcast piece, no per-recipient framing |
@@ -297,7 +297,7 @@ workflow doc §3), then apply that one definition throughout.
     with that block's `utm_content` and `utm_term=<ticker>`. Grep the finished HTML for the
     ticker string and confirm every hit sits inside an `<a>`. See `newsletter-format.md`'s
     **Ticker-mention convention**.
-14. **No clickable citation in body copy, any type** (and, for `weekly-insights-v2` and `monthly-market-pulse`, no inline citation of any kind since 2026-10-19: Sources list only) (confirmed 2026-08-31): a news source
+14. **No clickable citation in body copy, any type** (and, for `weekly-insights-v2`, `monthly-market-pulse` and `sector-spotlight`, no inline citation of any kind since 2026-10-19, `sector-spotlight` since 2026-10-22: Sources list only) (confirmed 2026-08-31): a news source
     is attributed as plain `(Source Name, DD Mon YYYY)` text, and its URL appears only in
     the Sources list. The only body links are `sectors.app` links and our own Instagram and
     Threads follow lines. An outbound link mid-issue hands the reader an exit before the
@@ -368,11 +368,12 @@ Finished issues land at:
   tracked tickers/sectors), same discipline as the dbquery skill's own
   `references/supabase-access.md`: flag it to the user, it stays local, never leaves
   this machine.
-- **Every issue type ships as HTML, and every issue except `weekly-insights-v2` gets a hero
+- **Every issue type ships as HTML, and every issue except `weekly-insights-v2` and `sector-spotlight` gets a hero
   chart.** All ten
   types are delivered as a send-ready `newsletter.html` (email-safe inline styles, table
   layout, tickers linked to `sectors.app/idx/<lower>`); the nine other than
-  `weekly-insights-v2` also carry at least one generated `chart-<slug>.svg`. Keep `newsletter.md` as the review draft and ship the `.html`
+  `weekly-insights-v2` also carry at least one generated `chart-<slug>.svg`, except `sector-spotlight`, whose
+  bars, tiles, cards and flow strips are built in HTML and need no hosted chart. Keep `newsletter.md` as the review draft and ship the `.html`
   alongside it. The worked HTML reference for a type is
   `newsletter/samples/<type-slug>/newsletter.html`; `newsletter-format.md`'s **Color
   convention** owns the shared HTML chrome and `workflows/upcoming-event.md` §4 carries the
