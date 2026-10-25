@@ -1,61 +1,25 @@
 # Section skeleton: sector-spotlight
 
-One issue type's section skeleton, split out of `references/newsletter-format.md`. That file still owns every cross-type convention (header block, ticker mentions, UTM, color, prose style, number formatting, sources appendix, disclaimer, length). Read this file only for the type you are actually writing.
+One issue type's section skeleton, split out of `references/newsletter-format.md`. That file still owns every cross-type convention (header block, ticker mentions, UTM, color, prose style, number formatting, sources appendix, disclaimer, length). Read this file only for the type you are actually writing. The HTML markup for every block below is in `sector-spotlight-components.md`, and the worked reference is `samples/sector-spotlight/newsletter.html`.
 
 ### Sector spotlight
 
-A **subsector-level argument**, not a three-name peer table with a hook glued on top. The
-issue starts at the whole sub-sector's valuation, explains why the group prints the number
-it prints, and only then narrows to individual names. A single company appears as evidence
-inside that argument, never as the subject of the issue.
+A **subsector-level argument** for two readers at once: the investor who wants the valuation read, and the person following the news who wants to know how the sector, and through it the country's market, is doing. The issue starts at the whole sub-sector, explains what its headline multiple does and does not mean, and only then narrows to names. A single company appears as evidence inside the argument, never as the subject.
 
-Every section heading below carries a **claim**, phrased as the finding rather than the
-data source ("Palm Oil and Poultry Dominate the Cheap End", not "Screener Results"). Every
-table gets a **one-line italic caption underneath** naming the source and the window
-("Subsector historical valuation.", "7-day change from 12 August's close to 19 August's
-close."). Four to six tables across the issue is normal here; this type is table-heavy by
-design.
+**Teach before you tabulate.** A page of P/E, P/B and P/S means nothing to a reader who does not know how the ratios relate. The first screen is plain language, the metrics are defined by the question they answer, and only the figures that carry the argument appear. Anything else belongs in a company report the reader can open.
 
-1. **H1 = the subsector finding.** States what the whole group is doing and the reason in
-   one line, drafted fresh each run from that run's numbers. "Food & Beverage Trades at a
-   Five-Year Low, Led by Commodities". Never a ticker-led headline, and never a reused
-   template.
-2. **Dateline + lede.** The italic `*Sectors Sector Spotlight, <date>. Data as of
-   <date>.*` line, then one paragraph sizing the group: median P/E, number of listed
-   companies, total market cap.
-3. **The group's own history** — a table of the sub-sector's median P/E, P/B and P/S over
-   the last five years, current year bolded, from
-   `subsector/report`'s `valuation.historical_valuation`. Under it, the paragraph that
-   makes the number mean something: the median against the market-cap-weighted P/E, and
-   what the gap says about the group's internal composition (commodity producers vs
-   branded names, banks vs multifinance, and so on). This dispersion read is the spine of
-   the issue.
-4. **Where the valuation actually sits** — the screener table, one row per member above a
-   stated market-cap floor, ranked by P/E, columns ticker, company, P/E, market cap. Then
-   the read: which industries cluster at the cheap end, and why that means the group's
-   headline multiple is not a "buy the sector" number.
-5. **Recent performance** — the 7-day (or the run's stated window) movers table for the
-   sub-sector, with the group's own move stated above it. Then the contrast: which part of
-   the sub-sector drove the move and which part did not participate. This section exists
-   to show whether the rebound or sell-off is broad-based.
-6. **The name that breaks from the group** — one company picked because it contradicts
-   the pattern established above, not because it is the biggest. Its trigger (index
-   review, earnings, a filing) in a sentence, then the **peer table**: price, P/E,
-   EV/EBITDA, debt/equity, interest coverage, ROE, dividend yield, one row per close peer,
-   **best-in-column values bolded**. The caption states which period each column comes
-   from, since valuation columns are the current-year series while leverage and
-   profitability are the last reported fiscal year.
-   Then the leverage-adjusted read: a cheaper P/E next to materially higher debt is not
-   the same discount it looks like on the headline multiple. Close on the fundamentals
-   direction (ROE trend, latest-quarter earnings growth, institutional flow) where it
-   cuts against the price.
-7. **What the group's earnings are expected to do** — realized growth for the last full
-   year against the forecast for the current one (`growth.weighted_avg_growth_data`,
-   `growth.growth_forecasts`), and the one sentence explaining what that forecast does to
-   the trailing multiple. This is what turns "cheap" into "priced for slower earnings".
-8. **The Key Takeaway** — three or four short paragraphs: what the headline multiple
-   really represents, which part of the group the rebound favoured, how the featured name
-   reads against its peers, and the open question the reader is left to watch. Valuation
-   context throughout, never "the one to buy".
-9. **Sources** list, **Appendix** (endpoint/field trace), disclaimer footer, in that
-   order.
+Every section heading carries a **claim**, phrased as the finding ("The Sell-Off Hit the Highest-Multiple Banks Hardest", not "Screener Results"). **No inline citations anywhere in the body**, no `(sectors.app)`, no `(Source, date)`, in prose or captions: they break the reading flow. Sources appear only in the Sources list. Every table, card group and bar block still gets a **one-line italic caption** naming the window and any member left out. No two data blocks of the same shape sit back to back: cycle tiles, bars, side-by-side cards, a company card and callouts.
+
+1. **H1 = the subsector finding**, drafted fresh from the run's numbers, never ticker-led. Under it, two short paragraphs in plain language: first what happened and why (the hook, cited), then the sizing (number of companies, market cap, year-to-date) and what this issue will explain.
+2. **The Banks at a Glance.** A shaded card with three stat tiles: past week, year to date, median P/E with a plain tag ("five-year low"). Never a two-row grid with uneven tile text.
+3. **How to Read the Numbers in This Issue.** A shaded box defining only the metrics used, each by the question it answers: P/E ("the price of a year of profit", with a worked example), median versus weighted, and P/B or whichever second ratio the issue uses. Two sentences each. Required, every issue.
+4. **The group's own history.** One paragraph stating the change in plain terms (the range of past years against now, the percentage gap), then a table of median P/E only, with bars drawn from zero and the current year highlighted. Other ratios appear in a sentence if the argument needs them, not as columns. Under it, a **Median versus weighted** read: what a wide gap means in words ("one average hides two groups"), which names lift the weighted figure, then two big-number tiles (median, weighted) with plain sub-lines. This dispersion read is the spine of the issue.
+5. **The week, split by the pattern the screen shows.** Screen members above a stated market-cap floor with `pe_ttm > 0`, find the cluster at each end (state-owned and regional lenders at the low end, smaller or digital lenders at the high end, commodity producers versus branded names, and so on), and compare what the week did to each group. Three stat tiles in a card (how many fell, the median member, the largest member), then two side-by-side cards, one per group, each with P/E, the week's move and a simple average. The caption lists every member of the screened extreme left out for lack of data and any member that contradicts the pattern. State plainly which group fell more. Use "lowest multiples" and "highest multiples", never "cheap" or "expensive".
+6. **The name that held up or broke the pattern.** One company, picked because it contradicts the pattern, never because it is the largest. A company card with three stat tiles, then a peer table of **one angle only**. Choose the angle first ("the biggest capital buffer, not the lowest P/E or the best ROE"), put it in the heading, keep three columns that serve it, label each column with a plain question ("Price for profit", "Profit earned", "Safety buffer") over the metric name, bold best-in-column, and point the reader to company reports for the rest. Add a flow strip (institutional buy and sell months) when flow cuts for or against the price. Follow with the trade-off in prose, never a verdict.
+7. **What the group's earnings are expected to do.** Realized growth for the last year beside the current and next year's forecast, as three tiles, with the sentence that ties the forecast to the trailing multiple ("a low P/E is only half the picture, because the E can change") and the warning that forecasts may predate the week's repricing.
+8. **Key takeaway.** Claim heading, an "In plain terms" callout (two sentences a non-investor can repeat), an "If you follow the economy" paragraph, an "If you invest" paragraph that covers the median, the weighted figure and the featured name's trade-off, and a "What to watch" callout. Valuation context only. Do not append a standalone "this is not a call" line, because the footer disclaimer carries it.
+9. **CTA card, Upcoming Events, Sources, Appendix, disclaimer footer**, in that order.
+
+Every designed block (the tile cards, the How to Read box, the bar table, the group cards, the peer card, the flow strips, the forecast tiles) carries `data-keep="1"` so the story page keeps it whole; the components file marks each one.
+
+No hosted bar chart is required for this type: the bars, tiles, cards and flow strips are the visuals. Add a generated chart only when a series needs a shape the HTML blocks cannot draw.

@@ -1,7 +1,9 @@
 # Sector spotlight, workflow
 
 One sub-sector read as a whole: what the group's valuation is, why it prints that number,
-who sits at each end of it, and which name contradicts the pattern. Top-of-funnel
+who sits at each end of it, and which name contradicts the pattern. Written for two
+readers, the investor and the person following the news for the big picture, so the first
+screen is plain language and the metrics are explained before they are used. Top-of-funnel
 discovery content. Read `../newsletter-format/skeletons/sector-spotlight.md`,
 `../sourcing.md`, and `../compliance.md` before drafting. "Which one is actually cheap" is
 a valuation-context question, report it as context, never as a buy call.
@@ -74,7 +76,15 @@ node ../../scripts/sectors.mjs \
 
 Read the screener output for **industry clustering**, not just for the cheapest row. The
 finding this type wants is "the cheap end is all palm oil and poultry", which is what makes
-the group's headline multiple un-buyable as a single idea. Use `overview.tags` on the
+the group's headline multiple un-buyable as a single idea.
+
+Then **split the screened members into the groups the cluster implies** (state-owned and
+regional lenders against smaller digital ones, say) and pull each member's 7-day move with
+`daily/{ticker}/?start=<close-7d>&end=<data_as_of>` (first and last `close`). The issue's
+insight is how the week landed on each group, shown as two side-by-side cards with a simple
+average. Compute the averages yourself, label them "simple" in the caption, list every member
+of the extreme that had no move data, and name any member that contradicts the pattern. Do
+not generalise past the members you measured. Use `overview.tags` on the
 picks, or the company names themselves, to name the cluster.
 
 ## 4. Pull the name that breaks from the group, plus its close peers
@@ -87,22 +97,25 @@ node ../../scripts/sectors.mjs \
   --save-dir <scratch-dir>
 ```
 
-Two or three names, all from the **same industry inside the sub-sector**, so the columns
-compare like with like. The peer table's columns:
+Two or three peers, all from the **same industry inside the sub-sector**, so the columns
+compare like with like. Pull the full set, then **choose one angle and show only the data
+that serves it**. The reader can open each company report for the rest. The angle goes in
+the heading ("the biggest capital buffer, not the lowest P/E or the best ROE").
 
-- `valuation.historical_valuation[]` — current-year `pe` and `enterprise_to_ebitda`, plus
-  `pe_peer_avg` to check the name against its own peer group, and `forward_pe` where the
-  earnings direction matters.
-- `financials.historical_financial_ratio[]` — last reported fiscal year's debt/equity,
-  interest coverage and ROE.
-- `dividend.yield_ttm` — trailing yield.
-- `ownership.institutional_transaction_flow[]` — whether institutions bought or sold
-  through the price move. This is the line that usually cuts against the headline.
+Candidate fields, pick three at most:
 
-**EV/EBITDA and leverage are not optional here.** The whole point of this section is that a
-lower P/E next to materially higher debt is a smaller discount than the headline multiple
-suggests, and you cannot make that argument from P/E alone. Bold the best value in each
-column so the split is readable at a glance.
+- `valuation.historical_valuation[]`: current-year `pe`, `pb`, `pe_peer_avg`, `forward_pe`.
+- `financials.historical_financial_ratio[]`: ROE, capital adequacy ratio for banks, debt/equity
+  and interest coverage for non-financials, margins.
+- `dividend.yield_ttm`: trailing yield.
+- `ownership.institutional_transaction_flow[]`: render as a seven-block flow strip when it cuts
+  for or against the price move.
+
+Sub-sector notes: banks do not report EV/EBITDA and debt/equity says little for them, so use
+capital adequacy, ROE and P/E. Non-financials still need leverage next to P/E when the story
+is "a lower P/E next to materially higher debt is a smaller discount than it looks". Label each
+column with a plain question over the metric name ("Price for profit", "Profit earned", "Safety
+buffer") and bold the best value in each column.
 
 ## 5. Validate
 
@@ -119,33 +132,55 @@ column so the split is readable at a glance.
 
 ## 6. Write the argument, not the data
 
-Order is fixed by the skeleton: group history, dispersion, cheap end, recent performance,
-the name that breaks the pattern, the earnings forecast, takeaway. Each heading states its
-finding. Each table carries a one-line italic caption under it. The paragraph after each
-table says what the table means, in two or three sentences, and does not restate the rows.
+Order is fixed by the skeleton: plain-language opening, At a Glance, How to Read the Numbers,
+group history and dispersion, the week split by group, the name that held up or broke the
+pattern, the earnings forecast, takeaway. Each heading states its finding. Each block carries
+a one-line italic caption. The paragraph after each block says what it means in two or three
+sentences and does not restate the rows.
 
-The takeaway closes on the open question (usually whether the current earnings level is
-sustainable), stated as context, not as a call.
+**Explain before you show.** Write the "How to Read the Numbers" box from the metrics the
+issue actually uses, each defined by the question it answers with a worked example from the
+issue's own figure. Say what a wide median-versus-weighted gap means in words. A reader with
+no finance background should be able to follow the headline and the "In plain terms" callout
+without the tables.
+
+**No inline citations.** Strip every `(sectors.app)` and `(Source, date)` from prose and captions. Web-sourced facts go in the Sources list only, and the reader still sees what the fact is, in plain words.
+
+**Vary the shape.** Cycle stat tiles, zero-based bars, side-by-side cards, a company card, a
+flow strip and callouts. Never two same-shaped blocks in a row. Blocks are in
+`../newsletter-format/sector-spotlight-components.md`.
+
+**Do not say "cheap" or "expensive".** Say "lowest multiples", "highest multiples",
+"low-multiple", "high-multiple" (`../compliance.md`). Card titles describe the screen.
+
+The takeaway has an "In plain terms" callout, an "If you follow the economy" paragraph, an
+"If you invest" paragraph and a "What to watch" callout, stated as context, not as a call.
+Do not add a standalone "this is not a call" line: the footer disclaimer carries it.
 
 ## 7. Self-review before delivery
 
-- Does the H1 name the sub-sector's finding, not a ticker?
-- Is the median-vs-weighted dispersion read present, and does it name the two groups that
-  create the gap?
-- Is the five-year valuation series table there, current year bolded?
-- Does the screener table state its market-cap floor in the caption?
-- Does the movers section say whether the move was broad or concentrated?
-- Does the peer table carry EV/EBITDA and leverage, not just P/E, and are best-in-column
-  values bolded?
-- Is the growth-forecast section present, tying the forecast back to the trailing multiple?
-- Is every "cheap/expensive/best" claim benchmarked against the group median, the group's
-  own history, or the name's peer average, never a bare multiple?
-- Did any member's garbage ratio survive into the ranking? Re-scan against the bands.
-- Is the framing valuation context, not a buy call? No "the one to own," no "clear winner
-  to buy" (`../compliance.md`).
-- Does every `TICKER` mention (table, chart label, AND inline prose) read bold, linked,
-  and ticker-blue (`#9E0142`)? Gains/losses green/red (`#568475`/`#D53E50`)?
-  (`../newsletter-format.md`'s Color convention, applies to every issue.)
-- Is the Appendix (endpoint/field trace) present, after Sources and before the disclaimer? **Endpoints and field names only**, one bullet per endpoint, with no section
-  label, chart name, table name, derivation or usage note attached to any bullet
-  (`../newsletter-format.md`'s Appendix section)?
+- Does the H1 name the sub-sector's finding, not a ticker, and do the first two paragraphs
+  make sense to someone with no finance background?
+- Is the At a Glance card three tiles, and is every tile vertically centred?
+- Is there a How to Read the Numbers box, defining only the metrics used?
+- Is the five-year table median P/E only, with bars from zero and the current year
+  highlighted? Is the median-versus-weighted gap explained in words, with the names that
+  create it?
+- Does the screener state its market-cap floor, and are the two group cards captioned with
+  the simple-average note, the members left out and any contradicting member?
+- Does the week's heading match what the cards show, with exceptions disclosed?
+- Does the peer table follow one stated angle, carry at most three columns with plain-question
+  labels, bold best-in-column, and point to company reports for the rest?
+- Is the growth forecast tied back to the trailing multiple, with the repricing caveat?
+- Does the takeaway have the four parts (in plain terms, economy, investor, what to watch)?
+- Grep the body for `(sectors.app)`, `(Trading`, `(Databoks` and any `, sectors.app.` caption tail. Zero hits.
+- Are any two adjacent blocks the same shape? Break the run.
+- Does any sentence call a bank cheap, expensive, undervalued, a bargain or the one to own?
+  Reword to "lowest multiple" or state the fact (`../compliance.md`).
+- Did any member's garbage ratio survive into a card or average? Re-scan against the bands.
+- Does every `TICKER` mention (tiles, cards, tables, flow strips, prose) read bold, linked and
+  `#9E0142`? Gains and losses `#568475` and `#D53E50`, bold, on numeric readings only?
+  (`../newsletter-format.md`'s Color convention.)
+- Is the Appendix present, after Sources and before the disclaimer, endpoints and field
+  names only?
+- Are `newsletter.md` and `newsletter.html` in sync?

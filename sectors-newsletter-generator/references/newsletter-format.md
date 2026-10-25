@@ -265,6 +265,14 @@ convert cleanly and are better as real markdown on the site. Mark the outermost 
 `data-keep` inside another is ignored. The attribute is invisible in email clients and is
 stripped before the block is written to the page.
 
+## Sector spotlight layout (confirmed 2026-10-22)
+
+`sector-spotlight` shares the company issues' shell and components and adds its own set in
+`newsletter-format/sector-spotlight-components.md`: shaded At a Glance and How to Read boxes,
+zero-based bar rows, big-number tile pairs, side-by-side group cards with an average, a
+one-angle peer card and flow strips. Reference issue `samples/sector-spotlight/newsletter.html`.
+Tiles are vertically centred so uneven tile text never looks like a missing line.
+
 ## Prose style (newsletter-specific, overrides the short-declarative instinct)
 
 `./writing/core.md` is medium-neutral and binds here in full. This section adds
