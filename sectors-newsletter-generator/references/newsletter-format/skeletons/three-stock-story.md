@@ -15,7 +15,7 @@ Three companies that share one reason to be read together this week. The reason 
 3. **Why This Pattern Matters.** One H2 stating the general lesson (`Why a Controlling Holder's Buying Matters`), two labelled paragraphs (`What it can signal`, `What it can change`), then a pull quote stating the limit of the signal. Generic to the pattern, no per-stock detail, no advice. Link tickers only where an example is named.
 4. **Three per-stock blocks**, each separated by the divider. Fixed shape:
    - H2 `TICKER: Narrative Label` (`BYAN: Founder Sells 30%, Then Buys Again`). Ticker link first, then a colon, then the label stating that stock's finding.
-   - Company card: `PT ... Tbk` plus linked ticker, three stat tiles (`Last close`, `Vs 52-week high` coloured red or green, `Market cap`).
+   - Company card: `PT ... Tbk` plus linked ticker, three stat tiles (`Last close`, `Vs 52-week high` coloured red or green, `Market cap`). Carries `data-keep="1"` on the card.
    - One intro sentence or short paragraph on who the company and the key person are.
    - **Dated timeline**, five to eight rows, oldest first, ending on the data-as-of close with the move against the relevant high or low in green or red. Dates carry the story: founding or control change, the deal, the filing, the company's response, the latest close. Each row is one to three sentences. Only rows that move the story, a full executive roster is API output, not writing.
    - Optional per-stock chart when one shows something the text cannot (ownership before and after a trade, `ownershipBars`), with a one-sentence italic caption stating the finding.

@@ -60,7 +60,8 @@ data dump.
    unresolved question to the reader without answering it. Green and red on every signed figure.
 2b. **Company card** — shaded `#f2ede4` card: full legal name with linked ticker, three stat
    tiles (`Last close`, `Market cap`, `Market cap rank`), then the 90 day price chart (PNG, non
-   zero y-axis) with a caption stating start, end and where the move happened.
+   zero y-axis) with a caption stating start, end and where the move happened. The card carries
+   `data-keep="1"`.
 3. **Why This Company, Now** — H2 naming the reason to publish, one or two short
    paragraphs, no more. An earnings print, a corporate action, an ownership filing, a
    regulatory change, or a valuation crossing its own historical band. Give the mechanism

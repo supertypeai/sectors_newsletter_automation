@@ -242,6 +242,29 @@ issues `newsletter_2026-10-15_three-stock-story` and `newsletter_2026-10-14_sing
 Copy it, change only text and numbers. These issues set the quality bar for both types: when
 a skeleton and a reference issue disagree, the reference issue wins and the skeleton gets fixed.
 
+## Marking designed blocks for the story page (`data-keep`)
+
+Every issue is also pushed to sectors.app as a story page, converted from this HTML to
+markdown by mailroom's GitHub sync. Markdown has no way to say "three stat tiles in a row", so
+a designed block left unmarked is flattened: tile values and card titles become headings (and
+table-of-contents entries), header-less tables turn into broken rows, and label/value pairs run
+together. Put `data-keep="1"` on the outermost element of any block that is a layout rather than
+prose, and the sync carries it to the story page as the email draws it:
+
+- stat-tile rows and company cards with stat tiles, including the glossary or "how to read"
+  card, the at-a-glance tile row and the forecast tile row
+- strips and grids drawn from cells (month-by-month heat strips, bar rows made of table cells)
+- any table whose first row is not a header, or whose cells hold nested blocks
+
+```html
+<div data-keep="1" style="background:#f2ede4;border-radius:12px;padding:16px 20px 12px 20px;">...</div>
+```
+
+Do not mark prose, ordinary header-row data tables, headings, lists or chart images: those
+convert cleanly and are better as real markdown on the site. Mark the outermost block only; a
+`data-keep` inside another is ignored. The attribute is invisible in email clients and is
+stripped before the block is written to the page.
+
 ## Sector spotlight layout (confirmed 2026-10-22)
 
 `sector-spotlight` shares the company issues' shell and components and adds its own set in

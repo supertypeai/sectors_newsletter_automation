@@ -20,4 +20,6 @@ Every section heading carries a **claim**, phrased as the finding ("The Sell-Off
 8. **Key takeaway.** Claim heading, an "In plain terms" callout (two sentences a non-investor can repeat), an "If you follow the economy" paragraph, an "If you invest" paragraph that covers the median, the weighted figure and the featured name's trade-off, and a "What to watch" callout. Valuation context only. Do not append a standalone "this is not a call" line, because the footer disclaimer carries it.
 9. **CTA card, Upcoming Events, Sources, Appendix, disclaimer footer**, in that order.
 
+Every designed block (the tile cards, the How to Read box, the bar table, the group cards, the peer card, the flow strips, the forecast tiles) carries `data-keep="1"` so the story page keeps it whole; the components file marks each one.
+
 No hosted bar chart is required for this type: the bars, tiles, cards and flow strips are the visuals. Add a generated chart only when a series needs a shape the HTML blocks cannot draw.
