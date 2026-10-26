@@ -421,6 +421,10 @@ comes back empty; the whole board is free but slow.
 Split the output two ways: a **Mon-Fri week grid** for anything landing in the next five
 trading days, and a **"beyond the week" table** for everything further out.
 
+**An empty day shows `•`, nothing else.** A weekday with no event gets a cell holding a single
+`•` (grey, centred). Never "None", "N/A", "No events" or a dash: the weekly digest page
+renders the cell text as written, and every issue so far reads `•`.
+
 ### 4b. Scheduled macro rows (ported from monthly-market-pulse §8.10)
 
 Corporate actions alone leave the block blind to the events that actually move the whole
