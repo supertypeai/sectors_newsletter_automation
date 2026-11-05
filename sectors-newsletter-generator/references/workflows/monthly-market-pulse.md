@@ -272,10 +272,10 @@ Follow `../newsletter-format/skeletons/monthly-market-pulse.md` exactly:
   per endpoint actually called this run, and no macro items smuggled into it? Endpoints and
   fields only, with no section labels or usage notes attached to any bullet?
 
-## Bucket social cards (width rule)
+## Social post images (width rule)
 
-Monthly pulse renders its own charts by default. If the user supplies social cards from the
-carousel pipeline's bucket for any block, each one is set at exactly 268px wide, the same as
+Monthly pulse renders its own charts by default. If a block uses an image from a published
+Instagram post (an `image_urls` entry from `scripts/social-posts.mjs`), each one is set at exactly 268px wide, the same as
 weekly insights v2: `<img src="<url>" width="268" alt="..." style="display:block;width:268px;max-width:100%;height:auto;border-radius:8px;">`.
 Never full width, never `width:100%`, never another pixel value. Two cards under one heading
 sit side by side, each 268px.

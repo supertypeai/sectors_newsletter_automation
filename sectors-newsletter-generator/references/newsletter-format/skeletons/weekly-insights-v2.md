@@ -42,11 +42,11 @@ that leaves a finding empty, the finding goes too.
    **join of two sources** (movers × corporate actions, price × foreign flow, volume ×
    filings), each with a heading stating the finding, a social card image, and **three**
    short bullets, four at the outside. Never paragraphs. No restated caveats, no recaps of
-   the issue's own structure, no "taken together" closers, no production notes in captions. **The images are existing social cards from the carousel
-   pipeline's Supabase bucket, supplied by the user, never charts this skill renders**; ask
-   for the week's URLs before drafting the block. **There is no chart fallback**: a finding
+   the issue's own structure, no "taken together" closers, no production notes in captions. **The images come from posts already published on the
+   Sectors Instagram feed, listed by `scripts/social-posts.mjs` (Mailroom API), never charts
+   this skill renders**; run it for the window before drafting the block. **There is no chart fallback**: a finding
    with no eligible card is cut, and this type ships no `chart-<slug>.svg` at all. Two images under one heading go side by side; every
-   bucket image is exactly 268px wide (`width="268"`, `width:268px;max-width:100%`), never full width. Closes with a follow-us line (Instagram, Threads).
+   social image is exactly 268px wide (`width="268"`, `width:268px;max-width:100%`), never full width. Closes with a follow-us line (Instagram, Threads).
 5. **Insider Filings** — the 5 most recent disclosures as one table: date, holder, ticker,
    buy/sell, shares, stake before → after. Structured fields only, filtered by `timestamp`
    to on-or-before the window's Friday. Ranked by transaction value. No note under the table.

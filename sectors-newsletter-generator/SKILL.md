@@ -12,7 +12,7 @@ description: >-
   on BBRI earnings", "sector spotlight on the banks", "three-stocks story", "write up
   the new release feature", "announce the upcoming workshop", "watchlist performance
   digest", or "did you catch it piece on [ticker]". The deliverable is Markdown text and
-  tables, bite-sized and scannable, plus a required visual (a generated chart, or bucket social cards for weekly insights v2); it
+  tables, bite-sized and scannable, plus a required visual (a generated chart, or published Instagram post images for weekly insights v2); it
   is not a slides or video renderer. Do NOT use it for Instagram carousels or slides
   (use sectors-carousel), for video (use sectors-reels), or for non-IDX/non-SGX
   markets, and do NOT use it for lifecycle/CRM/transactional email (onboarding nudges,
@@ -171,9 +171,9 @@ see their own workflow docs.
    generated chart for the issue's hero trend (`newsletter-format.md`'s **Bite-sized &
    visual formatting** section, which routes chart work through the `dataviz` skill).
    **The one-chart rule does not apply to `weekly-insights-v2` at all**: that type
-   generates no chart, so there is no count to cap. Its findings block takes social cards
-   from the bucket and the URLs come from the user, so pause here and ask for them before
-   drafting block 4. Generating a graph there is a defect with no fallback, see Delivery.
+   generates no chart, so there is no count to cap. Its findings block takes images from
+   published Instagram posts, listed by `scripts/social-posts.mjs` (Mailroom API), so run it
+   for the window before drafting block 4. Generating a graph there is a defect with no fallback, see Delivery.
    That type also uses the ticker alone with no company name (hard rule 15).
 4. **Self-review** — the checklist at the end of the chosen workflow doc, plus
    `references/compliance.md`'s one-line test, plus a UTM check of every link against
@@ -305,8 +305,8 @@ workflow doc §3), then apply that one definition throughout.
     citation format**.
 15. **Two rules are `weekly-insights-v2` only, and stay that way** (confirmed 2026-08-31):
     (a) **ticker alone, no company name** in any block, where every other type still pairs
-    the ticker with the company's full name once per section; (b) **bucket social cards
-    only, no generated graph anywhere in the issue**, where every other type ships a
+    the ticker with the company's full name once per section; (b) **published Instagram
+    post images only, no generated graph anywhere in the issue**, where every other type ships a
     generated `chart-<slug>.svg`. Do not port either to another type, and do not apply
     another type's opposite habit to v2.
 
@@ -378,14 +378,16 @@ Finished issues land at:
   `newsletter/samples/<type-slug>/newsletter.html`; `newsletter-format.md`'s **Color
   convention** owns the shared HTML chrome and `workflows/upcoming-event.md` §4 carries the
   promo type's own delivery note.
-  **`weekly-insights-v2` satisfies the visual requirement with the social cards from the
-  carousel pipeline's Supabase bucket, not with a generated `chart-<slug>.svg`.** The
-  skill cannot list that bucket without a credential, so the URLs are **supplied by the
-  user**: once the week's findings are derived from the API, **stop and ask the user for
-  the eligible card URLs**. This ask is mandatory and blocking for this type; do not skip
-  it, do not guess filenames, and do not quietly render a chart in place of asking. **There
-  is no chart fallback for this type** (confirmed 2026-08-31): if the user has no eligible
-  card for a finding, cut the finding and build the block from the cards that exist. A
+  **`weekly-insights-v2` satisfies the visual requirement with images from posts already
+  published on the Sectors Instagram feed, not with a generated `chart-<slug>.svg`.** Once
+  the week's findings are derived from the API, run
+  `node scripts/social-posts.mjs --from <Mon> --to <Fri>`, which calls the Mailroom API and
+  lists each eligible post's `image_urls`, caption and content group; use an `image_urls`
+  entry as the `<img src>`. This step is mandatory for this type; do not guess URLs, and do
+  not quietly render a chart in its place. Ask the user only if the script fails or returns
+  nothing. **There
+  is no chart fallback for this type** (confirmed 2026-08-31): if no eligible post
+  illustrates a finding, cut the finding and build the block from the posts that exist. A
   generated graph anywhere in a `weekly-insights-v2` issue is a defect, and this type ships
   no `chart-<slug>.svg`. It is also
   the one exception to stage 3's "at most one generated chart per issue": its findings

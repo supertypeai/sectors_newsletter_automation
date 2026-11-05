@@ -233,35 +233,47 @@ data dump:
 
 ### Visuals: the social cards
 
-**Block 4 never renders its own images.** Its visuals are existing social cards from the
-carousel pipeline's bucket. Do not call `charts.mjs` for this block, do not produce a
-`chart-<slug>.svg` for it, and do not substitute a rendered chart because the card URLs were
-not to hand. Since the bucket cannot be listed without a credential (see below), the correct
-move when you don't have URLs is to **stop and ask the user for them**, not to generate
-something. There is no chart fallback in this type (confirmed 2026-08-31): if the user has
-no eligible card for a finding, drop that finding and write one the available cards support,
-or ship the block with fewer findings. A generated graph in a weekly-insights-v2 issue is a
-defect in every case, including a week with no eligible card.
+**Block 4 never renders its own images.** Its visuals are images from posts already
+published on the Sectors Instagram feed, listed by the Mailroom API. Do not call `charts.mjs`
+for this block, do not produce a `chart-<slug>.svg` for it, and do not substitute a rendered
+chart. There is no chart fallback in this type (confirmed 2026-08-31): if no published post
+illustrates a finding, drop that finding and write one the available posts support, or ship
+the block with fewer findings. A generated graph in a weekly-insights-v2 issue is a defect in
+every case, including a week with no eligible post.
 
-Block 4's images come from the carousel pipeline's Google Cloud Storage bucket:
+**Where the images come from (since 2026-11-05).** The Mailroom API replaced browsing the
+Google Cloud Storage bucket and asking the user for URLs. Run:
 
 ```
-https://storage.googleapis.com/sectorsapp-sea/social_media/<filename>
+node scripts/social-posts.mjs --from <Monday YYYY-MM-DD> --to <Friday YYYY-MM-DD> --save <issue-folder>/social-posts.json
 ```
 
-Public, unauthenticated, no signed-URL expiry, so email clients load them directly with no
-mirroring step. Filenames follow `<topic>_<YYYYMMDD>_<n>.jpg`, sometimes with a slide index
-(`foreign-flow-1_20260718_1.jpg`). **The date is the generation date, not the data window**,
-so read the window off the image itself and state it in copy. The worked sample's CUAN card
-is dated 10 July and covers 19 Jan to 9 Jul, which is why its bullets say so explicitly.
+The script calls `GET https://mailroom.supertype.ai/api/v1/social/posts?status=published&since=...`
+with `Authorization: Bearer <key>`, the key coming from `MAILROOM_API_KEY` or `config.json`'s
+`mailroomApiKey` (created in Mailroom under Settings, API keys). Note the host: the
+`api.mailroom.supertype.ai` form in the original handoff has no DNS record, the `/api/v1` path
+on `mailroom.supertype.ai` is the one that answers. Each post comes back with `image_urls`,
+`caption`, `content_group`, `content_type`, `published_at` and `permalink`. **Use an entry of
+`image_urls` directly as the `<img src>`.** Those URLs are public, unauthenticated and never
+expire, so email clients load them with no mirroring step.
 
-**Every bucket image is exactly 268px wide, strictly, no exceptions.** One image under a
+By default the script already applies the two mechanical filters below (window and feed
+only), drops `.mp4` slides because email clients cannot play video, and drops posts whose
+`assets_purged_at` is set. `--all` shows everything, stories and Threads included, for
+debugging only. The API's own `until` parameter does not filter on `published_at` reliably,
+which is why the script pulls from `since` and cuts the window itself in Asia/Jakarta time.
+
+A carousel post returns several `image_urls`, one per slide, in slide order. Pick the slide
+that carries the figure the finding is about, usually not the cover. Read the slide itself
+before choosing: open the URL and look at it.
+
+**Every social image is exactly 268px wide, strictly, no exceptions.** One image under a
 heading runs at 268px; two images under one heading go side by side, two columns, each 268px.
 Never full width, never `width:100%`, never a percentage, never another pixel value. Use this
 exact tag shape, `width` attribute and inline style both:
 
 ```html
-<img src="<bucket url>" width="268" alt="..." style="display:block;width:268px;max-width:100%;height:auto;border-radius:8px;">
+<img src="<image_url>" width="268" alt="..." style="display:block;width:268px;max-width:100%;height:auto;border-radius:8px;">
 ```
 
 `max-width:100%` is only the narrow-phone safety net and must never replace the 268px width.
@@ -269,88 +281,52 @@ Height stays `auto` so the card keeps its ratio.
 
 **Credit every social image to `instagram.com/sectorsapp`, always, whatever the actual
 source.** That is the public home of this content and the only attribution a reader should
-see. The storage bucket is internal plumbing: it may appear in an `<img src>` because that is
-how the image loads, and nowhere else. Never name the bucket, a filename, or a storage path in
-the appendix or in body copy, and never credit a different origin even when the asset came
-from somewhere else.
-
-Instagram itself is not scrapeable: `instagram.com/sectorsapp` returns no post data
-unauthenticated. Don't try. The bucket is upstream of the posts anyway.
+see. The storage URL is internal plumbing: it may appear in an `<img src>` because that is how
+the image loads, and nowhere else. Never name Mailroom, the bucket, a filename or a storage
+path in the appendix or in body copy.
 
 ### How to pick which images to use
 
 **Findings first, images second. Never the reverse.**
 
-Derive the week's findings from the API, then look for a card that illustrates one. Do not
-browse the week's renders and write findings around whatever exists — that hands editorial
-control to whatever marketing happened to produce, and it is how a card's numbers end up
-driving copy (the ANTM sign-flip below is exactly that failure). The copy's figures always
-come from the API; the card illustrates them.
+Derive the week's findings from the API, then look for a post that illustrates one. Do not
+read through the week's posts and write findings around whatever exists. That hands
+editorial control to whatever marketing happened to produce, and it is how a card's numbers
+end up driving copy (the ANTM sign-flip below is exactly that failure). The copy's figures
+always come from the Sectors API; the card illustrates them. The caption helps you match a
+post to a finding, and it is never a source for a figure.
 
 Selection criteria, applied in order:
 
-1. **Date filter first, and it is a hard filter.** Every filename carries a `YYYYMMDD`.
-   **Only cards whose `YYYYMMDD` falls inside the issue's Mon-Fri window are eligible.** A
-   card stamped after the window belongs to a later issue; one stamped before it has already
-   run. On the 6-10 Jul run this left exactly one eligible card,
-   `insider_cluster_cuan_20260710_2.jpg`, and correctly excluded the 20260717 and 20260718
-   renders.
-2. **Drop the story-only renders.** These prefixes go to Instagram Stories, not the feed, so
-   they expire after 24 hours. Exclude any filename starting with:
-
-   `filings-plain`, `filings_daily`, `broker-bandar`, `broker-trending`, `broker-weekly`,
-   `macro-news`, `news-tier1`
-
-   (Note the inconsistent separators, `filings-plain` with a hyphen but `filings_daily` with
-   an underscore. Match the strings exactly as listed.) Everything else in the bucket is
-   feed-eligible and fair game.
-
-   This rule exists because of the credit rule below. We attribute every image to
-   `instagram.com/sectorsapp`, so a reader who goes looking has to be able to find it. A story
-   render will be long gone by the time the newsletter lands, which makes the credit a dead
-   end and the issue look sloppy.
-3. **Then, does it illustrate a finding you have, or suggest one worth building?** The date
-   filter decides what is *available*; relevance decides what is *used*. A card that passes
+1. **Date filter first, and it is a hard filter.** Only posts whose `published_at` falls
+   inside the issue's Mon-Fri window (Asia/Jakarta) are eligible. A post published after the
+   window belongs to a later issue; one published before it has already run. The script's
+   `--from`/`--to` enforce this.
+2. **Instagram feed posts only.** `post_type: "story"` expires after 24 hours and
+   `platform: "threads"` duplicates the Instagram post, so both are out. This rule exists
+   because of the credit rule above: a reader who goes looking at `instagram.com/sectorsapp`
+   has to be able to find the image, and a story will be gone by the time the newsletter
+   lands. The script enforces this too.
+3. **Then, does it illustrate a finding you have, or suggest one worth building?** The
+   filters decide what is *available*; relevance decides what is *used*. A post that passes
    both filters and carries a real story is worth writing a finding around, provided the
-   finding is still derived from the API (see below).
-4. **Note the window gap.** The stamp is the generation date, not the data window. The CUAN
-   card is stamped 10 Jul but covers 19 Jan to 9 Jul, so its bullets say so. Read the window
-   off the image, always.
+   finding is still derived from the API.
+4. **Note the window gap.** The publish date is not the data window. A card published
+   10 Jul can cover 19 Jan to 9 Jul, and its bullets must say so. Read the window off the
+   image, always.
 5. **Reconciliation.** Every figure quoted from the card must match the API. If it doesn't,
    either drop the finding or keep the card as decoration and quote the API's numbers in the
    bullets. Never publish the card's number unchecked.
-6. **Sets.** A numbered pair (`-1`/`-2`) that shows both sides of one story, buy and sell,
-   counts as **one** finding and renders side by side in two columns.
+6. **Sets.** Two slides of one post that show both sides of one story, buy and sell, count
+   as **one** finding and render side by side in two columns.
 7. **Budget.** Two or three findings, so at most about four images. Cut the weakest.
 
-**Where the filenames come from.** The bucket lives at
-`https://console.cloud.google.com/storage/browser/sectorsapp-sea/social_media`.
-Read the file list there, take the names whose `YYYYMMDD` falls in the window, and build the
-public URLs from them.
-
-The bucket cannot be listed programmatically without a credential, and public reads only
-resolve for an exactly-known filename (a guessed name 404s, and the trailing `_<n>` is not
-predictable). So today the URLs are **supplied by the user at generation time**. Ask for
-them; do not attempt to enumerate or guess.
-
-**This ask is a blocking step in the run, not an optional convenience.** Sequence: derive
-the findings from the API, then ask the user for the week's card URLs, then write block 4
-around the cards that pass the filters. Ask once, listing the window's date range so the
-user knows which renders qualify. Do not proceed past block 4 having silently rendered a
-chart in place of the cards, and do not treat "no URLs in the prompt" as permission to
-generate. If the user answers that there is no eligible card this week, the findings block
-is rebuilt around the cards that do exist or shipped with fewer findings; a chart is never
-substituted.
-
-Two ways to fix that, when the user wants to:
-
-- **Manifest file (preferred, no credential).** Have the carousel pipeline write a small JSON
-  to a predictable public path as it renders, e.g.
-  `.../social_media/manifest_<YYYYMMDD>.json`, listing each render's filename, topic,
-  tickers and data window. The skill then fetches one known URL and picks against the
-  criteria above. Keeps the bucket private-by-obscurity and needs no key in this skill.
-- **Storage credential.** Give the skill a GCS credential so it can list by date prefix.
-  More power, more setup, and another secret to hold alongside `config.json`'s API key.
+**This lookup is a required step in the run.** Sequence: derive the findings from the API,
+run `social-posts.mjs` for the window, then write block 4 around the posts that pass the
+filters. Ask the user only when the script fails (missing key, API error) or returns nothing
+for the window; never fill the gap with a generated chart. In an unattended run
+(`NEWSLETTER_UNATTENDED=1`) there is nobody to ask: record the failure in `run-notes.md` and
+apply the no-eligible-post rule above.
 
 > **Resolved 2026-07-27: default to the exchange definition (`idx_daily_data`) for weekly
 > aggregated foreign flow. Never use the broker-domicile aggregation (`idx_broker_summary_daily`
@@ -407,7 +383,7 @@ Every figure in block 4 is restated as HTML text under its image, because many c
 remote images by default. Alt text carries the full figure set for the same reason. This is
 the type's substitute for the standard `chart-<slug>.svg` hero chart. This type ships no
 `chart-<slug>.svg` at all: `charts.mjs` is not called anywhere in a weekly-insights-v2 run,
-and the bucket cards are the issue's only images.
+and the Instagram post images are the issue's only images.
 
 ## 4. The What's Ahead calendar
 
@@ -733,13 +709,12 @@ right-hand column below.
   something the rows do not.
 - **No inverted-pair sentences anywhere** (§5b): no "not X, but Y", "rather than", "isn't
   A, it's B", "not proof of", "the pattern isn't clean". Positive claim, then stop.
-- **Every bucket image in block 4 carries `width="268"` and `style="...width:268px;max-width:100%;..."`.**
+- **Every social image in block 4 carries `width="268"` and `style="...width:268px;max-width:100%;..."`.**
   `width:100%` or any other width is a defect, fix before shipping.
-- **Block 4's images are bucket social cards only.** Every `<img src>` in the block starts
-  `https://storage.googleapis.com/sectorsapp-sea/social_media/`. A `mailroom-email-assets`
-  URL, a `charts.mjs` render or any other generated image in this block is a defect: stop
-  and ask the user for the week's card URLs instead of shipping a substitute. If no eligible
-  card exists for a finding, cut the finding.
+- **Block 4's images are published Instagram post images only.** Every `<img src>` in the
+  block is an `image_urls` entry returned by `scripts/social-posts.mjs` for this window. A
+  `charts.mjs` render or any other generated image in this block is a defect. If no eligible
+  post exists for a finding, cut the finding.
 - **Does the Summary ship in full** (bull read, bear read, What to watch next), and does every bullet in blocks 4 and 8 lead with a reading and use at most two figures?
 - **Are all section titles exactly the fixed titles above**, and does every finding heading carry the weekly figure?
 - **No em dashes or en dashes anywhere in the issue**, Sources and Appendix included. Use a
@@ -776,11 +751,11 @@ right-hand column below.
   restatement? Bullets, never paragraphs?
 - Were the findings derived from the API **first**, with cards picked to illustrate them,
   rather than written around whatever images existed?
-- **Are block 4's visuals real bucket social cards, not generated charts?** Was the user
-  asked for the week's card URLs before drafting the block? A rendered `chart-*.svg` in this
-  block is a defect, with no exception: a week short on cards ships fewer findings.
-- Does every card URL's `YYYYMMDD` fall inside this issue's Mon-Fri window, with story-only
-  prefixes excluded and every image credited to `instagram.com/sectorsapp`?
+- **Are block 4's visuals real published post images, not generated charts?** Was
+  `social-posts.mjs` run for the window before drafting the block? A rendered `chart-*.svg` in
+  this block is a defect, with no exception: a week short on posts ships fewer findings.
+- Was every image's post published inside this issue's Mon-Fri window, an Instagram feed
+  post (never a story or Threads post), and credited to `instagram.com/sectorsapp`?
 - **Foreign flow uses the exchange definition (`idx_daily_data`) throughout, never the broker
   aggregation** (§3), pulled via the fixed `foreign-flow-range.sql` query, not a per-ticker API
   loop. Card figures and prose figures must come from the same method; exchange and broker
@@ -807,8 +782,8 @@ right-hand column below.
   list. A news outlet URL anywhere in Headlines, What's Ahead or the findings bullets is a
   defect: move it to Sources and leave nothing in the body.
 - **No generated chart anywhere in the issue.** No `chart-*.svg` in the delivery folder, no
-  `charts.mjs` call in the run. Block 4's images are bucket social cards or the finding is
-  cut.
+  `charts.mjs` call in the run. Block 4's images are published Instagram post images or the
+  finding is cut.
 - Bullets in the findings block: **three each**, four at the outside? Any restated caveat,
   structural recap, "taken together" closer or production note ("chart generated this run",
   "no matching social card") cut?
@@ -821,11 +796,10 @@ right-hand column below.
   disclaimer? **Endpoints and field names only**, one bullet per endpoint, with no section
   label, chart name, table name, derivation or usage note attached to any bullet
   (`../newsletter-format.md`'s Appendix section)?
-- Appendix credits `instagram.com/sectorsapp` for every social image, with no bucket name,
-  filename or storage path anywhere in reader-facing copy?
-- No story-only render used (`filings-plain`, `filings_daily`, `broker-bandar`,
-  `broker-trending`, `broker-weekly`, `macro-news`, `news-tier1`)? Those expire in 24 hours
-  and would make the Instagram credit a dead end.
+- Appendix credits `instagram.com/sectorsapp` for every social image, with no Mailroom,
+  bucket name, filename or storage path anywhere in reader-facing copy?
+- No story used (`post_type: "story"`)? Stories expire in 24 hours and would make the
+  Instagram credit a dead end.
 - **UTMs on every `sectors.app` link and on nothing else?** Third-party citations, Instagram
   and Threads stay clean. `&amp;` separators in the HTML, plain `&` in the Markdown.
 - `newsletter.md` and `newsletter.html` both updated, never one alone?

@@ -11,11 +11,11 @@ order, and `newsletter/samples/weekly-insights-v2/` for the worked reference. In
 settle the Mon-Fri window, then build nine blocks. Key Data Bites
 carries every computed market-level fact; Other Major Headlines carries every news-sourced
 one; the two must never repeat a fact. The single analysis block joins two sources to find
-something the tables don't already say, illustrated with the carousel's social cards from the
-Supabase bucket. Those cards are **never** charts this skill renders: the bucket can't be
-listed without a credential, so pause and ask the user for the week's URLs before drafting
-the findings block, and render a chart only if the user confirms nothing eligible exists.
-Every bucket card is set at exactly 268px wide (see the workflow's Visuals section).
+something the tables don't already say, illustrated with images from posts already
+published on the Sectors Instagram feed. Those images are **never** charts this skill renders:
+run `scripts/social-posts.mjs` for the window (Mailroom API) before drafting the findings
+block and pick from its `image_urls`; a finding with no eligible post is cut, never charted.
+Every social image is set at exactly 268px wide (see the workflow's Visuals section).
 What's Ahead closes with two to four dated, cited, mapped macro rows alongside the corporate
 actions, and **Summary** (bull read, bear read, what to watch next) sits between it and the
 CTA. Four blocks, four strictly separate jobs, and this is the type's main failure mode:

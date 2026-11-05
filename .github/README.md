@@ -127,8 +127,8 @@ used to provide. Do these in order before letting the cron fire:
 documented default at every point it would normally ask; see **Running unattended**
 in `sectors-newsletter-generator/SKILL.md` for the full table. The short version:
 issue type defaults to `weekly-insights-v2`, foreign flow uses the exchange
-definition, block 4 visuals are generated with `charts.mjs` rather than waiting on
-social-card URLs, and a missing `samples/` folder is noted rather than fatal.
+definition, block 4 visuals come from `scripts/social-posts.mjs` (Mailroom API) with
+no human in the loop, and a missing `samples/` folder is noted rather than fatal.
 
 Two things still fail the run loudly, because the alternative is publishing something
 false: a required block whose data comes back empty, and any figure that would have to
@@ -145,13 +145,13 @@ on direction, not just magnitude. This one genuinely needs the Supabase MCP conn
 without it, the skill degrades gracefully rather than failing — the foreign-flow line
 is omitted and noted.
 
-Block 4's **visuals** default to a real social card over a generated chart whenever one
-is eligible — but this now lists our own GCP bucket (`sectorsapp-sea`) directly over
-plain public HTTP (see `references/workflows/weekly-insights-v2.md`'s "Where the
-filenames come from"), not Supabase's storage table. **No credential, no MCP connector,
-and no setup needed for this one** (changed 2026-08-24 — was through the Supabase MCP
-connector, same as foreign flow; the carousel pipeline's Supabase bucket still exists
-but the skill no longer reads it).
+Block 4's **visuals** are images from posts already published on the Sectors Instagram
+feed. Since 2026-11-05 the skill lists them through the Mailroom API
+(`GET https://mailroom.supertype.ai/api/v1/social/posts?status=published&since=...`) via
+`sectors-newsletter-generator/scripts/social-posts.mjs`, and uses each post's
+`image_urls` directly as the `<img src>`. It needs the `MAILROOM_API_KEY` secret, which
+the draft job now passes in; the key must be allowed to read social posts (Mailroom,
+Settings, API keys). No Supabase connector is involved.
 
 #### Supabase MCP setup
 
