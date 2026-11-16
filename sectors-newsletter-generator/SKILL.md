@@ -89,7 +89,7 @@ skeleton under `references/newsletter-format/skeletons/`; both files share the s
 | family | type (slug) | what it is |
 |---|---|---|
 | Market Performance | **Weekly Insights v2** (`weekly-insights-v2`) | **the default weekly send.** Nine blocks, info-packed, no long-form reading: greeting, Key Data Bites, Top Movers, one "What the Data Unearthed" findings block built on the social cards, Insider Filings, Headlines, a corporate-action week calendar, Summary, CTA. Monday send (Hard rule 11) |
-| Market Performance | **Monthly market pulse** (`monthly-market-pulse`) | the trailing 30 days' movers, most-traded and broker flow, each aggregated across the whole window, not a single day's snapshot. Tight, table-first |
+| Market Performance | **Monthly market pulse** (`monthly-market-pulse`) | the trailing 30 days explained: the month's big events and what each did to named stocks, movers and broker flow side by side with the reasons behind them, and three or four names worth a closer look. Every section aggregates the whole window, and every paragraph adds insight the tables cannot show |
 | Market Insights | **Macro-reaction** (`macro-reaction`) | tie the last ~2 days of macro news to affected sectors/tickers, then report each name's fundamentals and valuation context |
 | Company Insights | **Three-stock storytelling** (`three-stock-story`) | three companies sharing one pattern this week, each with a dated timeline, numbers and key takeaway, attributed forward view |
 | Company Insights | **Single company deep dive** (`single-company-deep-dive`) | one company covered whole: business model and revenue mix, competitive moat tested against named peers, the unit-economics margin ladder, the macro forces on its line items, then the long-term read both ways. A recent event is only the reason to publish, a tenth of the issue. Runs 900-1,200 words under a three-figures-per-paragraph density cap. **Two formats, ask which:** the full deep dive, or an **earnings review** (one quarter's print explained: price chart, how-it-makes-money sankey, quarter at a glance, three things that mattered, open question) that also ships as a `newsletter.pdf` |
@@ -128,7 +128,7 @@ anything that doesn't serve the goal.
 | --- | --- |
 | **Upcoming event** | Register as a workshop participant (click through and sign up before it fills / closes) |
 | **New release feature** | Click "Try the feature now" and actively use the highlighted feature on real data |
-| **Monthly market pulse** | Click into the tickers/tables to check the month's movers live |
+| **Monthly market pulse** | Click into the closer-look names and tables to check the month's moves live |
 | **Macro-reaction** | Explore the affected sectors/tickers on Sectors to size up the move |
 | **Three-stock story** | Click through to each company's page on Sectors |
 | **Single company deep dive** | Open that company's report on Sectors and work the segment, peer and ratio data themselves |

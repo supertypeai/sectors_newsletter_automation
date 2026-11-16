@@ -265,6 +265,14 @@ convert cleanly and are better as real markdown on the site. Mark the outermost 
 `data-keep` inside another is ignored. The attribute is invisible in email clients and is
 stripped before the block is written to the page.
 
+## Monthly market pulse layout (confirmed 2026-11-01)
+
+`monthly-market-pulse` shares the company issues' shell and adds its own set in
+`newsletter-format/monthly-pulse-components.md`: stat tiles on a shaded card, the At a Glance
+box, event cards with a What it did callout, two-column movers and broker tables, closer-look
+cards and side-by-side bull and bear panels. Reference issue
+`samples/monthly-market-pulse/newsletter.html`.
+
 ## Sector spotlight layout (confirmed 2026-10-22)
 
 `sector-spotlight` shares the company issues' shell and components and adds its own set in

@@ -86,7 +86,7 @@ with a one-angle, three-column peer table. HTML blocks in
 multiples", never "cheap" or "expensive". Valuation context only, never "the one to buy."
 
 ### Monthly market pulse
-Open `references/workflows/monthly-market-pulse.md`. In brief: `top-changes`
+Open `references/workflows/monthly-market-pulse.md`. The issue explains the month: major events with their measured impact by phase (approved flow queries, regulator and exchange actions first), then movers and broker flow side by side with reasons, then three or four names worth a closer look. Data in brief: `top-changes`
 (`periods=30d`) for the month's gainers/losers, `most-traded` over the 30-day window
 aggregated client-side into one ranking (the endpoint itself only returns per-date
 top-N), Broker Flow pulled via the dbquery skill's approved
