@@ -98,3 +98,12 @@ Three tiles in one row, `valign="middle"`: label, the earnings growth figure at 
 ## Takeaway block
 
 Order: small caps eyebrow "Key takeaway", a claim heading, the "In plain terms" callout (the whole issue in two sentences a non-investor can repeat), then labelled paragraphs "If you follow the economy" and "If you invest", then the "What to watch" callout. Callout markup is the Key takeaway callout in `company-issue-components.md`. Do not close on a standalone "this is not a call" line, since the footer disclaimer carries it, and keep the prose itself free of any recommendation.
+
+## Sentence rules for spotlight copy (from the 22 Oct 2026 banks review)
+
+The first draft read as machine-written and as a data dump. Avoid these shapes:
+
+- **Abstract subjects doing human verbs.** "This issue explains what the number does and does not tell you", "a gap that wide says one average hides two groups", "sorting the moves shows where the selling landed", "the group is not behaving as one group". Name the people or things instead: "half the banks have a lower P/E and half a higher one", "state-owned banks lost about 5%, small digital banks more than 20%".
+- **Announcing what the issue will do.** Open with the finding, never with a promise to explain.
+- **Definitions that talk about the metric.** Define a metric by what a reader does with it ("you pay IDR 8 for every IDR 1 of profit"), in plain verbs, not "tells you" or "means that".
+- **Stacked figures.** At most two or three numbers per sentence, and every figure must support the sentence's claim. Move the rest into the table.

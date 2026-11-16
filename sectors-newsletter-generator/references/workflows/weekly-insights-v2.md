@@ -457,6 +457,60 @@ be vague.
 Write the closing claim in plain declarative prose. It is the one place in the issue that
 interprets rather than reports, so it should read like a view, not like a caption.
 
+**Figures: default to none.** The checklist's "no figure reprinted" is the default. The
+load-bearing exception above covers only a reversal, where both sides of the flip are the
+argument. A breadth count, a close, a stake, a rule's percentage or a profit growth rate is
+referred to in words ("nearly the whole LQ45", "its Friday close", "the tighter auto-reject
+floor", "double-digit profit growth").
+
+### Summary repetition gate (run before shipping)
+
+The 2026-10-26 draft shipped a Summary in which five of six bullets restated an earlier block
+and two bull bullets argued the same point. Run every bullet through these checks and rewrite
+or cut any that fails:
+
+1. **Not a Data Unearthed bullet in new clothes.** Put each Summary bullet next to every
+   block-4 bullet. If the closing claim matches a block-4 closing claim (for example block 4
+   says "domestic buyers absorbed the foreign supply" and the Summary says the recovery has
+   "a local bid that does not wait for foreign flows"), it is a restatement. The Summary
+   bullet has to go one step further, to what that claim means for positioning, liquidity or
+   policy transmission.
+2. **One idea per bullet, and no two bullets on one idea.** Within a side, name each bullet's
+   closing claim in five words. If two names overlap ("domestic demand carries the market",
+   "domestic sources stay active"), merge them into one bullet and use the freed slot for a
+   different argument or drop it. Two strong bullets beat three where one repeats.
+3. **Close on an implication, not on arithmetic.** "Most of the drawdown remains open" is the
+   number said again. "A week of local buying has not brought back the holders who left" is
+   a claim about who owns the market. Ask: does the last clause tell the reader something the
+   figure alone did not?
+3a. **No tacked-on closer.** End the bullet where the claim ends. A trailing ", and it did
+   not rest on a handful of thin names" or ", and that gap is what a recovery has to close"
+   adds no information, reads as AI-written, and the user cut both on 2026-10-26. Test: delete
+   the final ", and ..." or ", so ..." clause. If the bullet loses no fact and no claim, leave
+   it deleted.
+4. **Every premise is in the issue, at the scope the issue shows.** A plural needs plural
+   evidence. If the issue shows foreign selling in BBCA only, the Summary cannot say
+   "foreign selling stayed concentrated in the largest banks".
+5. **Vocabulary cap.** Any one ticker appears at most twice across the whole Summary, What to
+   watch next included, and any one theme word (MSCI, domestic, foreign, buyback) at most
+   once per side. Repeating the same anchor in every bullet is how a Summary starts to read
+   as one point said six ways.
+6. **The tiebreaker must split the reads.** What to watch next names an event whose outcome
+   moves the variable the bull and bear reads disagree on. If the event's own What's Ahead
+   row says it does not touch the watched names (the 2026-10-26 draft watched BBCA and BBRI
+   into the 2 November JCI change while the row said the LQ45 already excludes the affected
+   stocks), pick another row. When the disagreement is foreign versus domestic money, the
+   watched measure is foreign net flow, and the event is the one global funds react to.
+
+Worked fix, 2026-10-26, bear read bullet 3:
+
+- Shipped: "A tighter auto-reject floor, IPO conduct sanctions and index exclusions reshape
+  liquidity and ownership in the concentrated names, so price discovery there changes
+  whatever MSCI decides." Three Headlines items listed again, a vague close.
+- Fixed: "The tighter auto-reject floor and the 2 November exclusions both thin out trading
+  in the concentrated names that led past rallies, so their liquidity shrinks whatever MSCI
+  decides." Two items joined into one concrete consequence.
+
 Shape:
 
 - **The bull read** — two or three bullets.
@@ -733,6 +787,9 @@ right-hand column below.
   only), each bullet joining two reported things rather than restating one, the bear read
   given genuine weight, and **What to watch next** a specific dated event rather than a
   vague "time will tell"? Every forward-looking bullet attributed or reframed as a condition?
+  Does every bullet pass all six checks of the **Summary repetition gate** in §4c (no block-4
+  restatement, no two bullets on one idea, implication close, premise at the issue's scope,
+  ticker and theme-word caps, a tiebreaker that splits the reads)?
 - Key Data Bites: every line computed from an endpoint, none duplicated in Headlines, and
   **facts about the same subject grouped into one point** with indented sub-points (benchmark
   returns with breadth and best/worst constituent, foreign flow with largest buy and sell)?

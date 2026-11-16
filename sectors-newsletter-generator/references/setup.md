@@ -43,7 +43,7 @@ references/
     weekly-insights-v2.md         the current Monday digest: nine blocks, social-card
                                    findings block, corporate-action week calendar plus
                                    scheduled macro rows, two-sided read before the CTA
-    monthly-market-pulse.md       30-day movers/volume/broker-flow recipe, table-first
+    monthly-market-pulse.md       30-day event impact, movers, broker flow and closer-look recipe
     macro-reaction.md             macro sourcing + affected-ticker + valuation-context
                                    recipe, non-advice framing
     three-stock-story.md          stock-pick discovery + history/people research +
