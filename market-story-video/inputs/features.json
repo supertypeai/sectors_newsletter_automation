@@ -76,7 +76,7 @@
       "who": "Retail investors following a handful of IDX names across several brokers.",
       "demo": { "kind": "shot", "src": "", "device": "browser", "url": "sectors.app/watchlist" },
       "cta": "sectors.app/watchlist",
-      "verified": "Surface confirmed in assets/brand/app-overview.png (Watchlist tab) and the sibling sectors-newsletter-dbquery skill, which reads watchlist tracking per user. No footage captured yet."
+      "verified": "Surface confirmed in assets/brand/app-overview.png (Watchlist tab) and the sibling st-sectors-dbquery skill, which reads watchlist tracking per user. No footage captured yet."
     }
   },
 

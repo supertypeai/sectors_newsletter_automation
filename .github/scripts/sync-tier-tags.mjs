@@ -23,7 +23,7 @@ import { die, getFromMailroom, patchToMailroom } from "./mailroom.mjs";
 import { runApprovedQuery } from "./query-supabase.mjs";
 
 const approvedQueryPath = new URL(
-  "../../sectors-newsletter-dbquery/scripts/approved-queries/tier-sync.sql",
+  "../../st-sectors-dbquery/scripts/approved-queries/tier-sync.sql",
   import.meta.url
 ).pathname;
 

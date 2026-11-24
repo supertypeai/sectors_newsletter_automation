@@ -43,7 +43,7 @@ import { die, getFromMailroom, postToMailroom } from "./mailroom.mjs";
 import { openSupabaseSession, executeInSession, runApprovedQuery } from "./query-supabase.mjs";
 
 function approvedQueryPath(file) {
-  return new URL(`../../sectors-newsletter-dbquery/scripts/approved-queries/${file}`, import.meta.url).pathname;
+  return new URL(`../../st-sectors-dbquery/scripts/approved-queries/${file}`, import.meta.url).pathname;
 }
 
 /**

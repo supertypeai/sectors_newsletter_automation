@@ -5,7 +5,7 @@
 // JSON-RPC protocol directly with `fetch`. Protocol details below were verified
 // live against the real endpoint, not assumed from the interactive flow.
 //
-// Safety rule ported from sectors-newsletter-dbquery/references/supabase-access.md:
+// Safety rule ported from st-sectors-dbquery/references/supabase-access.md:
 // that doc's "approved-queries/ is the only run source" rule was written for an
 // interactive drafting session, but the same hazard exists here — a headless cron
 // with no human watching must never be able to run anything but a pre-approved,
@@ -20,7 +20,7 @@ const MCP_URL = "https://mcp.supabase.com/mcp";
 const PROJECT_ID = "rfiycxgjbnkefczvbosm";
 
 const APPROVED_QUERIES_DIR = resolve(
-  new URL("../../sectors-newsletter-dbquery/scripts/approved-queries", import.meta.url).pathname
+  new URL("../../st-sectors-dbquery/scripts/approved-queries", import.meta.url).pathname
 );
 
 /**
@@ -34,7 +34,7 @@ function assertApprovedPath(sqlFilePath) {
   if (real !== dir && !real.startsWith(dir + sep)) {
     die(
       `refusing to run "${sqlFilePath}": only files under ` +
-        `sectors-newsletter-dbquery/scripts/approved-queries/ may be executed by ` +
+        `st-sectors-dbquery/scripts/approved-queries/ may be executed by ` +
         `this script. fixed-queries.sql is staging only, never a run source.`
     );
   }

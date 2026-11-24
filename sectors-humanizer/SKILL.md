@@ -91,6 +91,6 @@ than echoing it, so fragments are not a stylistic choice.
 ## Scope
 
 Operates on `newsletter.html` only. `newsletter.md` is the archived record and stays as
-Claude wrote it. Do not point this at anything under `sectors-newsletter-dbquery/` while a
+Claude wrote it. Do not point this at anything under `st-sectors-dbquery/` while a
 free-tier key is in use — free tier permits Google to train on the payload, and those
 templates carry customer account state.

@@ -6,7 +6,7 @@ Claude skills for Sectors content: newsletters, Instagram carousels, and market 
 | --- | --- |
 | `sectors-newsletter-generator` | Data-backed IDX newsletter issues (Markdown + send-ready HTML) |
 | `sectors-humanizer` | A Gemini rewrite of a generated issue's prose, markup and figures untouched |
-| `sectors-newsletter-dbquery` | Lifecycle/CRM email off user-account data |
+| `st-sectors-dbquery` | Approved-query gateway to the Sectors Supabase project (lifecycle nudge audiences, tier sync) |
 | `sectors-carousel` | Instagram carousel decks |
 | `market-story-video` | Remotion market-story videos |
 
