@@ -5,10 +5,9 @@
 This file is the full treatment. The one-paragraph version lives in `./core.md` section 7, and the rules that override style in every case are `./core.md` section 1.
 
 <!-- GENERATED FILE. Do not edit. -->
-> **Generated copy.** The source of truth for this file lives in the Sectors skills
-> repo at `_shared/writing/brand-voice.md`, alongside the other content skills. This copy exists
-> because `sectors-newsletter` is shared with the company and run on machines that do not have this repo. Edit the canonical file and re-run
-> `node _shared/writing/sync.mjs`; an edit made here is overwritten on the next sync.
+> **Generated copy.** The source of truth for this file is `sources/sectors/writing/brand-voice.md` in the
+> supertypeai/skills repo. This copy exists because `st-sectors-newsletter` installs on its own and runs on machines that do not have this repo.
+> Edit the canonical file and run `npm run sync` in that repo; an edit made here is overwritten on the next sync.
 
 ## Who is talking
 

@@ -48,6 +48,10 @@ jobs:
       # Tells the skill no human is reachable: never ask, never stall at a menu.
       NEWSLETTER_UNATTENDED: "1"
       SECTORS_API_KEY: ${{ secrets.SECTORS_API_KEY }}
+      # Nobody can approve a credit-guard prompt in CI; the skill's sectors.mjs refuses >5-credit batches without this.
+      SECTORS_CONFIRM: "1"
+      # scripts/social-posts.mjs (weekly and monthly drafts) reads the Instagram post images from Mailroom.
+      MAILROOM_API_KEY: ${{ secrets.MAILROOM_API_KEY }}
       # Authenticates against an existing Claude Pro/Max/Team/Enterprise subscription,
       # so this needs no separate pay-per-token API plan. Generate the value by running
       # `claude setup-token` locally (one-year OAuth token) and store it as a secret.
@@ -105,7 +109,11 @@ jobs:
       - name: Make the skill discoverable
         run: |
           mkdir -p .claude/skills
-          ln -sfn "$GITHUB_WORKSPACE/sectors-newsletter-generator" .claude/skills/sectors-newsletter-generator
+          ln -sfn "$GITHUB_WORKSPACE/sectors-newsletter-generator" .claude/skills/st-sectors-newsletter
+          ln -sfn "$GITHUB_WORKSPACE/st-sectors-dbquery" .claude/skills/st-sectors-dbquery
+          # Fail closed: the skill's guard hook denies every Supabase write and any SQL that is not an
+          # approved query, so register it whether or not the connector ends up configured below.
+          jq -n --arg cmd "node $GITHUB_WORKSPACE/st-sectors-dbquery/scripts/supabase-guard.mjs" '{hooks: {PreToolUse: [{matcher: "mcp__supabase__.*", hooks: [{type: "command", command: $cmd}]}]}}' > .claude/settings.json
           mkdir -p "$NEWSLETTER_HOME"
 
       # sectors.mjs and charts.mjs are dependency-free; this is only for
@@ -157,7 +165,7 @@ jobs:
         if: ${{ github.event.inputs.skip_draft != 'true' }}
         run: |
           TODAY_WIB=$(TZ=Asia/Jakarta date +%F)
-          claude -p "Write this week's ${ISSUE_TYPE} newsletter issue using the sectors-newsletter-generator skill. Deliver to \$NEWSLETTER_HOME. Today's date in Asia/Jakarta (WIB) time is $TODAY_WIB — use this exact date as the issue date per Hard rule 11, not whatever date your own environment reports (which may be UTC and several hours behind WIB depending on when this run fires). This is an unattended CI run: do not ask any questions, apply the documented unattended defaults, and record every default you took in the separate run-notes.md file the skill documents for this — never as an HTML comment in newsletter.html, and never in the visible body or the reader-facing Appendix." \
+          claude -p "Write this week's ${ISSUE_TYPE} newsletter issue using the st-sectors-newsletter skill. Deliver to \$NEWSLETTER_HOME. Today's date in Asia/Jakarta (WIB) time is $TODAY_WIB — use this exact date as the issue date not whatever date your own environment reports (which may be UTC and several hours behind WIB depending on when this run fires). This is an unattended CI run with no one to answer: never ask the user anything, never wait for approval and never stop to offer a menu. Wherever the skill says to ask, confirm or let the user choose, take the most conservative option and keep going. If the ask does not name a sector, company or set of stocks, pick one the way the workflow doc describes. Use the exchange definition (idx_daily_data) for any foreign flow figure. Database reads go only through the st-sectors-dbquery skill and its approved queries: never write SQL of your own and never run a query that is not in its approved-queries folder. If the Supabase connector or an approved query is unavailable, use the API route the workflow doc gives, and where there is none leave that figure out. If scripts/social-posts.mjs fails or returns nothing, cut that finding and never replace it with a generated chart. Credit-guard approvals are already given through SECTORS_CONFIRM. Record every default, assumption and omission in a separate run-notes.md file in the issue folder, never in newsletter.html, never in newsletter.md and never in the reader-facing Appendix." \
             --permission-mode bypassPermissions \
             --model claude-sonnet-5-5 \
             --effort medium \
@@ -212,9 +220,11 @@ jobs:
       - name: Locate the delivered issue
         id: issue
         run: |
-          folder=$(ls -d "$NEWSLETTER_HOME"/newsletter_*_"${ISSUE_TYPE}" 2>/dev/null | sort | tail -1)
-          if [ -z "$folder" ]; then
-            echo "No issue folder was produced under $NEWSLETTER_HOME" >&2
+          # Today's folder only (WIB date): the newsletter/ directory holds every past issue, so
+          # "the latest folder" would quietly re-publish an old issue if drafting produced nothing.
+          folder="$NEWSLETTER_HOME/newsletter_$(TZ=Asia/Jakarta date +%F)_${ISSUE_TYPE}"
+          if [ ! -d "$folder" ]; then
+            echo "No issue folder for today was produced: expected $folder" >&2
             exit 1
           fi
           for f in newsletter.md newsletter.html; do

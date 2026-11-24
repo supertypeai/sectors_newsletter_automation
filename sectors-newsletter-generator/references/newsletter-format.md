@@ -1,6 +1,6 @@
 # Newsletter format, the Markdown output contract
 
-The prose equivalent of the carousel skill's `deck-format.md`. Every issue is a single
+The Markdown output contract. Every issue is a single
 `.md` file shaped like this, regardless of type.
 
 ## Header block (top of the file, before the body)
@@ -9,54 +9,33 @@ The prose equivalent of the carousel skill's `deck-format.md`. Every issue is a 
 ---
 subject: <the email subject line>
 preview: <the inbox preview/preheader text>
-issue_type: weekly-insights-v2 | macro-reaction | three-stock-story | single-company-deep-dive | sector-spotlight | monthly-market-pulse | upcoming-event | new-release-feature | watchlist-performance-digest | did-you-catch-it
+issue_type: weekly-insights-v2 | three-stock-story | single-company-deep-dive | sector-spotlight | monthly-market-pulse
 date: <YYYY-MM-DD, the issue/send date>
 data_as_of: <YYYY-MM-DD, the API's as-of date>
-sample_recipient: <watchlist-performance-digest only: a scrubbed placeholder
-  identifier for the worked example, never a real email or full name, e.g.
-  "sample-row-1">
 ---
 ```
 
+Optional keys, only on the types named:
+
+```markdown
+issue: <weekly-insights-v2 only: the issue number, the previous weekly issue's `issue:` plus one>
+window: <monthly-market-pulse only: YYYY-MM-DD to YYYY-MM-DD, the 30-day window>
+exchange: <monthly-market-pulse only: IDX | SGX>
+campaign: <monthly-market-pulse only: the `utm_campaign` value, <type-slug>_<YYYY-MM-DD>>
+```
+
+The type key is `issue_type`. Some older delivered issues wrote `type`; write `issue_type`.
+
 - **`subject`**: ≤ ~9 words. States the verdict or hook, not a category. Passes the same
   test as a carousel cover headline — "trades at 12x, near a 5-year low" beats "This
-  Week in Banks." No hype, no advice framing (never "3 stocks to buy now"). For
-  `watchlist-performance-digest`, the subject itself carries a `{{merge_tag}}` (it's a
-  template, not one fixed line), see **Merge-tag convention** below.
+  Week in Banks." No hype, no advice framing (never "3 stocks to buy now").
 - **`preview`**: ~40-90 characters. Re-angles the subject with a second detail; never
   restates it verbatim (the same rule the social skills apply to a caption's first line).
 - **`issue_type`**: one of the built workflow slugs, matches the folder/file naming in
   the delivery convention (see SKILL.md).
 - **`date`** and **`data_as_of`**: the API "today" lags ~1 day (UTC), so these can differ
   from the actual send date. Always show both.
-- **`sample_recipient`**: `watchlist-performance-digest` only, identifies which
-  dbquery-supplied audience row the worked example was rendered from, without
-  embedding the real identifier (dbquery's `references/supabase-access.md` PII rule
-  applies here too, same discipline, this skill has no DB credential of its own but
-  still handles the real rows the dbquery skill hands back).
 
-## Merge-tag convention (watchlist-performance-digest only)
-
-Every other issue type in this skill is a single broadcast piece, no merge tags. This
-one type is a reusable per-recipient template, borrowing dbquery's convention
-wholesale rather than inventing a second one:
-
-- Every per-recipient field is a `{{snake_case_field}}` tag, matching a column the
-  dbquery skill's `watchlist-tracked-interest` query actually returns (`{{first_name}}`,
-  `{{tickers}}`, `{{sectors}}`) or a value computed at draft time from the live market
-  fetch for that recipient's tracked items (ranked table rows, the headline mover).
-  Don't invent a tag that doesn't trace to one of those two sources.
-- The **worked example** immediately below the template (or in a clearly separated
-  "Rendered example" section) shows the same body with every tag resolved against one
-  real sample row, proving the template reads right once filled in. Scrub any real
-  email/name in that rendering unless the user explicitly wants it kept for their own
-  review.
-- The market-blended figures (each tracked item's 7-day move, its peer comparison
-  where available) are computed at draft time from the live fetch, not stored as
-  static merge tags, since they depend on both the dbquery row and the live market
-  data at render time. Document that distinction inline in the template so a
-  downstream renderer knows which fields it must recompute per recipient at actual
-  send time versus which are static from the dbquery row.
 
 ## Opening line (first line of the body)
 
@@ -64,9 +43,10 @@ The body opens with an **H1 headline that states the issue's hook**, not a brand
 masthead. Same job as the `subject` field, the reader's actual news, phrased as a
 heading: `# A weaker rupiah splits banks and coal miners`, never `# Sectors Weekly` or
 `# Sectors Midweek`. It can differ in wording from `subject` but never in substance,
-they're the same hook said twice. Follow it with a one-sentence standfirst that adds a
-second, different detail (the same job the `preview` field does, don't repeat either
-verbatim). Data citations anywhere in the body say **`sectors.app`**, never "Sectors
+they're the same hook said twice. Unless the type's skeleton says otherwise, follow it with a
+one-sentence standfirst that adds a second, different detail (the same job the `preview` field
+does, don't repeat either verbatim). `monthly-market-pulse` and `three-stock-story` carry no
+standfirst, and the skeleton for the type always wins. Data citations anywhere in the body say **`sectors.app`**, never "Sectors
 API" or bare "Sectors" (`compliance.md` rule 6).
 
 ## Ticker-mention convention (enforce everywhere, no exceptions)
@@ -74,7 +54,7 @@ API" or bare "Sectors" (`compliance.md` rule 6).
 - **Bold, and never `$`-prefixed**: `**BBCA**`. The `$` cashtag is banned outright, see
   `SKILL.md` hard rule 16.
 - **Link every ticker mention, every occurrence, every issue type** (tightened
-  2026-08-31, applies to all ten types with no exception). Not once per section, not
+  2026-08-31, applies to all five types with no exception). Not once per section, not
   first-mention-only: the same ticker appearing nine times across an issue carries nine
   links to `[**BBCA**](https://sectors.app/idx/bbca)`, lowercase ticker, no `.JK`
   suffix, each with that block's own `utm_content` and `utm_term=<ticker>`. A reader
@@ -106,7 +86,7 @@ API" or bare "Sectors" (`compliance.md` rule 6).
 
 ## UTM convention (every issue type, every `sectors.app` link)
 
-The authority is `~/.claude/skills/UTM_CONVENTION.md`, the organization-wide standard. Read it
+The authority is `../_shared/UTM_CONVENTION.md`, the organization-wide standard. Read it
 before writing the first link of a draft and check the finished draft against it before
 shipping. What follows is the newsletter-specific application of that standard; where the two
 ever disagree, `UTM_CONVENTION.md` wins.
@@ -242,28 +222,13 @@ issues `newsletter_2026-10-15_three-stock-story` and `newsletter_2026-10-14_sing
 Copy it, change only text and numbers. These issues set the quality bar for both types: when
 a skeleton and a reference issue disagree, the reference issue wins and the skeleton gets fixed.
 
-## Marking designed blocks for the story page (`data-keep`)
+## Monthly market pulse layout (confirmed 2026-11-01)
 
-Every issue is also pushed to sectors.app as a story page, converted from this HTML to
-markdown by mailroom's GitHub sync. Markdown has no way to say "three stat tiles in a row", so
-a designed block left unmarked is flattened: tile values and card titles become headings (and
-table-of-contents entries), header-less tables turn into broken rows, and label/value pairs run
-together. Put `data-keep="1"` on the outermost element of any block that is a layout rather than
-prose, and the sync carries it to the story page as the email draws it:
-
-- stat-tile rows and company cards with stat tiles, including the glossary or "how to read"
-  card, the at-a-glance tile row and the forecast tile row
-- strips and grids drawn from cells (month-by-month heat strips, bar rows made of table cells)
-- any table whose first row is not a header, or whose cells hold nested blocks
-
-```html
-<div data-keep="1" style="background:#f2ede4;border-radius:12px;padding:16px 20px 12px 20px;">...</div>
-```
-
-Do not mark prose, ordinary header-row data tables, headings, lists or chart images: those
-convert cleanly and are better as real markdown on the site. Mark the outermost block only; a
-`data-keep` inside another is ignored. The attribute is invisible in email clients and is
-stripped before the block is written to the page.
+`monthly-market-pulse` shares the company issues' shell and adds its own set in
+`newsletter-format/monthly-pulse-components.md`: stat tiles on a shaded card, the At a Glance
+box, event cards with an unlabelled conclusion callout, two-column movers and broker tables, closer-look
+cards and side-by-side bull and bear panels. Reference issue
+`samples/monthly-market-pulse/newsletter.html`.
 
 ## Sector spotlight layout (confirmed 2026-10-22)
 
@@ -348,14 +313,13 @@ no-dash/no-AI-tell rules, it constrains *shape*.
   | **BBCA** | 5,850 | -3.3% |
   ```
 
-  A per-ticker valuation comparison (macro-reaction's core section, once there are 2+
-  tickers) uses the same move: a table for the shared metrics (price, P/E vs. peer
+  A per-ticker valuation comparison (once there are 2+ tickers) uses the same move: a table for the shared metrics (price, P/E vs. peer
   average, ROE, dividend yield) with one row per ticker, then a short paragraph under it
   for whatever doesn't fit a column (analyst coverage detail, a one-off fact).
 - **A table dropped inside a tinted/shaded section (any background other than the card's
   own `#fdf7ee`) needs its own background set explicitly**, on the `<table>` and on every
-  data `<tr>` (confirmed 2026-07-17, caught from a screenshot: `new-release-feature`'s
-  shaded `#f2ede4` Feature Highlight box rendered its ticker table's data rows as a bare
+  data `<tr>` (confirmed 2026-07-17, caught from a screenshot: a
+  shaded `#f2ede4` box rendered its ticker table's data rows as a bare
   white patch because neither the nested `<table>` nor its `<tr>`s carried a
   `background`). A `<td>`/`<tr>` with no background isn't reliably transparent in every
   email/browser renderer, don't assume the ancestor's tint shows through. Same applies to
@@ -370,16 +334,16 @@ no-dash/no-AI-tell rules, it constrains *shape*.
   this run, never estimated or redrawn from memory. Static only: this skill stays
   dependency-free by design (no R/Python animation toolchain installed as a hard
   requirement), so ship a still image, not a GIF, unless the user has explicitly asked to
-  add that toolchain for this run. **The email references a PNG, not the SVG** (mail clients
-  strip SVG): write `chart-<slug>.svg`, then run `node scripts/svg2png.mjs chart-<slug>.svg`,
-  which rasterises at 2x with the carousel skill's Puppeteer install, the same one
-  `html2pdf.mjs` already uses. Keep the SVG beside the PNG as the source. `<img>` tags carry
+  add that toolchain for this run. **The email and the Markdown reference the SVG.** Write `chart-<slug>.svg` and point both at
+  it. Rasterise to PNG only when the user asks for PNG in that run: then run
+  `node scripts/svg2png.mjs chart-<slug>.svg`, which renders at 2x with puppeteer (`npm install puppeteer` once in the skill folder, or an
+  installed `st-sectors-carousel`), and point the HTML and Markdown at the PNG. `<img>` tags carry
   `width="536"`, a height at the canvas ratio, and alt text stating the chart's figures.
   **Use `scripts/charts.mjs`**, this skill's own light-surface fork of the carousel
   skill's chart engine: `import` the function for the kind you need (`sparkline`/`line`
   for a price series, `barChart` for year-over-year, `donut` for a mix, `multiline` for
-  self-vs-peer, and so on, the same 13-kind grammar documented in the carousel skill's
-  `references/charts/INDEX.md`) and write its returned SVG string to `chart-<slug>.svg`. Its
+  self-vs-peer, and so on, the kinds in the file map of `references/setup.md`; the carousel skill's
+  `references/charts/INDEX.md` has the per-kind picker when installed) and write its returned SVG string to `chart-<slug>.svg`. Its
   colors are already fixed and validated to the shared palette above (green
   `#568475` gain, red `#D53E50` loss, accent `#9E0142` ticker, see the file's own header
   comment for the full role map), so don't re-derive a palette per issue, and see this
@@ -429,10 +393,10 @@ no-dash/no-AI-tell rules, it constrains *shape*.
   image explaining what it shows and why it's in this issue, not just alt text (alt text
   is for accessibility/blocked-images, the caption is for a reader looking right at it):
   ```markdown
-  ![BBCA share price over the past 90 days, from IDR 6,575 to IDR 6,200 after a June low near IDR 4,850](chart-bbca-price.png)
+  ![BBCA share price over the past 90 days, from IDR 6,575 to IDR 6,200 after a June low near IDR 4,850](chart-bbca-price.svg)
   *BBCA is still 31% below its August 2025 high of IDR 8,975 (52-week high, sectors.app), the clearest read on the foreign-outflow pressure described above.*
   ```
-  Save the result as `chart-<slug>.png` (or `.svg`) inside the issue folder, next to
+  Save the result as `chart-<slug>.svg` inside the issue folder, next to
   `newsletter.md`. A chart is a supplement, never a replacement: state the same headline
   figure in prose or a table too. When a chart isn't worth the setup for a given issue,
   a well-labeled table is a completely acceptable substitute, this is never a blocking
@@ -446,7 +410,7 @@ no-dash/no-AI-tell rules, it constrains *shape*.
 - **≥1 million, <1 billion** (the tier with no clean T/B suffix): thousand-separated
   millions, two decimals, unit spelled out: `IDR 5.85 million`, `IDR 128.10 million`.
 - **<1 million**: plain thousand-separated, `IDR 10,150`.
-- Percentages as `%`, multiples as `x` (`12x earnings`, not `12×` or `12 times`).
+- Percentages as `%`, multiples as `x` (`12x earnings`, not `12×` or `12 times`). Pick one number of decimals for percentages and use it everywhere in the same issue: prose, tables, tiles, headings and chart labels.
 - Every ratio explained in one clause on first use: "ROE, profit earned on shareholder
   money, hit 21%."
 
@@ -466,9 +430,8 @@ reconstruct the issue's argument without reading the body.
   figure is misleading.
 - Good: `## Peer valuation, and what the yield figure actually means`.
 
-Macro-reaction's section 2 already models this ("Winners and losers" / "Who's exposed" /
-"The effects", picked by the issue's actual shape, never left as a generic label); apply
-the same instinct to every other slot in every issue type, not just that one section.
+Pick each heading by the issue's actual shape, never a generic label, in every slot of
+every issue type.
 Never state a causal or comparative relationship in a heading (or body) that the fetched
 data doesn't actually support, if two events are simply concurrent, say they're
 concurrent, don't imply one caused the other.
@@ -479,7 +442,7 @@ concurrent, don't imply one caused the other.
 Markdown**, colored +/- cells, tables, CTA buttons and the hero chart don't survive
 plain Markdown the same way, and the point is a self-contained, data-backed email with
 no PDF attachment. Keep `newsletter.md` as the review draft; ship the `.html` alongside
-it, for all ten types. See
+it, for all five types. See
 `newsletter/samples/<type-slug>/newsletter.html` for each type's own worked HTML
 reference.
 
@@ -491,29 +454,20 @@ this file's **Color convention** section.
 
 ## Pick one skeleton
 
-Read `references/newsletter-format/skeletons/<slug>.md`, that file only, for the issue type this run is writing. Never read all ten.
+Read `references/newsletter-format/skeletons/<slug>.md`, that file only, for the issue type this run is writing. Never read all five.
 
 | issue type | skeleton file |
 |---|---|
 | Weekly Insights v2 | `skeletons/weekly-insights-v2.md` |
-| Macro-reaction | `skeletons/macro-reaction.md` |
 | Three-stock story | `skeletons/three-stock-story.md` |
 | Single company deep dive | `skeletons/single-company-deep-dive.md` |
 | Sector spotlight | `skeletons/sector-spotlight.md` |
 | Monthly market pulse | `skeletons/monthly-market-pulse.md` |
-| Did you catch it | `skeletons/did-you-catch-it.md` |
-| Upcoming event | `skeletons/upcoming-event.md` |
-| New release feature | `skeletons/new-release-feature.md` |
-| Watchlist/sector performance digest | `skeletons/watchlist-performance-digest.md` |
 
-## Upcoming events closing block (required on every issue except `upcoming-event` itself, confirmed 2026-07-20)
+## Upcoming events closing block (only when an event is upcoming, confirmed 2026-07-20)
 
-Every broadcast issue this skill delivers ends with a small promo block for Sectors
-workshops, live-fetched from a shared Google Sheet, not user-supplied. This is distinct
-from the dedicated `upcoming-event` issue type (a full broadcast built around one event,
-user-supplied details): this is a standing closing section every *other* type carries,
-sourced automatically. Skip it only on `upcoming-event` itself, that type already is the
-event promo, a second one would be redundant.
+Every issue that has an upcoming Sectors workshop ends with a small promo block for it, live-fetched from a shared Google Sheet, not user-supplied. It is a standing closing
+section every type carries, sourced automatically.
 
 **Placement**: after the issue's own primary CTA, before **Sources**. Order for every
 applicable type becomes: main content blocks → primary CTA → **Upcoming events closing
@@ -647,15 +601,11 @@ stays untagged, per the third-party/own-account-not-our-analytics rule above. Ac
 
 Newsletter prose, not slide fragments: 400-900 words typical across the whole issue.
 Vary sentence and paragraph length; simplify word choice, not cadence (inherit
-`./writing/core.md` section 3). **`single-company-deep-dive` runs a little longer**,
-900-1,200 words, because that type promises whole-company coverage: business model, moat,
+`./writing/core.md` section 3). **`single-company-deep-dive` runs longer**,
+1,300 to 1,900 words, because that type promises whole-company coverage: business model, moat,
 unit economics, macro forces and the long-term read. It also carries a figure-density cap,
 three per paragraph, with every series pushed into a table or chart
 (`skeletons/single-company-deep-dive.md`).
-**`watchlist-performance-digest` is shorter**,
-150-300 words outside the table, it's a personalized digest read in a couple minutes
-on a phone, not a full briefing, closer to dbquery's nudge-length norm than this
-skill's usual newsletter length.
 
 ## Worked micro-example (header + one filled section)
 

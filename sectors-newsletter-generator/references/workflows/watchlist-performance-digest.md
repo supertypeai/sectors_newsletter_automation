@@ -14,12 +14,12 @@ itself (which tickers/sectors a specific user tracks). See SKILL.md's
 
 ## 1. Get the audience via the dbquery skill
 
-Invoke the `sectors-dbquery` skill (Skill tool) to run its approved
+Invoke the `st-sectors-dbquery` skill (Skill tool) to run its approved
 `watchlist-tracked-interest` query. That query returns, per eligible user: `user_id`,
 `email`, `first_name`, `tickers` (array), `sectors` (array). **Never write or improvise
 SQL for this, and never query Supabase directly for user-account data**, that
 discipline is load-bearing, not a formality, see dbquery's
-`references/supabase-access.md`. (The two public market-data queries used by
+`st-sectors-dbquery`'s `references/supabase-access.md`. (The two public market-data queries used by
 monthly-market-pulse and weekly-insights-v2, `broker-summary-range` and
 `foreign-flow-range`, now live in dbquery's `scripts/approved-queries/` too and are
 invoked the same way: this skill never runs SQL itself.)
@@ -40,7 +40,7 @@ both at draft time, don't assume the row is clean:
 Pick one sample user (real row, real tracked items) to build and prove the template
 against. This is a template proof, not a batch render, same discipline as any dbquery
 worked example: scrub the real email/name before this file is shared outside the
-session, per dbquery's `references/supabase-access.md`.
+session, per `st-sectors-dbquery`'s `references/supabase-access.md`.
 
 ## 2. Fetch 7-day performance per tracked item, exchange-aware
 
@@ -184,7 +184,7 @@ as the audience source, not just the market-data calls).
   market-blended table/takeaway value is documented as computed-at-render, not a
   static tag?
 - Worked example rendered against one real sample user, PII scrubbed per dbquery's
-  `references/supabase-access.md`, before this file is shared outside the session?
+  `st-sectors-dbquery`'s `references/supabase-access.md`, before this file is shared outside the session?
 - Is the Appendix (endpoint/field trace, including the dbquery audience query) present,
   after Sources and before the disclaimer? **Endpoints and field names only**, one bullet per endpoint, with no section
   label, chart name, table name, derivation or usage note attached to any bullet

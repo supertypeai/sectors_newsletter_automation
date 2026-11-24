@@ -15,6 +15,43 @@ sections established. If the draft's headline names a company, the issue has dri
 
 ## 1. Pick the sector and its current hook
 
+### 1a. Rotation check, before anything else
+
+Read `sector-spotlight-history.md` (next to this file) and list the
+`newsletter_*_sector-spotlight` folders in the newsletter repo. The history file is the
+source of truth, because some sent issues never got a folder (Sep 2026 oil, gas & coal).
+
+- **Skip any sub-sector covered in the last 3 spotlight issues.** Banks in Jul and again in
+  Oct, and oil, gas & coal in Sep and again in Nov, is the pattern this rule exists to stop.
+  If the user names a sector inside that window, say when it last ran and ask before going
+  ahead.
+- **Flag ticker overlap with other issue types in the last 30 days.** List the tickers the
+  draft will feature, then grep the last 30 days of `newsletter_*/newsletter.md` for them. A
+  name that led a three-stock story or a weekly-insights headline in that window should not
+  carry a section here; pick another breaker or another sector.
+- After the issue is final, append a row to `sector-spotlight-history.md`.
+
+### 1b. Earnings season is the default hook
+
+From roughly four weeks after a quarter end until the next quarter end, the default pick is
+the sub-sector whose latest quarter is most worth discussing. One structured screener call
+per sub-sector (33 calls, 33 credits, needs `SECTORS_CONFIRM=1`). Write the paths to a file
+and feed them with `tr '\n' '\0' < paths.txt | xargs -0 node scripts/sectors.mjs --save-dir <dir>`
+(passing them through a shell variable breaks the batch):
+
+```
+companies/?where=sub_sector = '<slug>' and market_cap > 1000000000000 and earnings_q[Q3-2026] is not null and earnings_q[Q3-2025] is not null&include_query_values=true&limit=200
+```
+
+Rank by how many members reported, aggregate year-on-year change, and the count of names up
+or down more than 20%. A group where most names moved the same way is a "the whole sector
+beat" story; a group split down the middle is a dispersion story. Both work, a sub-sector
+where nothing moved does not. **Before trusting any coal, metals, chemicals, pulp or
+shipping row, apply the USD-reporter landmine in `../sectors-api/data-quality.md`**: those
+members' current quarter comes back in USD and reads as a -100% collapse.
+
+### 1c. Otherwise, the week's hook
+
 A spotlight still needs a "why now": a sector that led or lagged the week, a macro event
 that just repriced it, an earnings season for the group, an index review that hit one of
 its members. Web-source or data-source the hook first (`../sourcing.md`), don't run an
@@ -31,6 +68,33 @@ node ../../scripts/sectors.mjs \
 Sub-sector slugs come from `subsectors/` (33 pairs, cacheable). Pull `n_stock=7`, not 3:
 this type needs enough rows to show whether the week's move was broad or concentrated in
 one industry inside the group.
+
+### 1d. Scope the group and hunt the structural finding
+
+This is research method only. It changes what the issue is built on, never which sections
+the skeleton carries.
+
+- **Scope a sub-sector, and check its membership instead of assuming it.** "Indonesian
+  banks" is four different businesses. Read `subsector/report/<slug>` and the screener
+  member list before committing, and note any member whose business plainly sits outside
+  the group's economics, because it will distort every median the issue quotes.
+- **Look for what the group-level number hides.** The finding this type earns is almost
+  always a divergence inside the group. Check these in order and keep the first that holds:
+  - dispersion, where the median stayed flat while the spread between ends widened;
+  - a cost or margin driver that separates two cohorts inside the same sub-sector;
+  - concentration, where one or two names carry most of the group's profit, volume or
+    return, and how that share has moved;
+  - an ownership difference (state-owned against private, conglomerate-controlled against
+    widely held) that lines up with different behaviour;
+  - a gap between the group's multiple and the driver that is supposed to set it.
+- **Know how the group makes money before comparing anyone.** Write yourself a short note
+  on what revenue depends on, what cost depends on and what the regulator controls, each
+  point sourced per `../sourcing.md`. It feeds the "How to Read the Numbers" box and the
+  dispersion paragraph, and it is not a new section.
+- **Settle the mechanism before writing it.** Any claim about *why* two cohorts differ needs
+  a dated outside source, and the obvious alternative explanations (a one-off item, a
+  reporting-calendar shift, a currency move, a definitional change, one member's corporate
+  action) need ruling out or disclosing in the clause beside the figure.
 
 ## 2. Fetch the group
 
@@ -55,6 +119,13 @@ it than a peer table needs:
 - `growth.weighted_avg_growth_data`, `.growth_forecasts` — last full year's realized
   earnings and revenue growth against the current year's forecast. Section 7 of the
   skeleton needs both.
+
+When the finding from §1d needs more than the report carries, fetch only what proves it:
+`financials/quarterly/{symbol}` (smallest `n_quarters` that shows the trend) for a cohort
+divergence over time, `company/get-segments/{symbol}/` where revenue mix is what splits the
+group, the mining family in `../sectors-api/endpoints.md` (production, reserves, exports,
+contracts, commodity prices) for a resources sub-sector, and on IDX only `foreign-flow`,
+`free-float` or ownership composition when ownership is the dividing line.
 
 ## 3. Screen the members, with a market-cap floor
 
@@ -129,6 +200,10 @@ buffer") and bold the best value in each column.
   most common error in this type.
 - State the exact window behind every "7-day" or "last week" figure (from which close to
   which close), in the caption.
+- Valuation differences are reported with the fundamental difference that accompanies
+  them, never as a verdict. "The discount has held for six quarters while the cohort's ROE
+  gapped four points the other way" is analysis; "the discount is unwarranted" or "should
+  re-rate" is a call and goes.
 
 ## 6. Write the argument, not the data
 

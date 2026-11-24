@@ -6,7 +6,7 @@
 Markdown**, colored +/- cells, tables, CTA buttons and the hero chart don't survive
 plain Markdown the same way, and the point is a self-contained, data-backed email with
 no PDF attachment. Keep `newsletter.md` as the review draft; ship the `.html` alongside
-it, for all ten types. See
+it, for every built type. See
 `newsletter/samples/<type-slug>/newsletter.html` for each type's own worked HTML
 reference.
 
@@ -18,18 +18,18 @@ this file's **Color convention** section.
 
 ## Pick one skeleton
 
-Read `references/newsletter-format/skeletons/<slug>.md`, that file only, for the issue type this run is writing. Never read all ten.
+Read `references/newsletter-format/skeletons/<slug>.md`, that file only, for the issue type this run is writing. Never read more than one.
 
 | issue type | skeleton file |
 |---|---|
 | Weekly Insights v2 | `skeletons/weekly-insights-v2.md` |
-| Macro-reaction | `skeletons/macro-reaction.md` |
 | Three-stock story | `skeletons/three-stock-story.md` |
-| Single company deep dive (full) | `skeletons/single-company-deep-dive.md` |
-| Single company deep dive (earnings review) | `skeletons/single-company-earnings-review.md` |
+| Single company deep dive | `skeletons/single-company-deep-dive.md` |
 | Sector spotlight | `skeletons/sector-spotlight.md` |
 | Monthly market pulse | `skeletons/monthly-market-pulse.md` |
-| Did you catch it | `skeletons/did-you-catch-it.md` |
+| Macro-reaction | `skeletons/macro-reaction.md` |
 | Upcoming event | `skeletons/upcoming-event.md` |
 | New release feature | `skeletons/new-release-feature.md` |
+| Did you catch it | `skeletons/did-you-catch-it.md` |
 | Watchlist/sector performance digest | `skeletons/watchlist-performance-digest.md` |
+| Single company deep dive, earnings review | `skeletons/single-company-earnings-review.md` |

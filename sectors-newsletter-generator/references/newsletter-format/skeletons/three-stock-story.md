@@ -15,7 +15,7 @@ Three companies that share one reason to be read together this week. The reason 
 3. **Why This Pattern Matters.** One H2 stating the general lesson (`Why a Controlling Holder's Buying Matters`), two labelled paragraphs (`What it can signal`, `What it can change`), then a pull quote stating the limit of the signal. Generic to the pattern, no per-stock detail, no advice. Link tickers only where an example is named.
 4. **Three per-stock blocks**, each separated by the divider. Fixed shape:
    - H2 `TICKER: Narrative Label` (`BYAN: Founder Sells 30%, Then Buys Again`). Ticker link first, then a colon, then the label stating that stock's finding.
-   - Company card: `PT ... Tbk` plus linked ticker, three stat tiles (`Last close`, `Vs 52-week high` coloured red or green, `Market cap`). Carries `data-keep="1"` on the card.
+   - Company card: `PT ... Tbk` plus linked ticker, three stat tiles (`Last close`, `Vs 52-week high` coloured red or green, `Market cap`).
    - One intro sentence or short paragraph on who the company and the key person are.
    - **Dated timeline**, five to eight rows, oldest first, ending on the data-as-of close with the move against the relevant high or low in green or red. Dates carry the story: founding or control change, the deal, the filing, the company's response, the latest close. Each row is one to three sentences. Only rows that move the story, a full executive roster is API output, not writing.
    - Optional per-stock chart when one shows something the text cannot (ownership before and after a trade, `ownershipBars`), with a one-sentence italic caption stating the finding.
@@ -31,6 +31,6 @@ Three companies that share one reason to be read together this week. The reason 
 
 **Voice.** Plain reported statements. The newsletter never says a filing is bullish. State what was filed, what it was worth against the stake or the market value, and what the data says about the company. Forward views appear only as attributed consensus or management guidance, with no trailing disclaimer. Any figure that sounds like a call (`0.11% of its market value`) is a size comparison, not a verdict.
 
-**Charts and images.** PNG in the HTML, SVG kept beside it as source (`scripts/svg2png.mjs`). Alt text states the figures. Markdown uses the same PNG.
+**Charts and images.** SVG in the HTML and the Markdown (PNG via `scripts/svg2png.mjs` only if the user asks). Alt text states the figures.
 
 **What this type is not.** Not three company biographies. A fun fact or founder detail survives only if it is part of the event or the control story, and carries a date and a figure. Three unrelated names with no pattern do not make an issue, pick a different type or a different trio.

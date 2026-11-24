@@ -1,7 +1,7 @@
 ## Upcoming events closing block: data source
 
-Every issue except `upcoming-event` itself ends with a small closing promo block
-for Sectors workshops, sourced live from one shared Google Sheet. This is
+An issue ends with a small closing promo block
+for Sectors workshops whenever the sheet has an upcoming event, sourced live from one shared Google Sheet. This is
 not user-supplied per run, it is fetched fresh every time. See
 `newsletter-format.md`'s **Upcoming events closing block** section for where it
 goes and how it's formatted; this doc is only the data-fetch recipe.

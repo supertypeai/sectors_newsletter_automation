@@ -1,10 +1,13 @@
-// Render a newsletter.html to a paginated PDF. Reuses the carousel skill's puppeteer install.
+// Render a newsletter.html to a paginated PDF. Uses this skill's puppeteer install, or the carousel skill's.
 // usage: node html2pdf.mjs <in.html> <out.pdf>
 import path from "path";
 import { createRequire } from "module";
 import os from "os";
-const require = createRequire(path.join(os.homedir(), ".claude/skills/sectors-carousel/package.json"));
-const puppeteer = require("puppeteer");
+// puppeteer: this skill's own `npm install` first, else an installed st-sectors-carousel.
+let puppeteer;
+try { puppeteer = (await import("puppeteer")).default; } catch {
+  puppeteer = createRequire(path.join(os.homedir(), ".claude/skills/st-sectors-carousel/package.json"))("puppeteer");
+}
 const [src, out] = process.argv.slice(2);
 const browser = await puppeteer.launch({ headless: "new", args: ["--no-sandbox"] });
 const page = await browser.newPage();

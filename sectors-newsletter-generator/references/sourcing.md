@@ -7,8 +7,6 @@ and keep it clearly attributed as *reported*, not as this newsletter's own figur
 
 ## When web search is mandatory
 
-- **Macro-reaction issue**: the last ~2 days of macro news is the entire premise. Not
-  optional.
 - **Three-stock-story issue**: company history, founders, fun facts, and the people
   behind the business are not in the Sectors API. Not optional.
 - **Weekly Insights v2**: web search corroborates the "why" behind whatever the data shows was
@@ -18,7 +16,7 @@ Your own knowledge cutoff is stale for "macro news in the past 2 days" and for a
 recent about a company. Verify live via search; never recall market events from memory
 and present them as current.
 
-## "Past ~2 days" macro sourcing (macro-reaction issue)
+## Macro sourcing (when an issue needs recent macro context)
 
 Search for, in rough priority order:
 - **Bank Indonesia (BI)** rate decisions or statements.
@@ -48,10 +46,8 @@ curl -s -A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36" 
 
 - **Release notes are no longer fetchable this way.** `https://sectors.app/release`
   serves a Vercel Security Checkpoint JS challenge (confirmed 2026-07-17, on two
-  separate runs), not the old Cloudflare 403/429 a UA swap could clear. The
-  `new-release-feature` issue type asks the user for the release note as a PDF or
-  Markdown file instead, see `workflows/new-release-feature.md` step 1, don't retry
-  this fetch for that type.
+  separate runs), not the old Cloudflare 403/429 a UA swap could clear. Ask the user for the release note as a PDF or Markdown
+  file instead, don't retry this fetch.
 - **How-to recipes**: `https://docs.sectors.app/recipes` and its children (e.g.
   `.../recipes/generative-ai-python`) for how-to and use-case-walkthrough issues.
 - **Docs index**: `https://docs.sectors.app/llms.txt` enumerates every docs page, fetch it

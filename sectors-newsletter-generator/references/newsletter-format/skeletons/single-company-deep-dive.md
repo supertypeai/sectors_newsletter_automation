@@ -47,7 +47,7 @@ data dump.
    structural tension the piece resolves, not this week's event alone.
    `SMAR Margins Doubled, but Operating Cash Flow Turned Negative`. Tighter is better,
    cut possessives and qualifiers. No question, no colon-subtitle. The company logo
-   (`logo-<ticker>.png`, 32px, from the carousel skill's `assets/logos.json`, base64 PNG
+   (`logo-<ticker>.png`, 32px, from this skill's `assets/logos.json`, base64 PNG
    decoded to the issue folder) sits inline before the linked ticker.
 2. **Standfirst** — directly under the headline in the same block, three short declarative
    sentences, no heading, no inline citations, no comma-chained subordinate clauses. Sentence one, what the business is and its scale.
@@ -60,8 +60,7 @@ data dump.
    unresolved question to the reader without answering it. Green and red on every signed figure.
 2b. **Company card** — shaded `#f2ede4` card: full legal name with linked ticker, three stat
    tiles (`Last close`, `Market cap`, `Market cap rank`), then the 90 day price chart (PNG, non
-   zero y-axis) with a caption stating start, end and where the move happened. The card carries
-   `data-keep="1"`.
+   zero y-axis) with a caption stating start, end and where the move happened.
 3. **Why This Company, Now** — H2 naming the reason to publish, one or two short
    paragraphs, no more. An earnings print, a corporate action, an ownership filing, a
    regulatory change, or a valuation crossing its own historical band. Give the mechanism

@@ -14,7 +14,7 @@ for prose:
 3. **Descriptive only, never investment advice.** No buy/sell/hold framing, no price
    targets stated as our call, no "undervalued / cheap / a good entry / should own", no
    "fair value". State what the data shows; the reader decides. See the reconciliation
-   below for how this applies to the macro-reaction and three-stock-story issue types.
+   below for how this applies to the three-stock-story and deep-dive issue types.
 4. **Every figure is band-checked before it ships.** Full landmine table and plausibility
    bands live in `sectors-api/data-quality.md` — don't
    fork them, open that file. Out of band → omit.
@@ -41,7 +41,7 @@ for prose:
 
 ## Reconciling "a good time to purchase" and "a great future forecast" with the no-advice rule
 
-The newsletter's own brief asks, for the macro-reaction issue, whether affected tickers
+The newsletter's own brief asks whether featured tickers
 are "a good time to purchase," and for the three-stock story, for "a great future
 forecast." Read literally, both are investment advice — exactly what rule 3 above (and
 the identical hard rule in `./writing/core.md`) forbids. This is resolved by **reframing, not
@@ -65,7 +65,7 @@ answerable factually without ever telling them what to do.
   year (`future.company_growth_forecasts`)," "the company's disclosed strategy is Y."
   Never the newsletter's own prediction, never "this stock will double," never hype.
 - **First- and second-person imperatives are banned.** No "you should buy," "we'd load
-  up," "this is your entry." Close the macro-reaction issue's per-ticker section with a
+  up," "this is your entry." Close any per-ticker valuation section with a
   neutral "what to watch" (an upcoming print, an ex-dividend date, a macro catalyst) in
   place of any call to action.
 - **The disclaimer footer** (defined in `newsletter-format.md`) restates non-advice on

@@ -1,8 +1,17 @@
 # Scope: not-yet-built types, out-of-scope types
 
 Split out of `SKILL.md` so the per-run path stays short. Read this only when the ask
-names something outside the ten built issue types, or when you are unsure whether a
+names something outside the built issue types, or when you are unsure whether a
 request belongs to this skill at all.
+
+### Kept here, not in the shared skills repo
+
+`macro-reaction`, `upcoming-event`, `new-release-feature`, `watchlist-performance-digest`,
+`did-you-catch-it` and the earnings-review format of `single-company-deep-dive` were
+removed from the shared `st-sectors-newsletter` on 2026-11-20 for low use, but this repo
+keeps their workflow docs and skeletons (`references/workflows/<slug>.md`,
+`references/newsletter-format/skeletons/<slug>.md`). They are built types here: use them
+when the ask names one. A re-sync from the skills repo must not delete them.
 
 ### Not yet built (in scope, will be added iteratively)
 
@@ -14,15 +23,13 @@ template (don't fake it with an ad-hoc pipeline):
 - Market Insights: Regulatory / index event, Global spillover, Broker flow digest
 - Market Performance: Monthly recap
 - Company Insights: Insider activity signal
-- FOMO (market content only, targeting is external): Sector rotation miss. (Did you
-  catch it is now built, see the numbered list above and
-  `references/workflows/did-you-catch-it.md`.) **Missed dividend was dropped on
+- FOMO (market content only, targeting is external): Sector rotation miss. **Missed dividend was dropped on
   2026-08-10, do not build it and do not offer it.** A screen on ex-date, payment size,
   payout ratio and cash payout ratio proves only that a payment was large and covered,
   which is not enough for a reader to decide anything, so the piece implies a judgment
   the data behind it cannot support. The retrospective half is worse: the ex-date has
   already passed, nothing is actionable, and there is no alert worth setting. If asked
-  for it, say it was dropped and offer `did-you-catch-it` or `sector-spotlight`.
+  for it, say it was dropped and offer `sector-spotlight`.
 - Educational: Concept explainer, How-to guide, Use-case walkthrough
 - Product Update: Feature enhancement, Deprecation notice
 
@@ -32,18 +39,15 @@ These need live **user-account or billing state** this skill cannot fetch
 (`quest_completed`, `credits_used`, onboarding progress, renewal dates). They are
 lifecycle/CRM/transactional email, a different system entirely, triggered by account
 state rather than market content, and drafted end-to-end by the sibling
-`sectors-dbquery` skill, not this one:
+`st-sectors-dbquery` skill, not this one:
 
 - Reminder: onboarding nudge, onboarding unclaimed reward, credit-expiry,
   quota-cycle renewal
 - Account & Value: notification setup nudge, upgrade prompt, win-back reoffer
 
-The one account-adjacent thing that IS in scope here is **which tickers/sectors a user
-tracks**, that's audience/personalization data for the `watchlist-performance-digest`
-type above, not a lifecycle trigger, see the **Personalization check** section.
 
 **Recipient grouping, segmentation, frequency caps, and send scheduling are also out of
-scope**, including for the personalized type. This skill generates content (one
+scope**. This skill generates content (one
 broadcast piece, or one reusable per-recipient template); who receives it and when is
 decided by the delivery/CRM system that consumes the output, not here.
 

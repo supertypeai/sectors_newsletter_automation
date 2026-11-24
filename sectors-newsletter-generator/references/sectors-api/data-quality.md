@@ -23,6 +23,10 @@ the checklist.
    the plausibility bands below. Out of band → omit it.
 5. **Show the date.** Prices, flows, and ratios are as-of a date. Stamp it; stale or
    undated numbers read as wrong.
+6. **Never convert currencies yourself.** Use the figure as the database returns it or as
+   the source reports it, in its own currency. No FX translation, no restating USD in IDR
+   or SGD, no "equivalent" figures, unless the user explicitly asks for a conversion in
+   this run. When two figures sit in different currencies, they are not compared.
 
 ---
 
@@ -51,6 +55,7 @@ the checklist.
 | `share_percentage` type inconsistency | `report.ownership.major_shareholders[].share_percentage` is a **string** (`"0.54942"` in `examples/report_ownership.json`) while `management.executives_shareholdings[].share_percentage` is a **float** (`3e-05` in `examples/report_management.json`), same field name, two different types across sections of the same report. | `parseFloat` before any math or before feeding a donut spec; skipping the cast silently breaks arithmetic or the chart. |
 | Field-vintage nulls | Even BBCA's `historical_financials` has `ebit`, `ebitda`, `gross_loan`, `provision`, `total_deposit` all `null` in 2018 but populated by 2020 (`examples/report_financials.json`). | Not only a small-cap problem; check per-year before charting a full window, older years of a series can be structurally incomplete even for a blue chip. |
 | Sector-level P/E extremes | `subsector/report`'s `statistics` carries `min_company_pe: -71.7` and `max_company_pe: 2202.2` in the cached banks sample (`examples/subsector_report.json`). | The per-company P/E-liar landmine (above) lives at the aggregate level too. Never surface a sector P/E range verbatim; band-check the underlying companies the same way you would a single ticker's `pe_ttm`. |
+| USD reporters in `earnings_q[...]` | The screener's quarterly fields mix currencies: for USD-reporting companies the newest quarter comes back in **USD** while the year-ago quarter is in **IDR** (verified 2026-11-19: BYAN `earnings_q[Q3-2026]` 179,416,619 vs `[Q3-2025]` 2,877,968,685,265; same on AADI, ADRO, ADMR, AMMN, TPIA, INKP, INCO, BRMS, ENRG, MCOL, HRUM). A naive YoY prints -100% for the whole coal and metals complex. Root cause (traced 2026-11-19 via st-sectors-dbquery `idx-quarterly-income-stmt-for-symbol`): the Q3-2026 rows in `idx_financial_sheets_quarterly` for USD reporters are tagged `currency: IDR`, so ingestion skipped translation and `income_stmt_metrics` holds raw USD (its `ebitda` is garbage too). | Treat any current quarter below about 1/1,000 of its year-ago value as a unit mismatch, not a collapse. **Do not convert it yourself** (hard rule 6). Either report each quarter as returned, in its own currency and labelled as such, with no YoY change computed across the two; or use the company's own reported figure from its filing, cited; or drop the comparison and leave the company out of any ranking or aggregate, saying so in the caption. Convert only when the user asks in this run. Report the mis-tagged rows to engineering so the database is fixed at source. |
 | Broker gross vs net scale | `brokers/top` sample has broker CC with `gross: 4,616,313,142,400` and `net: -639,908,303,600` (`examples/new/brokers_top.json`), the two live on different scales and can point opposite directions. | Never bar-chart gross and net on one axis; use `scatter` (x=gross, y=net) or two separate rankings. |
 
 Coverage reality: blue chips are clean. Anomalies cluster in **loss-makers, small

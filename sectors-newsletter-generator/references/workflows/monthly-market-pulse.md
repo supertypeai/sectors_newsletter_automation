@@ -8,8 +8,30 @@ drafting.
 
 **This type is an argument evidenced by data, not a data dump with news garnish.** Every
 run states one thesis up front, defends it section by section, gives the opposing read
-its own space, and closes with dated events that would settle it. The tables are the
-same tables they always were; what changed is that each one now sits under a claim.
+its own space, and closes with dated events to watch.
+
+**The issue must explain the month, not narrate it (2026-11-01).** A reader who finishes it
+can answer three questions: what were the month's big events, what did each one do to
+which stocks, and which names deserve a second look and why. Facts stay sourced, but the
+conclusion comes first and in plain language. Binding rules:
+
+- **The "so what" test.** Every paragraph under a table must add something the table cannot
+  show: a cause, a split, a contrast, an unusual fact. If it restates the table or describes
+  its shape ("gainers all ended at least 35% higher"), cut it.
+- **No mechanical or methodology notes in reader copy.** Why a name was excluded, how a tick
+  size distorts a percentage, how a figure was aggregated: drop these silently. An excluded
+  ticker is simply absent.
+- **No description lines under headings (2026-11-01).** "Ranked by...", "Net value per
+  broker summed across..." and date-scope lines are all out for this type. A table goes straight
+  under its heading.
+- **Test the thesis across phases, not only the 30-day total.** A month-end total hides
+  whether a stock fell before, on, or after the event. Step 4b is mandatory.
+- **Pin down who a sanction fell on.** Read the regulator's own release, and name the sanctioned
+  party exactly. Press often writes "fined DSSA" when OJK fined unnamed related parties, and
+  the chair said the issuers were not the ones who paid. Calling a stock "fined" there is wrong.
+- **Every monthly table gets a cross-check against the news.** Ask why each top mover moved
+  and search for it. The 1 Nov 2026 draft missed the OJK cases around DSSA, BREN and CUAN because
+  it only looked up the most-traded leader.
 
 ## 1. Settle the window
 
@@ -50,19 +72,25 @@ node ../../scripts/sectors.mjs \
   itself a fact worth stating, see the sample).
 - **`news/?symbols=<top most-traded ticker>&start=<window-start>&end=<data_as_of>`** —
   once the most-traded ranking is settled, pull this one name's own news for the
-  window and look for a real, dated reason its volume ran hot all month (an analyst
+  window, plus `daily/<ticker>/` around any volume spike so the dates in the copy match the
+  tape, and look for a real, dated reason its volume ran hot all month (an analyst
   call, a foreign-buying flag, a sector policy story), for the required "why" paragraph
   in step 6. Not every window will have a clean answer, if nothing real turns up, say
   so rather than manufacturing a reason.
 
-## 3. Broker flow (approved Supabase query via dbquery, not an API loop)
+## 3. Broker flow (Sectors API first, approved query via dbquery as fallback)
 
 `brokers/top` **only accepts a single `date`, confirmed live** (`start`/`end` 400s:
 `"Invalid query parameters: start, end."`). There is no market-wide "top brokers over a
-range" endpoint via the Sectors API. Don't loop it day by day. Instead invoke the `sectors-dbquery`
-skill for its approved `broker-summary-range` query, giving it the window's
-`{{start}}`/`{{end}}`. Never run this SQL yourself; it is reproduced here only so you
-can see what comes back:
+range" endpoint via the Sectors API, so call `brokers/top` once per trading day in the
+window and sum per broker. That loop is roughly 23 credits, which is over the 5-credit guard in
+`scripts/sectors.mjs`: it refuses to run until it is re-run with `SECTORS_CONFIRM=1`, and only
+after the user has okayed the spend. Without that okay, go straight to the approved query
+below. Only if any day's call fails (error after a retry, empty, or
+out of band), invoke the `st-sectors-dbquery` skill for its approved `broker-summary-range`
+query with the window's `{{start}}`/`{{end}}`, and note the fallback in the data notes.
+Never run this SQL yourself; it is reproduced here only so you can see what the fallback
+returns:
 
 ```sql
 with agg as (
@@ -87,7 +115,7 @@ order by a.net_val desc;
   comes up in copy.
 - `broker_name` comes free from the join, no separate registry call needed.
 - This is public market data, not user-account data, so no PII rules apply to the rows,
-  but it still runs through `sectors-dbquery` like every other Supabase read (see that
+  but it still runs through `st-sectors-dbquery` like every other Supabase read (see that
   skill's `references/supabase-access.md`); it's read-only, verified live 2026-07-27
   against 13-17 Jul 2026 (top buyer BB/Verdhana Sekuritas Indonesia +612.12B,
   `days_active`=5 on every row for that 5-day window).
@@ -95,7 +123,7 @@ order by a.net_val desc;
   plausibly explains the pattern (a regulatory story, a macro flow narrative), for the
   required observation paragraph in step 6, under the causation policy in step 5.
 
-## 4. Macro overlay (new, required)
+## 4. Macro overlay (required)
 
 The three market pulls above say **what** moved. This step says **what the market was
 sitting inside while it moved**, and it is the section that carries most of the issue's
@@ -117,11 +145,60 @@ forward as if it were current:
 | Domestic prints | CPI, trade balance, PMI, whatever printed inside the window | BPS release / cited coverage |
 | Policy and market structure | Rules, tax changes, index rebalances, IDX/OJK announcements dated in-window | IDX / OJK / cited coverage |
 
-Then **map each macro item to the names already in this issue's own tables.** That
-mapping is the point of the section, not the macro list itself. If coal prices ran and
+Then **map each macro item to names whose move you measured in step 4b.** That mapping is
+the point, not the macro list itself, and it feeds the What Moved the Market cards. If coal prices ran and
 two coal names sit in the most-traded table, say so and name them. If a macro item
 touches nothing in this issue's tables, drop it, this is not a general macro digest.
 Aim for three to five mapped items; a longer list reads as a wire feed.
+
+## 4b. Event impact (required, 2026-11-01)
+
+This step produces **What Moved the Market**, the core of the issue.
+
+1. **Name three to five events** from step 4, the top-mover list and a search for each top
+   gainer and loser (`saham <TICKER> <bulan> <tahun> penyebab`, regulator actions, exchange
+   rule changes, suspensions, acquisitions). Regulator and exchange actions outrank macro
+   prints. Also look just before the window: a rule effective days earlier can drive the
+   whole month (the IDR 1 price floor took effect 28 September 2026, before that window).
+2. **Measure each event** with the Sectors API first (`companies/top-changes/` where a
+   supported period matches the phase, `daily/{symbol}` closes for the names involved).
+   When the API cannot return movers for an arbitrary phase window, fall back to
+   `st-sectors-dbquery`'s approved `idx-window-movers-with-foreign-flow`, once per phase: before the main event, the event
+   day, after it, and the full window (`base_date` = last close before the phase, `n` 500,
+   `min_turnover` 1, `min_mcap` 1000000000000, or 0 for the full window; the result is large,
+   read it from the saved file). Add the approved `foreign-flow-range` for the full window
+   and `idx-retail-vs-foreign-flow-summary` for retail against foreign.
+3. **Ask these questions of the rows:** Which stocks took the foreign selling, and what share
+   of the total sat in the top four? Which stocks fell with almost no foreign selling, so the
+   seller was domestic? How much money traded in the top gainers against the top losers? Did a
+   group behave differently (banks, coal, a conglomerate, a list named in a rule change)?
+   Which big names bounced after the event and which did not?
+4. **Build the event chart** (see Write the pulse) from daily closes.
+
+**Foreign means the exchange definition, always.** Foreign totals come from `foreign-flow-range`
+or the query above, never from summing brokers whose registry domicile is foreign. Domicile
+gave -16.97T where the exchange definition gave -20.97T on the same 2026 window. Broker
+tables may still rank houses, but never call a broker's net figure foreign money.
+
+## 4c. Names worth a closer look (required, 2026-11-01)
+
+Pick three or four names from this month's data, one of them a caution case, each for a
+specific data reason: the largest foreign sale, a name that held up against the tape, one
+whose index weight changes, one that fell yet still carries a stretched multiple. Fetch
+`company/report/<symbol>/?sections=valuation` (add `dividend` where yield is part of the
+reason). Compare P/E with the stock's own history and its peer average, and always state the
+peer average even when it is unflattering.
+
+This section reports and points the reader at the next step. It never concludes. No
+"undervalued", "cheap", "attractive", "opportunity" or price target. **Each card ends on a
+different, specific action with a real link, and no two cards end the same way** (2026-11-01).
+A repeated label such as "The Question" on every card reads as machine-made, so use no shared
+label and no box. Fit the action to why the name is here: compare metrics or peers on its page,
+a dated test to watch, a workflow alert, or a broker read from
+`broker-summary/<symbol>/top/` naming the houses behind the bid, with the link to Sectors news
+for an update to follow. The action never tells the reader to trade. Link only to pages known to
+exist: company page, `/idx/broker/<code>`, `/indonesia/news`, `/workflow`, `/watchlist`. It is the reconciliation in `../compliance.md` applied to the reader's real
+question: which stocks should I look at, and why?
 
 ## 5. Causation policy (read before writing any linking sentence)
 
@@ -174,57 +251,51 @@ and what sits under each block exactly.
 
 Follow `../newsletter-format/skeletons/monthly-market-pulse.md` exactly:
 
-1. **Headline + trend paragraph**, drafted fresh from this run's own `idx-total` trend,
-   never a templated line reused from a prior issue.
-2. **The month in four numbers** — a four-tile stat row directly under the trend
-   paragraph: index cap move, the window's single largest mover, the aggregate broker
-   net of the top-3 sellers (or buyers, whichever side dominated), and one macro anchor
-   from step 4 (rate level, rupiah move, or the commodity that mattered). Each tile is a
-   number, a one-line label, nothing else. See `scripts/charts.mjs` for the tile row.
-3. **The Read** — two to four sentences, the issue's single thesis, stated as a
-   claim, before any table. It must be falsifiable by this issue's own data and it must
-   be defended by the sections that follow. "IDX fell, but foreign sellers, not domestic
-   ones, set the price, and the month's real return sat in small caps the index doesn't
-   feel" is a thesis. "The market was mixed this month" is not.
-4. **Section headings keep their existing names**, and each carries a **subtitle line
-   directly under the heading** stating that section's claim. Format: `## Top Movers`
-   then, on the next line, an italic single-sentence claim. Do not rename the headings
-   themselves, the heading names the data, the subtitle names the argument.
-5. **Top Movers** — two small tables (gainers, losers) plus the hero `moversChart`
-   (logos + full labels + green/red diverging bars, see `scripts/charts.mjs`). Caption
-   states only what the chart shows, no interpretive commentary. Subtitle carries the
-   claim (e.g. breadth, where the month's real dispersion sat).
-6. **Most traded** — the aggregated ranking from step 2, a short table, **followed by a
-   short paragraph** naming one ticker from the list and its real, dated, cited reason
-   for running hot all month, under step 5's causation policy.
-7. **Broker Flow** — top-net-buyers and top-net-sellers tables from step 3, columns
-   broker code, broker name, 30d net, **followed by a short paragraph** on the shape of
-   the flow (foreign vs domestic-leaning houses, how concentrated) with the mechanism
-   named per step 5. **Link every broker code** (confirmed 2026-07-16):
-   `https://sectors.app/idx/broker/<lowercase code>`, bold ticker-blue like a ticker
-   link, both tables, every row.
-8. **Macro Backdrop** — new section, placed after Broker Flow and before the two-sided
-   read. Three to five mapped items from step 4, each one short paragraph or one row of
-   a compact table: the macro fact with its date and source, then the IDX names or
-   sectors in this issue's own tables it touches. No unmapped macro items.
-9. **The Other Side** — the two-sided read. Two short stacked blocks, **The bull read**
-   and **The bear read**, three to four bullets each, every bullet grounded in a number
-   or citation already in this issue **but never reprinting it**: this block is macro and
-   structural analysis, so figures are referenced conceptually ("robust fundamental
-   backing from the big banks against a deteriorating foreign bid"), not restated with
-   their exact profit, percentage or rupiah values. Each bullet joins at least two things
-   the issue reported, or frames one structurally (valuation, liquidity, positioning,
-   policy transmission, index mechanics); a single earlier line with the number stripped
-   out is still a restatement, cut it. Then one closing line, **What would settle it**,
-   naming the specific dated print or event that distinguishes the two. Attribution
-   rules from step 5 apply to every forward-looking bullet: if it predicts, it is
-   quoted and attributed, or it is reframed as a condition ("if X prints above Y").
-10. **What to Watch, next 30 days** — a compact table, columns Window, Event, Why it
-    matters. Three to five rows, each a real scheduled event: BI RDG date, BPS release
-    date, earnings-season window, index rebalance effective date, dividend cum-date, a
-    named company's scheduled result. Every row's "why" ties back to a name or sector in
-    this issue. **Strictly forward-looking**: the "why" explains the pending decision or
-    effective date, never recaps what already happened elsewhere in the issue.
+HTML markup for every block below: `../newsletter-format/monthly-pulse-components.md`.
+
+1. **Headline, then straight into At a Glance** (2026-11-01). No standfirst paragraph. The
+   headline states this run's finding in plain words, drafted fresh.
+2. **At a Glance** (replaces The Read). The deep dive's `#fbe9d8` box: four to five bullets with
+   bold lead-ins, ending on **Open Question**. Gains and losses take the colour highlight. Be
+   direct: name who did what to whom, and when the thesis has parts, give each its own bullet
+   (First Sell-off, Second Sell-off). Never tease a finding and explain it later. The first
+   bullet carries the index move and closing market cap.
+3. **Stat tiles.** Four tiles on the shaded card, under At a Glance. Each has a label, a number
+   and a one-line context line: index cap move with closing market cap, net foreign flow
+   (exchange definition) with its day count, the month's main event in one number, and one macro
+   anchor. A tile must be readable alone: no ratio that needs a sentence to explain it ("70.6%
+   of it in four stocks" failed this). The largest mover is not a tile.
+4. **What Moved the Market**, after the first divider. One card per event from step 4b: date
+   label, plain title, a short "what happened" paragraph, then an unlabelled callout whose bold
+   first sentence is the conclusion and whose remainder names the stocks and numbers.
+   This replaces Macro Backdrop; macro items only appear as events with a measured impact.
+   Close with the **Before, during and after** chart, one line on the difference beneath it.
+   The chart is `scripts/charts.mjs`'s `eventLines`: six stocks rebased to the first close on
+   one axis, two groups (colour plus solid or dashed), direct end labels, and a shaded box per
+   key trading day, the main event in red. Closes come from the approved
+   `idx-recent-closes-for-symbol`, no API credits. Save it as SVG (PNG via `scripts/svg2png.mjs` only if the user asks).
+5. **Top Movers.** Gainers left, losers right, in the two-column block, ticker with company
+   name beneath, close, 30d. Then the hero `moversChart` with a caption stating only what it
+   shows. Then up to two short paragraphs explaining why these names moved, under the "so what"
+   test. Excluded names are omitted without comment.
+6. **Most traded.** Table with Ticker, Company, 30d volume, Close, 30d. Then one line on what
+   the group has in common and a paragraph on the leader's real, dated cause, under step 5's
+   causation policy. Check that dated causes really fall where the copy says.
+7. **Broker Flow.** Net buyers left, net sellers right, in the two-column block, broker code
+   with name beneath, 30d net. **Link every broker code** to
+   `https://sectors.app/idx/broker/<lowercase code>`. Then one paragraph answering who took the
+   other side of the flow, using retail net against exchange-defined foreign net.
+8. **Names Worth a Closer Look.** Step 4c. One card per name: three tiles (30d price, net
+   foreign, P/E), a short reason, then a closing line below a thin rule, each one a different
+   action. One italic line after the cards says the names come from the data and none is a
+   recommendation.
+9. **The Other Side.** Bull and bear in two tinted side-by-side panels, two to three bullets
+   each, grounded in the issue but referring to it **conceptually**, never reprinting a figure.
+   Each bullet joins two reported things or frames one structurally. No "What would settle it"
+   block (removed 2026-11-01); dated events belong in What to Watch. Forward-looking bullets are
+   attributed or framed as conditions (step 5).
+10. **What to Watch Next.** Compact table: Window, Event, Why it matters. Three to five
+    real scheduled events tied to this issue. **Strictly forward-looking**, no recap.
 10b. **CTA**, fixed copy, verbatim every issue: "Keep the signals coming" watchlist and
     workflow block from `../newsletter-format/skeletons/monthly-market-pulse.md` §4e.
     Never draft a bespoke CTA (e.g. "Check the month's movers yourself").
@@ -240,23 +311,32 @@ Follow `../newsletter-format/skeletons/monthly-market-pulse.md` exactly:
 
 ## 9. Self-review before delivery
 
-- Is there one stated thesis in **The Read**, and does every section below actually
-  defend or qualify it, rather than sitting next to it?
-- Does every section heading carry its claim subtitle, with the heading name itself
-  unchanged?
+- Do the At a Glance bullets state one thesis outright, with no standfirst above them, and does every section below defend or
+  qualify it, rather than sitting next to it?
+- **"So what" pass:** does any paragraph under a table only restate that table, or carry a
+  mechanical or methodology note? Cut it.
+- Does What Moved the Market give every event a measured impact on named stocks, with the
+  conclusion as the unlabelled callout's bold first sentence?
+- Did you search for why each top gainer and loser moved? Is any regulator or exchange action
+  from the window missing?
+- Is every foreign total on the exchange definition, with no broker's net labelled foreign?
+- Does every Closer Look card state the peer average, avoid verdict words, include one caution
+  case and end on an action different from every other card, with a working link?
+- Are movers and brokers in the two-column layout, and are section titles unchanged from the
+  skeleton?
 - Is the headline this run's own finding, not a copy of a prior issue's line?
 - Do the four stat tiles trace to numbers that appear elsewhere in the issue?
 - Did any microcap with a failed plausibility band slip into a movers table?
 - Does "Most traded" reflect the whole-window sum, not just the latest day's top-N?
 - Is Broker Flow really the 30-day aggregate, not a single day's `brokers/top`?
-- Is every Macro Backdrop item dated, sourced, **and** mapped to a name or sector that
-  appears in this issue's own tables? An unmapped macro item is a wire feed line, cut it.
+- Is every event dated, sourced, **and** mapped to named stocks with a measured move? A macro
+  item with no measured impact is a wire feed line, cut it.
 - Does at least one citation clear the step-6 sourcing bar (research note, central-bank
   or regulator release, exchange statistic), or is the shortfall stated plainly?
 - Does every linking sentence pass step 5's test: the reader can see who asserts what
   and how confident they are, and the newsletter itself never predicts a price?
 - Does **The Other Side** give the bear read genuine weight, or is it a token block? Is
-  **What would settle it** a specific dated event, not a vague "time will tell"? Does it
+  each side concrete? Does it
   stay conceptual, reprinting **no** figure already published earlier in the issue?
 - Is every What-to-Watch row a real scheduled event with a verifiable date, and
   forward-looking only with no recap of past events in the "why"?
@@ -272,10 +352,10 @@ Follow `../newsletter-format/skeletons/monthly-market-pulse.md` exactly:
   per endpoint actually called this run, and no macro items smuggled into it? Endpoints and
   fields only, with no section labels or usage notes attached to any bullet?
 
-## Bucket social cards (width rule)
+## Social post images (width rule)
 
-Monthly pulse renders its own charts by default. If the user supplies social cards from the
-carousel pipeline's bucket for any block, each one is set at exactly 268px wide, the same as
+Monthly pulse renders its own charts by default. If a block uses an image from a published
+Instagram post (an `image_urls` entry from `scripts/social-posts.mjs`), each one is set at exactly 268px wide, the same as
 weekly insights v2: `<img src="<url>" width="268" alt="..." style="display:block;width:268px;max-width:100%;height:auto;border-radius:8px;">`.
 Never full width, never `width:100%`, never another pixel value. Two cards under one heading
 sit side by side, each 268px.

@@ -33,6 +33,30 @@ node ../../scripts/sectors.mjs \
 Each pick still needs a real current reason to feature, not just an interesting history
 — recency discipline from `../sourcing.md` applies here too.
 
+### 1a. When the pattern comes from a screen, test it like a study
+
+Research method only; the issue's blocks do not change. A trio picked off a screener, a
+filings sweep or any computation over the universe is a small data study, and it carries
+the same risk of being wrong in a way nobody catches.
+
+- **Write the screen down before running it**: universe, window, every filter, and any
+  threshold. Fix the threshold before seeing results and never tune it afterwards. If the
+  screen is SQL, it goes through the `st-sectors-dbquery` approval flow like any other query.
+- **Ask whether the opposite result would also be worth an issue.** If only one answer is
+  publishable, you are hunting for a conclusion, and the pattern will not survive a reader
+  who checks.
+- **Shake it.** Move the threshold a notch each way and shift the window a week. If the
+  pattern only holds at one exact setting, it is noise, and the three names are three
+  unrelated names.
+- **Drop the biggest contributor.** If one name produces the whole pattern, that name is a
+  single-company story, not a trio.
+- **Rule out the mundane causes**: an index reconstitution, a corporate action, a currency
+  move, a reporting-calendar shift, a definitional change in the field.
+- **Count honestly.** When the issue sizes the pattern ("one of 14 names that"), give the
+  sample next to the figure, and below 20 observations give raw counts, never a percentage.
+  The screen, its exclusions and the sensitivity results stay in the scratch notes for the
+  fact check; the Appendix keeps its endpoints-and-fields-only rule.
+
 ## 2. Research the story (web, cited)
 
 For each pick, the dated sequence that explains why it is here: control changes, deals, the
@@ -51,7 +75,10 @@ node ../../scripts/sectors.mjs \
   --save-dir <scratch-dir>
 ```
 
-Repeat per ticker, or batch all three into one `--save-dir` call. `overview` feeds the three stat
+Five report sections cost 5 credits and the three calls together about 7 per ticker, which is
+over the 5-credit guard in `scripts/sectors.mjs` (it refuses until re-run with
+`SECTORS_CONFIRM=1` after the user okays the spend). Run the `company/report` call on its own
+first, then `filings/` and `daily/` as separate calls, once per ticker. `overview` feeds the three stat
 tiles (`last_close_price`, `market_cap`, and the 52-week high from `all_time_price` or the
 `daily` series, computed one way for all three picks). `daily` feeds both the latest-close
 timeline row and the rebased price chart.
@@ -99,9 +126,8 @@ Follow `../newsletter-format/skeletons/three-stock-story.md` for the block order
 
 - Charts from `../../scripts/charts.mjs`: `ownershipBars` for a control change, `rebasedLines`
   for the closing three-way price chart, plus any `barChart` (with `financial: true` for signed
-  moves) that one pick's story needs. Write each SVG next to the issue, then
-  `node ../../scripts/svg2png.mjs chart-<slug>.svg` and reference the PNG from both the HTML and
-  the Markdown. Every number on a chart must equal the number in the table and the timeline.
+  moves) that one pick's story needs. Write each SVG next to the issue and reference the SVG from both the HTML and
+  the Markdown (PNG only if the user asks for it). Every number on a chart must equal the number in the table and the timeline.
 - Write `newsletter.md` and `newsletter.html` together, never one alone.
 - Prose per block stays short. The timeline carries the dates, so the finances paragraph carries
   only the trend, one ratio, debt and attributed forward view.

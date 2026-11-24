@@ -8,19 +8,10 @@ event supplies the reason to publish now and nothing more. Read
 else: a piece that covers a whole business and ends on a valuation is the issue type most
 likely to drift into "this looks cheap, buy it" without noticing.
 
-## 0. Pick the format first
+## 0. Scope
 
-This type has two formats. Unless the ask already settles it, ask the user which one:
-
-1. **Full deep dive** (this document): whole company, moat, margin ladder, macro, long-term
-   read. Delivered as `newsletter.md` + `newsletter.html`.
-2. **Earnings review**: one quarterly print explained, with a how-it-makes-money sankey, a
-   quarter-at-a-glance list and three "what mattered" items. Delivered as `newsletter.md`
-   + `newsletter.html` + `newsletter.pdf`. Switch to
-   `single-company-earnings-review.md` and its skeleton, and ignore the rest of this file.
-
-"Earnings review", "Q2 review", "results breakdown" or a PDF request means format 2.
-"Deep dive" with no mention of results means format 1.
+The output is `newsletter.md` + `newsletter.html`: whole company, moat, margin ladder, macro,
+long-term read.
 
 **The scope test, apply it before you write a word.** Delete the recent event from your
 outline. Is there still an issue left, a business explained, a moat tested, an economics
@@ -63,6 +54,25 @@ Also confirm the company has segment data before planning the business section:
 node ../../scripts/sectors.mjs "companies/list_companies_with_segments/" --save-dir <scratch-dir>
 ```
 
+### 1a. Where the finding usually lives
+
+Research method only, the skeleton's sections stay as they are. Before drafting the thesis
+in §4, look for the one thing the earnings release alone would not tell a reader, in this
+order, and stop at the first that holds:
+
+1. **The segment breakdown.** The business the market talks about is often not the
+   business driving the result. `get-segments` across two financial years shows it.
+2. **The ownership register.** Shareholder composition, free float, and on IDX the broker
+   or foreign flow around a dated event. Who owns it and what changed is under-covered
+   because the data is rarely assembled in one place.
+3. **The gap between guidance and trend.** Management's stated direction against the
+   quarterly series, attributed on both sides, never our prediction.
+4. **The history.** How the company came to be structured this way, sourced. It is what
+   turns a number into something a reader repeats.
+
+If none of the four produces anything beyond the release, the company may not carry this
+type this week; say so before fetching the full report.
+
 ## 2. Fetch the company, all six sections plus segments and sub-sector
 
 This type needs breadth, so the usual "slice `sections=` hard" advice relaxes: the moat and
@@ -79,7 +89,10 @@ node ../../scripts/sectors.mjs \
 ```
 
 Add `ownership` and `management` only when governance or control is part of the moat
-argument. Pull the quarter directly when the entry is an earnings print:
+argument, or when §1a placed the finding in the ownership register. For a miner, also pull
+the mining family in `../sectors-api/endpoints.md` (production, reserves, licences, exports,
+contracts) and the relevant commodity price series; on a miner these usually carry the
+finding, and the margin ladder means little without the realised price beside it. Pull the quarter directly when the entry is an earnings print:
 
 ```bash
 node ../../scripts/sectors.mjs \
@@ -127,6 +140,14 @@ Fields by section of the issue:
 - Confirm the `start`/`end` echoed back match what you asked, ranges silently clamp to
   90 days.
 - `major_shareholders[].share_percentage` is a **string**, `parseFloat` before any math.
+- Payout ratios, growth forecasts and anything derived are the fields that most often come
+  back implausible on a single name. Band-check them first.
+- **Named people stay inside the record.** Founders, executives and controlling
+  shareholders are described only by what a filing, an official disclosure, a company
+  document or a dated reputable outlet states: holdings, stated plans, tenure, disclosed
+  transactions. Never motive, competence or intent, and never a characterisation assembled
+  from inference. The temptation is strongest in the history the research turns up, which
+  is also where sourcing is loosest.
 
 ## 4. Find the thesis, then write it first
 
@@ -178,9 +199,8 @@ one per paragraph.
 Charts: this type carries three or four, more than any other. The reference set is the 90-day
 price line in the company card, a `sankeySite` of the quarter's income statement in the print
 block (or of the segment decomposition in the business section), and a `barChart` of the
-quarterly margin trend in the economics section. Write each SVG into the issue folder, rasterise
-with `node ../../scripts/svg2png.mjs chart-<slug>.svg`, and reference the PNG from the HTML and
-the Markdown. Fetch the company logo for the headline from the carousel skill's
+quarterly margin trend in the economics section. Write each SVG into the issue folder and reference the SVG from the HTML and
+the Markdown (PNG only if the user asks for it). Fetch the company logo for the headline from this skill's
 `assets/logos.json` (base64 PNG keyed by ticker) and save it as `logo-<ticker>.png`; if the
 ticker has no entry, omit the logo rather than substituting one. Build every block from
 `../newsletter-format/company-issue-components.md`, and match the reference issue

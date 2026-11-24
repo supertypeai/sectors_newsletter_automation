@@ -1,7 +1,7 @@
 <!-- SYNC:LOCAL header -->
 # Sectors API v2, Endpoint Reference
 
-**Synced copy.** The source of truth is `sectors-carousel/references/sectors-api/endpoints.md`; re-sync from there rather than editing this file in place. Paths it names in passing (`references/charts/INDEX.md`, `visual-language.md`, `scripts/blocks.mjs`, `assets/logos.json`) are carousel paths and may not exist here.
+**Synced copy.** The source of truth is `st-sectors-carousel/references/sectors-api/endpoints.md`; re-sync from there rather than editing this file in place. Paths it names in passing (`references/charts/INDEX.md`, `visual-language.md`, `scripts/blocks.mjs`, `assets/logos.json`) are carousel paths and may not exist here.
 <!-- /SYNC:LOCAL -->
 
 Scope: **IDX (Indonesia Stock Exchange) primarily**, plus the SGX (Singapore) endpoints in section 4. Live-verified 2026-06-12, re-verified 2026-07-02 (20-call audit; every "verified live" note below with a July date comes from that run). This is
@@ -33,19 +33,35 @@ beat, e.g. `company/report/BBCA/?sections=overview` plus `daily/BBCA`, pass them
 with `--save-dir <dir>` instead of one `sectors.mjs` invocation per path.
 
 ### Credit costs
-The API reports each request's real cost in a **`limit-consumption` response header**
-(observed on `report`, `top-changes`, `most-traded`; absent on screener/news/filings/daily,
-which appear to be flat single-credit). When unsure what a call costs, check that header.
+Cost is NOT flat per call. Rules below are the "Costs ..." line on each endpoint page of
+docs.sectors.app (checked 2026-10-28). `sectors.mjs` prices every uncached path from these same
+rules before sending (`estimateCredits`) and refuses a run over 5 credits, or any unbounded
+shape, until re-run with `SECTORS_CONFIRM=1` after the user okays the spend. The real cost is
+also reported per request in the **`limit-consumption`** response header.
 
 | Call | Cost |
 |---|---|
-| `companies/top-changes` | **1 credit per classification × period** (e.g. gainers+losers × 4 periods = 8) |
-| `company/report/{symbol}` | `limit-consumption` read 1/4/6 for 1/4/6 requested sections (2026-07-02), i.e. cost tracks the section count; by that pattern a no-`sections` call (all 8) would cost ~8. Always slice `sections=` to what your beats need |
-| `most-traded` | observed `limit-consumption: 2` per call (a 2-day and an 11-day window both) |
+| `financials/quarterly/{symbol}` | **1 per quarter returned.** `n_quarters=8` cost 8 (verified 2026-10-28, four banks = 32). Use `report_date=YYYY-MM-DD` for one quarter (1), or the smallest `n_quarters` the beat needs; a YoY quarter pair is 2. No `n_quarters` and no `report_date` returns every quarter on file, so never send that |
+| `company/report/{symbol}` | **1 per section**, all 8 by default. Always slice `sections=` |
+| `sgx/company/report/{symbol}` | 1 per section, all 6 by default |
+| `klse/company/report/{symbol}` | 1 per section, all 4 by default |
+| `subsector/report/{sub_sector}` | 1 per section, all 6 by default |
+| `companies/top-changes` | **1 per classification x period**, default 2 x 5 = 10 |
+| `sgx/companies/top`, `klse/companies/top` | 1 per classification, default 5 |
+| `corporate-actions` (market calendar) | 1 per `type`, default all 7. Per-symbol `company/corporate-actions/{symbol}` is 1 |
+| `most-traded`, `brokers/top`, `broker-summary/{symbol}/top`, `broker-activity/{code}/top` | flat **2** |
 | `companies` screener, structured (`where`/`order_by`) | **1** |
 | `companies` screener, natural language (`q`) | **3** (run once, copy `llm_translation`, then reuse the structured form) |
-| Everything else observed | normal single-credit GET |
-| Discovery/slug endpoints | cheap; cache them, slugs change rarely |
+| `free-float` | 1 per 100 companies returned, rounded up |
+| Paginated universe feeds (`close`, `foreign-flow`, `companies/quarterly-financial-dates`, `sgx/close`, `sgx/reits`) | 1 per page of at most 30; a full IDX sweep is ~32. Filter (`since`, symbols) instead of sweeping |
+| Everything else | 1 |
+| Errors | 400, 401/403, 429, 5xx are free; a 404 (lookup ran) costs 1 |
+
+**Who has reported a quarter:** `companies/quarterly-financial-dates/?since=<quarter-end>&limit=30`
+lists every company whose latest quarter ends on or after that date (1 credit per page). `since`
+filters on quarter-END date, not on when the data arrived. For a fixed short list, one screener
+call `where=symbol in [...] and earnings_q[Q3-2026] is not null` is 1 credit total. Sectors
+ingestion lags press releases by days (BBCA's Q3 2026 was out 27 Oct and not in Sectors on 28 Oct).
 
 ---
 

@@ -1,4 +1,4 @@
-// Inline-SVG chart generators. Forked from sectors-carousel's scripts/charts.mjs (same
+// Inline-SVG chart generators. Forked from st-sectors-carousel's scripts/charts.mjs (same
 // geometry, same chart-kind grammar) for a LIGHT chart surface: the carousel original is
 // dark-card-only (comments there say so explicitly — near-white label ink, a near-black
 // donut track), which reads as low/no-contrast the moment it's dropped on the newsletter's
@@ -19,7 +19,7 @@
 // while instead of the usual green/red finance convention.
 //
 // GAIN/LOSS now use a green/red pair sourced from OUTSIDE that 22-hex list instead: the
-// light-mode `gain`/`loss` tokens already shipped in the sibling `sectors-reels`
+// light-mode `gain`/`loss` tokens already shipped in the former sibling `sectors-reels`
 // skill's own brand tokens (`src/tokens.ts`, light theme: gain #568475, loss #D53E50),
 // picked over the newsletter's own list on explicit request to match the plain finance
 // green/red convention. Checked against this file's #fcfcfb chart surface: #568475 is
@@ -63,7 +63,7 @@ const uid = (p) => `${p}${_uid++}`;
 // nothing warm in the approved list clears 3:1 on white (see header note).
 const PINK = "#C14D94";
 const GOLD = "#8B004C";
-// GAIN/LOSS: bar/flow polarity, brand green/red sourced from sectors-reels's light
+// GAIN/LOSS: bar/flow polarity, brand green/red sourced from the former sectors-reels light
 // tokens (see header note above), not the newsletter's own 22-hex categorical list.
 const GAIN = "#568475";  // repalette 2026-07-20, was #1D8A4E
 const LOSS = "#D53E50";  // repalette 2026-07-20, was #D6295A
@@ -387,6 +387,18 @@ export function moversChart(items, { w = 936, rowH = 46, labelZone = 190, pad = 
   const halfW = cx - plotL;
   const maxAbs = Math.max(1e-9, ...items.map((it) => Math.abs(it.value)));
   const fmt = (it) => (it.display != null ? it.display : `${it.value >= 0 ? "+" : ""}${trimNum(it.value)}%`);
+  // Every value label sits just past its bar's end, so a long bar plus a long label can run off
+  // the canvas (or, on the loss side, into the ticker column). Cap the longest bar so each
+  // row's label still fits inside its half: bar + 10px gap + label width + 4px margin <= halfW.
+  // Monospace glyphs are ~0.6em wide; 0.62 leaves a little slack. Charts whose labels already
+  // fit keep the original 86% scale and look unchanged.
+  const labelW = (it) => fmt(it).length * 23 * 0.62;
+  let barMax = halfW * 0.86;
+  for (const it of items) {
+    const k = Math.abs(it.value) / maxAbs;
+    if (k > 0) barMax = Math.min(barMax, (halfW - 14 - labelW(it)) / k);
+  }
+  barMax = Math.max(40, barMax);
   let out = `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
     <line x1="${cx.toFixed(1)}" y1="${pad}" x2="${cx.toFixed(1)}" y2="${(h - pad).toFixed(1)}" stroke="rgba(11,11,11,0.14)" stroke-width="2"/>`;
   items.forEach((it, i) => {
@@ -400,7 +412,7 @@ export function moversChart(items, { w = 936, rowH = 46, labelZone = 190, pad = 
     const tickerX = pad + logoSize + 10;
     out += `<text x="${tickerX}" y="${(midY + 7).toFixed(1)}" fill="${TICKER}" font-family="${MONO}" font-size="24" font-weight="800" text-anchor="start">${esc(it.symbol)}</text>`;
     const neg = it.value < 0;
-    const barLen = (Math.abs(it.value) / maxAbs) * halfW * 0.86;
+    const barLen = (Math.abs(it.value) / maxAbs) * barMax;
     const barX = neg ? cx - barLen : cx;
     const fill = neg ? LOSS : GAIN;
     out += `<rect x="${barX.toFixed(1)}" y="${(rowY + 8).toFixed(1)}" width="${Math.max(2, barLen).toFixed(1)}" height="${(rowH - 16).toFixed(1)}" rx="6" fill="${fill}"/>`;
@@ -1763,4 +1775,43 @@ export function rebasedLines(series, dates, { w = 1072, h = 440, padL = 64, padR
     out += `<circle cx="${X(n - 1)}" cy="${e.y.toFixed(1)}" r="5" fill="${e.c}"/><text x="${X(n - 1) + 14}" y="${(e.ly + 6).toFixed(1)}" font-size="20" font-weight="700" ${font}><tspan fill="${e.c}">${esc(e.s.symbol)}</tspan><tspan dx="10" fill="${pct >= 0 ? GAIN : LOSS}">${pct >= 0 ? "+" : "-"}${Math.abs(pct).toFixed(1)}%</tspan></text>`;
   });
   return out + `</svg>`;
+}
+
+// Event chart for monthly-market-pulse: daily closes rebased to the window's first close, on one
+// axis, with shaded boxes marking the trading days that matter. Each series carries a group, the
+// group sets colour and dash (two groups at most), and every line ends in a direct label.
+// series: [{ label, group: 0 | 1, closes: [..] }], dates: ['2026-09-29', ..] same length,
+// bands: [{ date, label: [line1, line2], strong }], groups: ['Big banks', 'OJK case stocks']
+export function eventLines(series, { dates, bands = [], groups = [], ticks = [], w = 936, h = 560, yMin = -60, yMax = 10 } = {}) {
+  const pad = { l: 74, r: 158, t: 112, b: 44 };
+  const colors = ["#3288BD", "#9E0142"], dash = ["", "9 6"];
+  const X = (i) => pad.l + (i * (w - pad.l - pad.r)) / (dates.length - 1);
+  const Y = (v) => pad.t + ((yMax - v) * (h - pad.t - pad.b)) / (yMax - yMin);
+  const pct = (v) => `${v > 0 ? "+" : ""}${v.toFixed(2)}%`;
+  const out = [`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" font-family="${MONO}">`, `<rect width="${w}" height="${h}" fill="#fcfcfb"/>`];
+  groups.forEach((g, i) => {
+    const x = 10 + i * 190;
+    out.push(`<line x1="${x}" x2="${x + 34}" y1="22" y2="22" stroke="${colors[i]}" stroke-width="3.5" stroke-dasharray="${dash[i]}" stroke-linecap="round"/>`, `<text x="${x + 42}" y="29" font-size="20" fill="#52514E">${g}</text>`);
+  });
+  for (const b of bands) {
+    const i = dates.indexOf(b.date), x0 = X(i - 1), x1 = X(i);
+    out.push(`<rect x="${x0}" y="${pad.t}" width="${x1 - x0}" height="${h - pad.t - pad.b}" fill="${b.strong ? "#D53E50" : "#52514E"}" fill-opacity="${b.strong ? 0.2 : 0.13}"/>`);
+    const anchor = b.strong ? "start" : "end", tx = b.strong ? x0 : x1;
+    b.label.forEach((t, n) => out.push(`<text x="${tx}" y="${pad.t - 34 + n * 23}" text-anchor="${anchor}" font-size="19" font-weight="${n ? 400 : 700}" fill="#1c1c1c">${t}</text>`));
+  }
+  for (const v of [0, -20, -40, -60]) {
+    out.push(`<line x1="${pad.l}" x2="${w - pad.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="#52514E" stroke-opacity="${v ? 0.14 : 0.45}"/>`, `<text x="${pad.l - 10}" y="${Y(v) + 6}" text-anchor="end" font-size="18" fill="#52514E">${v}%</text>`);
+  }
+  for (const t of ticks) out.push(`<text x="${X(dates.indexOf(t.date))}" y="${h - 12}" text-anchor="middle" font-size="18" fill="#52514E">${t.label}</text>`);
+  const ends = series.map((s) => ({ ...s, pts: s.closes.map((c) => (c / s.closes[0] - 1) * 100) })).sort((a, b) => a.pts.at(-1) - b.pts.at(-1)).reverse();
+  let last = -Infinity;
+  for (const s of ends) {
+    const d = s.pts.map((v, i) => `${i ? "L" : "M"}${X(i).toFixed(1)} ${Y(v).toFixed(1)}`).join("");
+    out.push(`<path d="${d}" fill="none" stroke="${colors[s.group]}" stroke-width="3" stroke-dasharray="${dash[s.group]}" stroke-linejoin="round" stroke-linecap="round"/>`);
+    const end = s.pts.at(-1), y = Math.max(Y(end) + 6, last + 24);
+    last = y;
+    out.push(`<circle cx="${X(dates.length - 1)}" cy="${Y(end)}" r="5" fill="${colors[s.group]}" stroke="#fcfcfb" stroke-width="2"/>`, `<text x="${w - pad.r + 12}" y="${y}" font-size="18" fill="#1c1c1c"><tspan font-weight="700">${s.label}</tspan> ${pct(end)}</text>`);
+  }
+  out.push("</svg>");
+  return out.join("");
 }

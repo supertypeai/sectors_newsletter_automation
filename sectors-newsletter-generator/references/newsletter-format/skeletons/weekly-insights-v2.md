@@ -5,7 +5,7 @@ One issue type's section skeleton, split out of `references/newsletter-format.md
 ### Weekly Insights v2
 
 The weekly send, and the only weekly type: v1 `weekly-wrap` was retired 2026-08-31, so a
-request for "the wrap" routes here. **Nine blocks, info-packed, no long-form reading anywhere.** Full recipe in `workflows/weekly-insights-v2.md`.
+request for "the wrap" routes here. **Nine blocks, info-packed, no long-form reading anywhere.** Full recipe in `workflows/weekly-insights-v2.md`. **HTML for blocks 4 to 8 is copied from `newsletter-format/weekly-insights-components.md`**, which also fixes the Insider Filings share format (compact signed millions or billions, `+2.23m`, `-98.12m`, `+1.47b`, never the full integer).
 
 **No claim subtitles anywhere in this type** (changed 2026-08-17). Heading, then straight
 into the data. Where a block needs an observation, it goes as one short plain line *after*
@@ -42,14 +42,14 @@ that leaves a finding empty, the finding goes too.
    **join of two sources** (movers × corporate actions, price × foreign flow, volume ×
    filings), each with a heading stating the finding, a social card image, and **three**
    short bullets, four at the outside. Never paragraphs. No restated caveats, no recaps of
-   the issue's own structure, no "taken together" closers, no production notes in captions. **The images are existing social cards from the carousel
-   pipeline's Supabase bucket, supplied by the user, never charts this skill renders**; ask
-   for the week's URLs before drafting the block. **There is no chart fallback**: a finding
+   the issue's own structure, no "taken together" closers, no production notes in captions. **The images come from posts already published on the
+   Sectors Instagram feed, listed by `scripts/social-posts.mjs` (Mailroom API), never charts
+   this skill renders**; run it for the window before drafting the block. **There is no chart fallback**: a finding
    with no eligible card is cut, and this type ships no `chart-<slug>.svg` at all. Two images under one heading go side by side; every
-   bucket image is exactly 268px wide (`width="268"`, `width:268px;max-width:100%`), never full width. Closes with a follow-us line (Instagram, Threads).
-5. **Insider Filings** — the 5 most recent disclosures as one table: date, holder, ticker,
+   social image is exactly 268px wide (`width="268"`, `width:268px;max-width:100%`), never full width. Closes with a follow-us line (Instagram, Threads).
+5. **Insider Filings** — the five most recent disclosures (by `timestamp`, never the week's five largest) as one table: date, holder, ticker,
    buy/sell, shares, stake before → after. Structured fields only, filtered by `timestamp`
-   to on-or-before the window's Friday. Ranked by transaction value. No note under the table.
+   to on-or-before the window's Friday. Those five are shown ranked by transaction value. No note under the table, and no line under the heading describing the selection.
 6. **Other Major Headlines** — 5 IDX-relevant `news` items, **from news sources**, each with
    no inline attribution (the source appears only in the Sources list). Tickers only, no company names. **No category prefix** on the bullets. Strictly **new factual
    events** that happened inside the window (bank earnings released, a merger rumor, a
@@ -57,14 +57,14 @@ that leaves a finding empty, the finding goes too.
    Bites line. Closes with a read-more link to `sectors.app/indonesia/news`.
 7. **What's Ahead** — a **Mon-Fri week-grid calendar** of corporate actions (stock splits,
    dividend ex-dates, AGMs, rights issues), a "beyond the week" table for anything further
-   out, and a third compact **scheduled macro** table (Date, Event, Why it matters) of two
+   out, and a third compact **scheduled macro** table (Date, Event, Market impact) of two
    to four dated prints and policy events: BI RDG, BPS CPI or trade balance, an FOMC
    decision, an index rebalance effective date. Corporate actions are polled from
    `company/corporate-actions/{symbol}/`; the macro rows are sourced and cited, not an API
    pull. Every macro row's "why" names a ticker or sector that already appears in this
    issue; an unmapped row is a wire feed line, cut it. **Strictly forward-looking**: every
    row is a catalyst with a future date (BI Rate decision, MSCI rebalance effective date, an
-   ex-date, a scheduled result). No recap of what already happened, and the "Why it matters"
+   ex-date, a scheduled result). No recap of what already happened, and the "Market impact"
    cell explains the pending decision, not the past print. Closes with the dividend-calendar
    link.
 8. **Summary** — macro and structural analysis of what the issue already reported, no new

@@ -5,10 +5,9 @@
 It states the universal checks. A skill may add checks in its own references, layering further structural and compliance checks on top of these. No skill may drop a check stated here.
 
 <!-- GENERATED FILE. Do not edit. -->
-> **Generated copy.** The source of truth for this file lives in the Sectors skills
-> repo at `_shared/writing/audit.md`, alongside the other content skills. This copy exists
-> because `sectors-newsletter` is shared with the company and run on machines that do not have this repo. Edit the canonical file and re-run
-> `node _shared/writing/sync.mjs`; an edit made here is overwritten on the next sync.
+> **Generated copy.** The source of truth for this file is `sources/sectors/writing/audit.md` in the
+> supertypeai/skills repo. This copy exists because `st-sectors-newsletter` installs on its own and runs on machines that do not have this repo.
+> Edit the canonical file and run `npm run sync` in that repo; an edit made here is overwritten on the next sync.
 
 ## How to report
 

@@ -13,7 +13,7 @@
 // final hosted URL and a reviewer sees precisely the image subscribers will get.
 //
 // Steps, per chart-*.svg in the folder:
-//   1. rasterize to PNG via the skill's scripts/svg2png.mjs (Puppeteer, real fonts)
+//   1. rasterize to PNG via the skill's scripts/svg2png.mjs (Puppeteer, one chart per call)
 //   2. POST it to mailroom POST /v1/uploads, which returns a permanent public URL
 //   3. rewrite newsletter.html so any reference to that chart points at the URL
 //
@@ -32,10 +32,6 @@ const {
   MAILROOM_API_KEY,
   MAILROOM_UPLOAD_URL = "https://mailroom.supertype.ai/api/v1/uploads",
   SKILL_DIR = "sectors-newsletter-generator",
-  // Env-facing name for svg2png.mjs's --scale, since a workflow step configures
-  // through the environment rather than argv. Deliberately has no default here:
-  // svg2png.mjs owns that value, and repeating it would let the two drift.
-  CHART_SCALE,
   // Optional: compress each PNG through Storing before upload. Unset = skip.
   STORING_API_KEY,
   STORING_PROFILE = "balanced",
@@ -61,17 +57,17 @@ if (!svgs.length) {
 
 console.log(`Found ${svgs.length} chart(s): ${svgs.join(", ")}`);
 
-// 1. Rasterize them all in one Puppeteer launch.
+// 1. Rasterize each chart. svg2png.mjs takes one SVG per call (`<in.svg> [out.png]`, fixed 2x),
+// so this loops; the skill's own `npm install` supplies Puppeteer on the runner.
 const rasterize = join(SKILL_DIR, "scripts", "svg2png.mjs");
 if (!existsSync(rasterize)) die(`missing ${rasterize}. Is SKILL_DIR correct?`);
-try {
-  execFileSync(
-    "node",
-    [rasterize, ...svgs.map((f) => join(dir, f)), ...(CHART_SCALE ? ["--scale", CHART_SCALE] : [])],
-    { stdio: "inherit" }
-  );
-} catch {
-  die("svg2png.mjs failed, see output above");
+for (const f of svgs) {
+  const svgPath = join(dir, f);
+  try {
+    execFileSync("node", [rasterize, svgPath, svgPath.replace(/\.svg$/i, ".png")], { stdio: "inherit" });
+  } catch {
+    die(`svg2png.mjs failed on ${f}, see output above`);
+  }
 }
 
 /** Per-chart ceiling on the Storing round-trip. See the call site for why. */

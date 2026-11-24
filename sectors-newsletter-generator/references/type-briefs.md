@@ -11,11 +11,11 @@ order, and `newsletter/samples/weekly-insights-v2/` for the worked reference. In
 settle the Mon-Fri window, then build nine blocks. Key Data Bites
 carries every computed market-level fact; Other Major Headlines carries every news-sourced
 one; the two must never repeat a fact. The single analysis block joins two sources to find
-something the tables don't already say, illustrated with the carousel's social cards from the
-Supabase bucket. Those cards are **never** charts this skill renders: the bucket can't be
-listed without a credential, so pause and ask the user for the week's URLs before drafting
-the findings block, and render a chart only if the user confirms nothing eligible exists.
-Every bucket card is set at exactly 268px wide (see the workflow's Visuals section).
+something the tables don't already say, illustrated with images from posts already
+published on the Sectors Instagram feed. Those images are **never** charts this skill renders:
+run `scripts/social-posts.mjs` for the window (Mailroom API) before drafting the findings
+block and pick from its `image_urls`; a finding with no eligible post is cut, never charted.
+Every social image is set at exactly 268px wide (see the workflow's Visuals section).
 What's Ahead closes with two to four dated, cited, mapped macro rows alongside the corporate
 actions, and **Summary** (bull read, bear read, what to watch next) sits between it and the
 CTA. Four blocks, four strictly separate jobs, and this is the type's main failure mode:
@@ -32,15 +32,6 @@ its status, never predict a price on our own authority.
 drafting any flow figure** (the cards and `foreign-flow/{symbol}` use different methods that
 disagree on direction, see the workflow doc §3), then apply that one definition throughout.
 
-### Macro-reaction piece
-Open `references/workflows/macro-reaction.md`, and open `references/compliance.md`
-before writing the per-ticker valuation section — this is the issue type where the
-no-advice line matters most. In brief: web-source the last ~2 days of macro news
-(`references/sourcing.md`), state which sectors/tickers it plausibly touches and the
-mechanism, fetch those names' fundamentals and valuation context, and frame the "is this
-a good time to buy" question as objective valuation-context reporting, never a buy/sell
-directive.
-
 ### Three-stock storytelling piece
 Open `references/workflows/three-stock-story.md`. In brief: pick three stocks that share
 one pattern this week (same-direction insider filings, a control change, a group), web-source
@@ -54,8 +45,7 @@ reference issue in `samples/three-stock-story/`. Cut hard, the research pass gat
 than the draft should carry.
 
 ### Single company deep dive
-Two formats, ask which: full deep dive (below) or earnings review, one quarter's print
-explained and delivered as PDF, workflow `references/workflows/single-company-earnings-review.md`.
+Two formats: the full deep dive (the default, and the only one in an unattended run) or the earnings review, one quarter's print explained and delivered as a PDF (`references/workflows/single-company-earnings-review.md`, ask which when a person is present).
 Open `references/workflows/single-company-deep-dive.md`, and open `references/compliance.md`
 before the valuation section (this is the type most likely to drift into "looks cheap,
 buy it"). In brief: the whole company, not one week's news. A recent event (earnings,
@@ -65,7 +55,7 @@ mix, the moat tested against named peers with a position figure, the unit-econom
 ladder plus ROE/ROA and leverage trends, two or three dated macro forces each landing on a
 named line item, and a long-term read carrying the valuation and a researched
 counterargument, closing on the unresolved question; finish with three or four
-forward-looking bullets, one structural. Five body sections in Title Case, 900-1,200
+forward-looking bullets, one structural. Five body sections in Title Case, 1,300-1,900
 words, two or three charts, sparse inline citation, valuation as context, never a call.
 Density rules decide whether it reads: at most three figures a paragraph, every section
 opening on a claim with no figure in it, every year-by-year series in a table or chart
@@ -86,7 +76,7 @@ with a one-angle, three-column peer table. HTML blocks in
 multiples", never "cheap" or "expensive". Valuation context only, never "the one to buy."
 
 ### Monthly market pulse
-Open `references/workflows/monthly-market-pulse.md`. In brief: `top-changes`
+Open `references/workflows/monthly-market-pulse.md`. The issue explains the month: major events with their measured impact by phase (approved flow queries, regulator and exchange actions first), then movers and broker flow side by side with reasons, then three or four names worth a closer look. Data in brief: `top-changes`
 (`periods=30d`) for the month's gainers/losers, `most-traded` over the 30-day window
 aggregated client-side into one ranking (the endpoint itself only returns per-date
 top-N), Broker Flow pulled via the dbquery skill's approved
@@ -94,6 +84,15 @@ top-N), Broker Flow pulled via the dbquery skill's approved
 replaces looping the API day by day), and `idx-total` start/end for the month's index
 read; write the headline off that month's own idx-total trend, a combined Top Movers
 table+chart, Most traded, and Broker Flow, table-first throughout.
+
+### Macro-reaction piece
+Open `references/workflows/macro-reaction.md`, and open `references/compliance.md`
+before writing the per-ticker valuation section — this is the issue type where the
+no-advice line matters most. In brief: web-source the last ~2 days of macro news
+(`references/sourcing.md`), state which sectors/tickers it plausibly touches and the
+mechanism, fetch those names' fundamentals and valuation context, and frame the "is this
+a good time to buy" question as objective valuation-context reporting, never a buy/sell
+directive.
 
 ### Did you catch it
 Open `references/workflows/did-you-catch-it.md`, and open `references/compliance.md`
@@ -133,7 +132,7 @@ questions, and the only data fetch is the optional teaser.
 ### Watchlist/sector performance digest
 Open `references/workflows/watchlist-performance-digest.md`. This is the pipeline's
 other divergent type, personalized rather than broadcast. In brief: invoke the
-`sectors-dbquery` skill to run its approved `watchlist-tracked-interest`
+`st-sectors-dbquery` skill to run its approved `watchlist-tracked-interest`
 query and get each eligible user's tracked tickers/sectors; for a sample user, fetch
 7-day performance for every tracked item (IDX tickers via `company/report?sections=overview,peers`
 for performance + ready-made peer comparison, SGX tickers via `sgx/company/report`
